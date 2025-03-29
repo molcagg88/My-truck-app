@@ -9,27 +9,23 @@ import {
 import { ChevronDown, Phone, ArrowRight } from "lucide-react-native";
 
 interface PhoneInputProps {
-  onSubmit?: (phoneNumber: string) => void;
-  initialCountryCode?: string;
-  initialPhoneNumber?: string;
+  value: string;
+  onChangeText: (text: string) => void;
+  placeholder?: string;
+  countryCode?: string;
+  onCountryCodeChange?: (code: string) => void;
   isLoading?: boolean;
 }
 
 const PhoneInput = ({
-  onSubmit = () => {},
-  initialCountryCode = "+251", // Ethiopia country code
-  initialPhoneNumber = "",
+  value,
+  onChangeText,
+  placeholder = "9XX XXX XXXX",
+  countryCode = "+251", // Ethiopia country code
+  onCountryCodeChange,
   isLoading = false,
 }: PhoneInputProps) => {
-  const [countryCode, setCountryCode] = useState(initialCountryCode);
-  const [phoneNumber, setPhoneNumber] = useState(initialPhoneNumber);
   const [isCountryCodeOpen, setIsCountryCodeOpen] = useState(false);
-
-  const handleSubmit = () => {
-    if (phoneNumber.length >= 9) {
-      onSubmit(`${countryCode}${phoneNumber}`);
-    }
-  };
 
   // Country codes for the dropdown (simplified for demo)
   const countryCodes = [
@@ -59,10 +55,11 @@ const PhoneInput = ({
           <Phone size={18} color="#374151" className="mr-2" />
           <TextInput
             className="flex-1 text-base text-black h-10"
-            placeholder="9XX XXX XXXX"
+            placeholder={placeholder}
+            placeholderTextColor="#6B7280"
             keyboardType="phone-pad"
-            value={phoneNumber}
-            onChangeText={setPhoneNumber}
+            value={value}
+            onChangeText={onChangeText}
             maxLength={10}
           />
         </View>
@@ -76,7 +73,7 @@ const PhoneInput = ({
               key={item.code}
               className="px-4 py-3 border-b border-gray-100"
               onPress={() => {
-                setCountryCode(item.code);
+                onCountryCodeChange?.(item.code);
                 setIsCountryCodeOpen(false);
               }}
             >
@@ -87,18 +84,6 @@ const PhoneInput = ({
           ))}
         </View>
       )}
-
-      {/* Submit button */}
-      <TouchableOpacity
-        className={`flex-row items-center justify-center rounded-lg py-3 px-4 ${phoneNumber.length >= 9 ? "bg-red-600" : "bg-gray-400"}`}
-        onPress={handleSubmit}
-        disabled={phoneNumber.length < 9 || isLoading}
-      >
-        <Text className="text-white font-medium mr-2">
-          {isLoading ? "Sending code..." : "Send verification code"}
-        </Text>
-        {!isLoading && <ArrowRight size={18} color="white" />}
-      </TouchableOpacity>
 
       <Text className="text-gray-500 text-xs mt-3 text-center">
         We'll send a verification code to this number via GeezSMS

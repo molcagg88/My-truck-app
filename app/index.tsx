@@ -17,12 +17,12 @@ export default function HomeScreen() {
       {/* Logo and Header */}
       <View className="items-center mb-10">
         <Image
-          source={require("../assets/images/splash-icon.png")}
-          className="w-24 h-24 mb-4"
+          source={require("../assets/images/logo.jpg")}
+          className="w-48 h-48 mb-4"
           resizeMode="contain"
         />
         <Text className="text-3xl font-bold text-neutral-800 dark:text-white mb-2">
-          My Truck App
+          My Truck
         </Text>
         <Text className="text-center text-neutral-600 dark:text-neutral-400">
           Connect with reliable truck services for all your delivery needs
