@@ -1,251 +1,396 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
   ScrollView,
+  Modal,
   RefreshControl,
 } from "react-native";
-import { useRouter } from "expo-router";
-import { Bell, Settings, MapPin, Clock, Truck } from "lucide-react-native";
 import { useTheme } from "../_layout";
+import { useRouter } from "expo-router";
 import RequestsList from "../components/RequestsList";
-import EarningsSummary from "../components/EarningsSummary";
+import { Bell, Settings, MapPin, Clock, Truck, Package, Gavel, Check, X } from "lucide-react-native";
+import PaymentModal from "../components/PaymentModal";
 
-const DriverDashboard = () => {
-  const router = useRouter();
+const COMMITMENT_FEE = 400;
+
+type JobStatus = "pending" | "bidding" | "accepted" | "delivered" | "cancelled" | "declined";
+
+interface JobRequest {
+  id: string;
+  pickup: string;
+  destination: string;
+  estimatedTime: string;
+  price: number;
+  status: JobStatus;
+  customerId: string;
+  currentBid?: number;
+  driverId?: string;
+  distance?: string;
+}
+
+// Sample job requests for testing
+const sampleRequests: JobRequest[] = [
+  {
+    id: "1",
+    pickup: "Bole, Addis Ababa",
+    destination: "Bishoftu, Oromia",
+    estimatedTime: "2 hours",
+    price: 2500,
+    status: "pending",
+    customerId: "customer1",
+    distance: "45 km",
+  },
+  {
+    id: "2",
+    pickup: "Megenagna, Addis Ababa",
+    destination: "Adama, Oromia",
+    estimatedTime: "3 hours",
+    price: 3500,
+    status: "bidding",
+    currentBid: 3200,
+    customerId: "customer2",
+    distance: "95 km",
+  },
+  {
+    id: "3",
+    pickup: "Piassa, Addis Ababa",
+    destination: "Debre Birhan, Amhara",
+    estimatedTime: "4 hours",
+    price: 4500,
+    status: "pending",
+    customerId: "customer3",
+    distance: "130 km",
+  },
+  {
+    id: "4",
+    pickup: "Merkato, Addis Ababa",
+    destination: "Hawassa, SNNPR",
+    estimatedTime: "5 hours",
+    price: 5500,
+    status: "accepted",
+    customerId: "customer4",
+    driverId: "driver1",
+    distance: "275 km",
+  },
+  {
+    id: "5",
+    pickup: "Bole, Addis Ababa",
+    destination: "Dire Dawa, Dire Dawa",
+    estimatedTime: "6 hours",
+    price: 6500,
+    status: "delivered",
+    customerId: "customer5",
+    driverId: "driver1",
+    distance: "515 km",
+  },
+];
+
+export default function DriverDashboard() {
   const { isDarkMode } = useTheme();
+  const router = useRouter();
   const [isOnline, setIsOnline] = useState(true);
+  const [activeJobs, setActiveJobs] = useState<JobRequest[]>([]);
+  const [jobRequests, setJobRequests] = useState<JobRequest[]>(
+    sampleRequests.filter(job => job.status === "pending" || job.status === "bidding")
+  );
+  const [showWarning, setShowWarning] = useState(false);
+  const [warningMessage, setWarningMessage] = useState("");
   const [refreshing, setRefreshing] = useState(false);
-  const [activeTab, setActiveTab] = useState<
-    "requests" | "active" | "completed"
-  >("requests");
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [selectedJob, setSelectedJob] = useState<JobRequest | null>(null);
 
-  // Mock active job
-  const activeJob = {
-    id: "job123",
-    customerName: "Tigist Haile",
-    pickupLocation: "Piassa, Addis Ababa",
-    destinationLocation: "CMC, Addis Ababa",
-    distance: "12.3 km",
-    estimatedTime: "40 mins",
-    price: 520,
-    status: "in_transit",
+  const hasActiveJob = activeJobs.length > 0;
+
+  const handleAccept = async (jobId: string) => {
+    if (hasActiveJob) {
+      setWarningMessage("Please complete your current job before accepting a new one.");
+      setShowWarning(true);
+      return;
+    }
+
+    setSelectedJob(jobRequests.find(job => job.id === jobId) || null);
+    setShowPaymentModal(true);
   };
 
-  const onRefresh = () => {
-    setRefreshing(true);
-    // Simulate a refresh
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 1000);
+  const handleDecline = (jobId: string) => {
+    setJobRequests(jobRequests.filter(job => job.id !== jobId));
+  };
+
+  const handleBid = (jobId: string, amount: number) => {
+    setJobRequests(
+      jobRequests.map(job =>
+        job.id === jobId
+          ? { ...job, currentBid: amount, bidderId: "driver123" }
+          : job
+      )
+    );
+  };
+
+  const handleAcceptBid = (jobId: string) => {
+    if (hasActiveJob) {
+      setWarningMessage("Please complete your current job before accepting a new one.");
+      setShowWarning(true);
+      return;
+    }
+
+    setSelectedJob(jobRequests.find(job => job.id === jobId) || null);
+    setShowPaymentModal(true);
+  };
+
+  const handleDeclineBid = (jobId: string) => {
+    setJobRequests(
+      jobRequests.map(job =>
+        job.id === jobId ? { ...job, currentBid: undefined, bidderId: undefined } : job
+      )
+    );
+  };
+
+  const handleCounterBid = (jobId: string, amount: number) => {
+    setJobRequests(
+      jobRequests.map(job =>
+        job.id === jobId ? { ...job, currentBid: amount } : job
+      )
+    );
+  };
+
+  const handlePaymentSuccess = async () => {
+    if (selectedJob) {
+      const updatedJob = { ...selectedJob, status: "accepted" as const, driverId: "driver123" };
+      setActiveJobs([...activeJobs, updatedJob]);
+      setJobRequests(jobRequests.filter(job => job.id !== selectedJob.id));
+      setShowPaymentModal(false);
+      setSelectedJob(null);
+      setShowWarning(true);
+      setWarningMessage("Job accepted! Please keep your location on and confirm checkpoints every 2 hours.");
+    }
+  };
+
+  const handlePaymentFailure = () => {
+    setShowPaymentModal(false);
+    setSelectedJob(null);
   };
 
   const handleToggleOnline = () => {
+    if (hasActiveJob) {
+      setWarningMessage("Cannot go offline while you have an active job. Please complete your current job first.");
+      setShowWarning(true);
+      return;
+    }
     setIsOnline(!isOnline);
   };
 
-  const handleViewJobDetails = (jobId: string) => {
-    router.push({
-      pathname: "/driver/job-details",
-      params: { jobId },
-    });
-  };
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    // Simulate fetching new data
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1000);
+  }, []);
 
   return (
-    <ScrollView
-      className="flex-1 bg-gray-50 dark:bg-neutral-900"
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }
-    >
-      {/* Header */}
-      <View className="p-4 flex-row justify-between items-center">
-        <View>
-          <Text className="text-2xl font-bold text-neutral-800 dark:text-white">
-            Driver Dashboard
-          </Text>
-          <View className="flex-row items-center">
+    <View className={`flex-1 ${isDarkMode ? "bg-neutral-900" : "bg-neutral-50"}`}>
+      <ScrollView 
+        className="flex-1"
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+        <View className="p-4">
+          {/* Header */}
+          <View className="flex-row justify-between items-center mb-4">
+            <Text
+              className={`text-2xl font-bold ${
+                isDarkMode ? "text-white" : "text-neutral-900"
+              }`}
+            >
+              Driver Dashboard
+            </Text>
+            <TouchableOpacity
+              onPress={handleToggleOnline}
+              disabled={hasActiveJob}
+              className={`px-4 py-2 rounded-lg ${
+                isOnline
+                  ? hasActiveJob 
+                    ? "bg-neutral-400"
+                    : "bg-green-500"
+                  : "bg-red-500"
+              }`}
+            >
+              <Text className="text-white font-medium">
+                {isOnline ? "Go Offline" : "Go Online"}
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Stats Cards */}
+          <View className="flex-row space-x-4 mb-4">
             <View
-              className={`w-3 h-3 rounded-full ${isOnline ? "bg-green-500" : "bg-neutral-400"} mr-2`}
-            />
-            <Text className="text-neutral-600 dark:text-neutral-400">
-              {isOnline ? "Online" : "Offline"}
-            </Text>
-          </View>
-        </View>
-        <View className="flex-row">
-          <TouchableOpacity
-            className="mr-4"
-            onPress={() => router.push("/notifications")}
-          >
-            <Bell size={24} color={isDarkMode ? "#ffffff" : "#374151"} />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => router.push("/settings")}>
-            <Settings size={24} color={isDarkMode ? "#ffffff" : "#374151"} />
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      {/* Online/Offline Toggle */}
-      <View className="px-4 mb-4">
-        <TouchableOpacity
-          className={`py-3 rounded-lg flex-row items-center justify-center ${isOnline ? "bg-primary-500" : "bg-neutral-300 dark:bg-neutral-700"}`}
-          onPress={handleToggleOnline}
-        >
-          <Text className="font-semibold text-white">
-            {isOnline ? "Go Offline" : "Go Online"}
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Earnings Summary */}
-      <View className="px-4 mb-4">
-        <EarningsSummary
-          todayEarnings={250}
-          weeklyEarnings={1850}
-          totalEarnings={12500}
-          currency="ETB"
-          onViewDetails={() => router.push("/driver/earnings")}
-        />
-      </View>
-
-      {/* Tabs */}
-      <View className="flex-row border-b border-gray-200 dark:border-neutral-800 mb-4">
-        <TouchableOpacity
-          className={`flex-1 py-3 ${activeTab === "requests" ? "border-b-2 border-primary-500" : ""}`}
-          onPress={() => setActiveTab("requests")}
-        >
-          <Text
-            className={`text-center font-medium ${activeTab === "requests" ? "text-primary-500" : "text-neutral-600 dark:text-neutral-400"}`}
-          >
-            Requests
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          className={`flex-1 py-3 ${activeTab === "active" ? "border-b-2 border-primary-500" : ""}`}
-          onPress={() => setActiveTab("active")}
-        >
-          <Text
-            className={`text-center font-medium ${activeTab === "active" ? "text-primary-500" : "text-neutral-600 dark:text-neutral-400"}`}
-          >
-            Active
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          className={`flex-1 py-3 ${activeTab === "completed" ? "border-b-2 border-primary-500" : ""}`}
-          onPress={() => setActiveTab("completed")}
-        >
-          <Text
-            className={`text-center font-medium ${activeTab === "completed" ? "text-primary-500" : "text-neutral-600 dark:text-neutral-400"}`}
-          >
-            Completed
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Tab Content */}
-      <View className="px-4 mb-8">
-        {activeTab === "requests" && (
-          <RequestsList
-            onAccept={(id) => handleViewJobDetails(id)}
-            onDecline={(id) => console.log(`Declined job ${id}`)}
-            onCallCustomer={(id) =>
-              console.log(`Calling customer for job ${id}`)
-            }
-          />
-        )}
-
-        {activeTab === "active" && (
-          <View>
-            {activeJob ? (
-              <TouchableOpacity
-                className="bg-white dark:bg-neutral-800 rounded-lg p-4 shadow-sm border border-gray-100 dark:border-neutral-700"
-                onPress={() => handleViewJobDetails(activeJob.id)}
+              className={`flex-1 p-4 rounded-lg ${
+                isDarkMode ? "bg-neutral-800" : "bg-white"
+              }`}
+            >
+              <Text
+                className={`text-lg font-semibold mb-2 ${
+                  isDarkMode ? "text-white" : "text-neutral-900"
+                }`}
               >
-                <View className="flex-row justify-between items-center mb-3">
-                  <Text className="font-semibold text-lg text-neutral-800 dark:text-white">
-                    {activeJob.customerName}
-                  </Text>
-                  <View className="bg-primary-100 dark:bg-primary-900/30 px-2 py-1 rounded-full">
-                    <Text className="text-primary-600 dark:text-primary-400 text-xs font-medium">
-                      In Progress
-                    </Text>
-                  </View>
-                </View>
-
-                <View className="mb-3">
-                  <View className="flex-row items-center mb-2">
-                    <MapPin size={16} color="#ef4444" />
-                    <Text className="ml-2 text-neutral-700 dark:text-neutral-300">
-                      {activeJob.pickupLocation}
-                    </Text>
-                  </View>
-                  <View className="flex-row items-center">
-                    <MapPin size={16} color="#3b82f6" />
-                    <Text className="ml-2 text-neutral-700 dark:text-neutral-300">
-                      {activeJob.destinationLocation}
-                    </Text>
-                  </View>
-                </View>
-
-                <View className="flex-row justify-between">
-                  <View className="flex-row items-center">
-                    <Clock
-                      size={16}
-                      color={isDarkMode ? "#9ca3af" : "#6b7280"}
-                    />
-                    <Text className="ml-1 text-neutral-600 dark:text-neutral-400">
-                      {activeJob.estimatedTime}
-                    </Text>
-                  </View>
-                  <View className="flex-row items-center">
-                    <Truck
-                      size={16}
-                      color={isDarkMode ? "#9ca3af" : "#6b7280"}
-                    />
-                    <Text className="ml-1 text-neutral-600 dark:text-neutral-400">
-                      {activeJob.distance}
-                    </Text>
-                  </View>
-                  <Text className="font-bold text-neutral-800 dark:text-white">
-                    ETB {activeJob.price}
-                  </Text>
-                </View>
-
-                <TouchableOpacity
-                  className="mt-3 py-2 bg-primary-500 rounded-lg items-center"
-                  onPress={() => handleViewJobDetails(activeJob.id)}
-                >
-                  <Text className="text-white font-medium">View Details</Text>
-                </TouchableOpacity>
-              </TouchableOpacity>
-            ) : (
-              <View className="bg-white dark:bg-neutral-800 rounded-lg p-8 items-center justify-center shadow-sm">
-                <Text className="text-neutral-600 dark:text-neutral-400 text-center mb-2">
-                  No active jobs
-                </Text>
-                <Text className="text-neutral-500 dark:text-neutral-500 text-center text-sm">
-                  Accept a new request to start earning
-                </Text>
-              </View>
-            )}
+                Active Jobs
+              </Text>
+              <Text
+                className={`text-3xl font-bold ${
+                  isDarkMode ? "text-white" : "text-neutral-900"
+                }`}
+              >
+                {activeJobs.length}
+              </Text>
+            </View>
+            <View
+              className={`flex-1 p-4 rounded-lg ${
+                isDarkMode ? "bg-neutral-800" : "bg-white"
+              }`}
+            >
+              <Text
+                className={`text-lg font-semibold mb-2 ${
+                  isDarkMode ? "text-white" : "text-neutral-900"
+                }`}
+              >
+                Available Jobs
+              </Text>
+              <Text
+                className={`text-3xl font-bold ${
+                  isDarkMode ? "text-white" : "text-neutral-900"
+                }`}
+              >
+                {jobRequests.length}
+              </Text>
+            </View>
           </View>
-        )}
 
-        {activeTab === "completed" && (
-          <View className="bg-white dark:bg-neutral-800 rounded-lg p-8 items-center justify-center shadow-sm">
-            <Text className="text-neutral-600 dark:text-neutral-400 text-center mb-2">
-              No completed jobs today
+          {/* Job Requests Section */}
+          {isOnline && jobRequests.length > 0 && (
+            <View className="mb-4">
+              <Text
+                className={`text-lg font-semibold mb-2 ${
+                  isDarkMode ? "text-white" : "text-neutral-900"
+                }`}
+              >
+                Job Requests
+              </Text>
+              <RequestsList
+                requests={jobRequests}
+                onAccept={handleAccept}
+                onDecline={handleDecline}
+                onBid={handleBid}
+                onAcceptBid={handleAcceptBid}
+                onDeclineBid={handleDeclineBid}
+                onCounterBid={handleCounterBid}
+                driverId="driver123"
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+              />
+            </View>
+          )}
+
+          {/* Active Jobs Section */}
+          {activeJobs.length > 0 && (
+            <View className="mb-4">
+              <Text
+                className={`text-lg font-semibold mb-2 ${
+                  isDarkMode ? "text-white" : "text-neutral-900"
+                }`}
+              >
+                Active Jobs
+              </Text>
+              <RequestsList
+                requests={activeJobs}
+                onAccept={() => {}}
+                onDecline={() => {}}
+                onBid={() => {}}
+                onAcceptBid={() => {}}
+                onDeclineBid={() => {}}
+                onCounterBid={() => {}}
+                driverId="driver123"
+              />
+            </View>
+          )}
+
+          {/* Empty States */}
+          {!isOnline && (
+            <View className="items-center justify-center py-8">
+              <Text
+                className={`text-lg ${
+                  isDarkMode ? "text-neutral-400" : "text-neutral-600"
+                }`}
+              >
+                You are currently offline. Go online to see job requests.
+              </Text>
+            </View>
+          )}
+
+          {isOnline && jobRequests.length === 0 && !hasActiveJob && (
+            <View className="items-center justify-center py-8">
+              <Text
+                className={`text-lg ${
+                  isDarkMode ? "text-neutral-400" : "text-neutral-600"
+                }`}
+              >
+                No job requests available at the moment.
+              </Text>
+            </View>
+          )}
+        </View>
+      </ScrollView>
+
+      {/* Modals */}
+      <PaymentModal
+        visible={showPaymentModal}
+        onClose={handlePaymentFailure}
+        onSuccess={handlePaymentSuccess}
+        amount={COMMITMENT_FEE}
+        jobId={selectedJob?.id || ""}
+      />
+
+      <Modal
+        visible={showWarning}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowWarning(false)}
+      >
+        <View className="flex-1 justify-center items-center bg-black/50">
+          <View
+            className={`p-6 rounded-lg mx-4 ${
+              isDarkMode ? "bg-neutral-800" : "bg-white"
+            }`}
+          >
+            <Text
+              className={`text-lg font-semibold mb-4 ${
+                isDarkMode ? "text-white" : "text-neutral-900"
+              }`}
+            >
+              {warningMessage}
             </Text>
-            <Text className="text-neutral-500 dark:text-neutral-500 text-center text-sm">
-              Completed jobs will appear here
-            </Text>
+            <TouchableOpacity
+              onPress={() => setShowWarning(false)}
+              className={`p-3 rounded-lg ${
+                isDarkMode ? "bg-neutral-700" : "bg-neutral-100"
+              }`}
+            >
+              <Text
+                className={`text-center ${
+                  isDarkMode ? "text-white" : "text-neutral-900"
+                }`}
+              >
+                OK
+              </Text>
+            </TouchableOpacity>
           </View>
-        )}
-      </View>
-    </ScrollView>
+        </View>
+      </Modal>
+    </View>
   );
-};
+}
 
-export default DriverDashboard;
+
+

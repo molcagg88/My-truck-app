@@ -29,20 +29,18 @@ const PhoneInput = ({
 
   // Country codes for the dropdown (simplified for demo)
   const countryCodes = [
-    { code: "+251", country: "Ethiopia" },
-    { code: "+254", country: "Kenya" },
-    { code: "+256", country: "Uganda" },
-    { code: "+255", country: "Tanzania" },
+    { code: "+251", country: "Ethiopia" }
   ];
 
   return (
-    <View className="w-full bg-white p-4 rounded-lg shadow-sm">
+    <View style={styles.container} className="w-full bg-white p-4 rounded-lg shadow-sm">
       <Text className="text-gray-700 font-medium mb-2">
         Enter your phone number
       </Text>
-      <View className="flex-row items-center mb-4">
+      <View style={styles.container} className="flex-row items-center mb-4">
         {/* Country code selector */}
         <TouchableOpacity
+          style={styles.touchable}
           className="flex-row items-center bg-gray-100 rounded-l-lg px-2 py-3 border-r border-gray-300"
           onPress={() => setIsCountryCodeOpen(!isCountryCodeOpen)}
         >
@@ -51,7 +49,7 @@ const PhoneInput = ({
         </TouchableOpacity>
 
         {/* Phone number input */}
-        <View className="flex-row flex-1 items-center bg-gray-100 rounded-r-lg px-3 py-2">
+        <View style={styles.container} className="flex-row flex-1 items-center bg-gray-100 rounded-r-lg px-3 py-2">
           <Phone size={18} color="#374151" className="mr-2" />
           <TextInput
             className="flex-1 text-base text-black h-10"
@@ -67,10 +65,11 @@ const PhoneInput = ({
 
       {/* Country code dropdown (simplified) */}
       {isCountryCodeOpen && (
-        <View className="bg-white rounded-lg shadow-md mb-4 absolute top-20 left-4 z-10 w-48">
+        <View style={styles.container} className="bg-white rounded-lg shadow-md mb-4 absolute top-20 left-4 z-10 w-48">
           {countryCodes.map((item) => (
             <TouchableOpacity
               key={item.code}
+              style={styles.touchable}
               className="px-4 py-3 border-b border-gray-100"
               onPress={() => {
                 onCountryCodeChange?.(item.code);
@@ -91,5 +90,14 @@ const PhoneInput = ({
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    pointerEvents: 'auto'
+  },
+  touchable: {
+    pointerEvents: 'auto'
+  }
+});
 
 export default PhoneInput;

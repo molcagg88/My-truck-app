@@ -1,53 +1,74 @@
-import React, { useState } from "react";
-import { View, Text, TouchableOpacity, ScrollView } from "react-native";
-import { useRouter } from "expo-router";
+import React, { useState, useEffect } from "react";
+import { View, Text, TouchableOpacity, ScrollView, TextInput } from "react-native";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import { ArrowLeft, Calendar, Clock, Package } from "lucide-react-native";
 import { useTheme } from "../_layout";
 import LocationSelector from "../components/LocationSelector";
 import TruckTypeSelector from "../components/TruckTypeSelector";
 import PriceEstimate from "../components/PriceEstimate";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 const BookingScreen = () => {
   const router = useRouter();
+  const params = useLocalSearchParams();
   const { isDarkMode } = useTheme();
   const [pickupLocation, setPickupLocation] = useState("");
   const [destinationLocation, setDestinationLocation] = useState("");
-  const [selectedTruckType, setSelectedTruckType] = useState("");
+  const [selectedTruckId, setSelectedTruckId] = useState("");
   const [cargoDescription, setCargoDescription] = useState("");
   const [scheduledTime, setScheduledTime] = useState<"now" | "schedule">("now");
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date());
+
+  // Initialize form with passed data
+  useEffect(() => {
+    if (params.pickup) setPickupLocation(params.pickup as string);
+    if (params.destination) setDestinationLocation(params.destination as string);
+    if (params.truckType) setSelectedTruckId(params.truckType as string);
+  }, [params]);
 
   // Estimated price based on selections
-  const estimatedPrice = selectedTruckType
-    ? selectedTruckType === "Small"
+  const estimatedPrice = selectedTruckId
+    ? selectedTruckId === "1"
       ? 350
-      : selectedTruckType === "Medium"
+      : selectedTruckId === "2"
         ? 550
-        : selectedTruckType === "Large"
+        : selectedTruckId === "3"
           ? 850
-          : 0
+          : selectedTruckId === "4"
+            ? 950
+            : 0
     : 0;
 
   const handleContinue = () => {
-    if (pickupLocation && destinationLocation && selectedTruckType) {
+    if (pickupLocation && destinationLocation && selectedTruckId) {
       router.push({
         pathname: "/customer/payment",
         params: {
           price: estimatedPrice,
           pickup: pickupLocation,
           destination: destinationLocation,
-          truckType: selectedTruckType,
+          truckType: selectedTruckId,
           cargo: cargoDescription,
           scheduled: scheduledTime,
+          scheduledDate: scheduledTime === "schedule" ? selectedDate.toISOString() : undefined,
         },
       });
     }
   };
 
   const isFormComplete =
-    pickupLocation && destinationLocation && selectedTruckType;
+    pickupLocation && destinationLocation && selectedTruckId;
+
+  const handleDateChange = (event: any, selectedDate?: Date) => {
+    setShowDatePicker(false);
+    if (selectedDate) {
+      setSelectedDate(selectedDate);
+    }
+  };
 
   return (
-    <ScrollView className="flex-1 bg-gray-50 dark:bg-neutral-900">
+    <ScrollView className="flex-1 bg-neutral-50 dark:bg-neutral-900">
       <View className="p-4">
         <TouchableOpacity onPress={() => router.back()} className="mb-4">
           <ArrowLeft size={24} color={isDarkMode ? "#ffffff" : "#374151"} />
@@ -76,8 +97,8 @@ const BookingScreen = () => {
             Truck Type
           </Text>
           <TruckTypeSelector
-            selectedType={selectedTruckType}
-            onSelectType={setSelectedTruckType}
+            selectedTruckId={selectedTruckId}
+            onSelectTruck={setSelectedTruckId}
           />
         </View>
 
@@ -86,18 +107,22 @@ const BookingScreen = () => {
           <Text className="text-lg font-semibold mb-2 text-neutral-800 dark:text-white">
             Cargo Details
           </Text>
-          <View className="bg-white dark:bg-neutral-800 rounded-lg p-4 shadow-sm">
+          <View className="bg-neutral-100 dark:bg-neutral-800 rounded-lg p-4 shadow-sm">
             <View className="flex-row items-center mb-2">
               <Package size={20} color={isDarkMode ? "#9ca3af" : "#6b7280"} />
               <Text className="ml-2 text-neutral-700 dark:text-neutral-300">
                 What are you shipping?
               </Text>
             </View>
-            <TouchableOpacity className="py-2 px-4 bg-gray-100 dark:bg-neutral-700 rounded-lg">
-              <Text className="text-neutral-600 dark:text-neutral-400">
-                {cargoDescription || "Tap to describe your cargo"}
-              </Text>
-            </TouchableOpacity>
+            <TextInput
+              className="py-2 px-4 bg-white dark:bg-neutral-700 rounded-lg text-neutral-800 dark:text-white"
+              placeholder="Describe your cargo (e.g., furniture, boxes, etc.)"
+              placeholderTextColor={isDarkMode ? "#9ca3af" : "#6b7280"}
+              value={cargoDescription}
+              onChangeText={setCargoDescription}
+              multiline
+              numberOfLines={3}
+            />
           </View>
         </View>
 
@@ -108,7 +133,9 @@ const BookingScreen = () => {
           </Text>
           <View className="flex-row">
             <TouchableOpacity
-              className={`flex-1 mr-2 p-4 rounded-lg flex-row items-center justify-center ${scheduledTime === "now" ? "bg-primary-500" : "bg-white dark:bg-neutral-800"}`}
+              className={`flex-1 mr-2 p-4 rounded-lg flex-row items-center justify-center ${
+                scheduledTime === "now" ? "bg-primary-500" : "bg-neutral-100 dark:bg-neutral-800"
+              }`}
               onPress={() => setScheduledTime("now")}
             >
               <Clock
@@ -122,14 +149,21 @@ const BookingScreen = () => {
                 }
               />
               <Text
-                className={`ml-2 font-medium ${scheduledTime === "now" ? "text-white" : "text-neutral-700 dark:text-neutral-300"}`}
+                className={`ml-2 font-medium ${
+                  scheduledTime === "now" ? "text-white" : "text-neutral-700 dark:text-neutral-300"
+                }`}
               >
                 Now
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              className={`flex-1 ml-2 p-4 rounded-lg flex-row items-center justify-center ${scheduledTime === "schedule" ? "bg-primary-500" : "bg-white dark:bg-neutral-800"}`}
-              onPress={() => setScheduledTime("schedule")}
+              className={`flex-1 ml-2 p-4 rounded-lg flex-row items-center justify-center ${
+                scheduledTime === "schedule" ? "bg-primary-500" : "bg-neutral-100 dark:bg-neutral-800"
+              }`}
+              onPress={() => {
+                setScheduledTime("schedule");
+                setShowDatePicker(true);
+              }}
             >
               <Calendar
                 size={20}
@@ -142,13 +176,32 @@ const BookingScreen = () => {
                 }
               />
               <Text
-                className={`ml-2 font-medium ${scheduledTime === "schedule" ? "text-white" : "text-neutral-700 dark:text-neutral-300"}`}
+                className={`ml-2 font-medium ${
+                  scheduledTime === "schedule" ? "text-white" : "text-neutral-700 dark:text-neutral-300"
+                }`}
               >
                 Schedule
               </Text>
             </TouchableOpacity>
           </View>
+          {scheduledTime === "schedule" && (
+            <View className="mt-2 p-3 bg-neutral-100 dark:bg-neutral-800 rounded-lg">
+              <Text className="text-neutral-700 dark:text-neutral-300">
+                Scheduled for: {selectedDate.toLocaleString()}
+              </Text>
+            </View>
+          )}
         </View>
+
+        {showDatePicker && (
+          <DateTimePicker
+            value={selectedDate}
+            mode="datetime"
+            display="default"
+            onChange={handleDateChange}
+            minimumDate={new Date()}
+          />
+        )}
 
         {/* Price Estimate */}
         {isFormComplete && (
@@ -156,8 +209,8 @@ const BookingScreen = () => {
             <PriceEstimate
               price={estimatedPrice}
               currency="ETB"
-              estimatedTime="45 min"
-              distance="7.5 km"
+              duration={45}
+              distance={7.5}
             />
           </View>
         )}
@@ -166,7 +219,9 @@ const BookingScreen = () => {
         <TouchableOpacity
           onPress={handleContinue}
           disabled={!isFormComplete}
-          className={`py-4 rounded-lg ${!isFormComplete ? "bg-neutral-300 dark:bg-neutral-700" : "bg-primary-500"}`}
+          className={`py-4 rounded-lg ${
+            !isFormComplete ? "bg-neutral-300 dark:bg-neutral-700" : "bg-primary-500"
+          }`}
         >
           <Text className="text-white font-semibold text-center">
             Continue to Payment

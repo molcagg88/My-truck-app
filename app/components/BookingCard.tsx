@@ -71,7 +71,14 @@ const BookingCard = ({
     if (expanded) {
       if (pickupLocation && destinationLocation && selectedTruckType) {
         onBookingInitiated();
-        router.push("/customer/booking");
+        router.push({
+          pathname: "/customer/booking",
+          params: {
+            pickup: pickupLocation,
+            destination: destinationLocation,
+            truckType: selectedTruckType,
+          },
+        });
       }
     } else {
       setExpanded(true);

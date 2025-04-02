@@ -60,14 +60,10 @@ export const verifyTelebirrPayment = async (
     // Simulate API delay
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    // Mock successful response (80% success rate for demo)
-    const isSuccessful = Math.random() > 0.2;
-
+    // Always return success for demo
     return {
-      success: isSuccessful,
-      message: isSuccessful
-        ? "Payment verified successfully"
-        : "Payment verification failed",
+      success: true,
+      message: "Payment verified successfully",
     };
   } catch (error) {
     console.error("Telebirr verification error:", error);
@@ -77,3 +73,9 @@ export const verifyTelebirrPayment = async (
     };
   }
 };
+
+const telebirr = {
+  // ... existing exports ...
+};
+
+export default telebirr;

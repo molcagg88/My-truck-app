@@ -23,7 +23,7 @@ interface OrderHistoryListProps {
   onOrderPress?: (orderId: string) => void;
 }
 
-const getStatusColor = (status: string) => {
+const getStatusColor = (status: OrderItem["status"]) => {
   switch (status) {
     case "completed":
       return "bg-green-500";
@@ -108,33 +108,16 @@ const OrderHistoryList = ({
       <View className="flex-row justify-between items-center">
         <View className="flex-row items-center">
           <Truck size={16} color="#FF0000" />
-          <Text className="ml-2 text-xs text-gray-600 dark:text-gray-400">
+          <Text className="ml-2 text-sm text-gray-700 dark:text-gray-300">
             {item.truckType}
           </Text>
         </View>
-
         <View className="flex-row items-center">
-          <Clock size={16} color="#FF0000" />
-          <Text className="ml-2 text-xs text-gray-600 dark:text-gray-400">
-            {item.date}
+          <Text className="text-sm font-semibold text-gray-800 dark:text-gray-200">
+            ETB {item.price}
           </Text>
+          <ChevronRight size={16} color="#6B7280" className="ml-1" />
         </View>
-
-        <Text className="font-bold text-red-600 dark:text-red-400">
-          {item.price} ETB
-        </Text>
-      </View>
-
-      <View className="flex-row justify-end mt-2">
-        <TouchableOpacity
-          className="flex-row items-center"
-          onPress={() => onOrderPress(item.id)}
-        >
-          <Text className="text-red-600 dark:text-red-400 text-sm mr-1">
-            View Details
-          </Text>
-          <ChevronRight size={16} color="#FF0000" />
-        </TouchableOpacity>
       </View>
     </TouchableOpacity>
   );
@@ -156,7 +139,7 @@ const OrderHistoryList = ({
           renderItem={renderOrderItem}
           keyExtractor={(item) => item.id}
           showsVerticalScrollIndicator={false}
-          className="w-full"
+          contentContainerStyle={{ paddingBottom: 16 }}
         />
       ) : (
         <View className="items-center justify-center py-8">

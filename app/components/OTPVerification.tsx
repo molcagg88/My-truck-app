@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { View, Text, TextInput, TouchableOpacity } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native";
 
 interface OTPVerificationProps {
   value?: string;
@@ -51,8 +51,8 @@ const OTPVerification = ({
   };
 
   return (
-    <View className="w-full">
-      <View className="flex-row justify-between mb-6">
+    <View style={styles.container} className="w-full">
+      <View style={styles.container} className="flex-row justify-between mb-6">
         {Array(length)
           .fill(0)
           .map((_, index) => (
@@ -69,11 +69,15 @@ const OTPVerification = ({
           ))}
       </View>
 
-      <View className="flex-row justify-center items-center">
+      <View style={styles.container} className="flex-row justify-center items-center">
         <Text className="text-gray-600 dark:text-gray-400">
           Didn't receive code?
         </Text>
-        <TouchableOpacity onPress={handleResend} disabled={timer > 0}>
+        <TouchableOpacity 
+          style={styles.touchable}
+          onPress={handleResend} 
+          disabled={timer > 0}
+        >
           <Text
             className={`ml-2 ${timer > 0 ? "text-gray-400 dark:text-gray-600" : "text-red-600"}`}
           >
@@ -84,5 +88,14 @@ const OTPVerification = ({
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    pointerEvents: 'auto'
+  },
+  touchable: {
+    pointerEvents: 'auto'
+  }
+});
 
 export default OTPVerification;

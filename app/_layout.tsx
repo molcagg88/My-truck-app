@@ -12,6 +12,8 @@ import "react-native-reanimated";
 import "../global.css";
 import { Platform, useColorScheme } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { AuthProvider } from "./auth/authContext";
+import { useTheme as useAppTheme } from "./_layout";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -19,7 +21,7 @@ SplashScreen.preventAutoHideAsync();
 // Create a theme context to manage dark mode across the app
 export type ThemeContextType = {
   isDarkMode: boolean;
-  toggleTheme: () => void;
+  toggleTheme: (isDarkMode: boolean) => void;
 };
 
 export const ThemeContext = createContext<ThemeContextType>({
@@ -30,8 +32,8 @@ export const ThemeContext = createContext<ThemeContextType>({
 export const useTheme = () => useContext(ThemeContext);
 
 export default function RootLayout() {
+  const { isDarkMode, toggleTheme } = useAppTheme();
   const colorScheme = useColorScheme();
-  const [isDarkMode, setIsDarkMode] = useState(colorScheme === "dark");
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
@@ -42,7 +44,7 @@ export default function RootLayout() {
       try {
         const themePreference = await AsyncStorage.getItem("themePreference");
         if (themePreference !== null) {
-          setIsDarkMode(themePreference === "dark");
+          toggleTheme(themePreference === "dark");
         }
       } catch (error) {
         console.log("Error loading theme preference", error);
@@ -50,21 +52,14 @@ export default function RootLayout() {
     };
 
     loadThemePreference();
-  }, []);
+  }, [toggleTheme]);
 
-  // Toggle theme function
-  const toggleTheme = async () => {
-    try {
-      const newTheme = !isDarkMode;
-      setIsDarkMode(newTheme);
-      await AsyncStorage.setItem(
-        "themePreference",
-        newTheme ? "dark" : "light",
-      );
-    } catch (error) {
-      console.log("Error saving theme preference", error);
+  useEffect(() => {
+    // Sync system theme with app theme
+    if (colorScheme) {
+      toggleTheme(colorScheme === 'dark');
     }
-  };
+  }, [colorScheme]);
 
   useEffect(() => {
     if (process.env.EXPO_PUBLIC_TEMPO && Platform.OS === "web") {
@@ -84,53 +79,129 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeContext.Provider value={{ isDarkMode, toggleTheme }}>
-      <ThemeProvider value={isDarkMode ? DarkTheme : DefaultTheme}>
-        <Stack
-          screenOptions={({ route }) => ({
-            headerShown: !route.name.startsWith("tempobook"),
-            headerStyle: {
-              backgroundColor: isDarkMode ? "#1f2937" : "#ffffff",
-            },
-            headerTintColor: isDarkMode ? "#ffffff" : "#1f2937",
-            contentStyle: {
-              backgroundColor: isDarkMode ? "#111827" : "#f9fafb",
-            },
-          })}
-        >
-          <Stack.Screen name="index" options={{ headerShown: false }} />
-          <Stack.Screen
-            name="auth/phone-verification"
-            options={{ title: "Phone Verification" }}
-          />
-          <Stack.Screen
-            name="auth/profile-setup"
-            options={{ title: "Complete Your Profile" }}
-          />
-          <Stack.Screen
-            name="customer/dashboard"
-            options={{ title: "Dashboard" }}
-          />
-          <Stack.Screen
-            name="customer/booking"
-            options={{ title: "Book a Truck" }}
-          />
-          <Stack.Screen
-            name="customer/tracking"
-            options={{ title: "Track Your Order" }}
-          />
-          <Stack.Screen
-            name="driver/dashboard"
-            options={{ title: "Driver Dashboard" }}
-          />
-          <Stack.Screen
-            name="driver/job-details"
-            options={{ title: "Job Details" }}
-          />
-          <Stack.Screen name="settings/index" options={{ title: "Settings" }} />
-        </Stack>
-        <StatusBar style={isDarkMode ? "light" : "dark"} />
-      </ThemeProvider>
-    </ThemeContext.Provider>
+    <AuthProvider>
+      <ThemeContext.Provider value={{ isDarkMode, toggleTheme }}>
+        <ThemeProvider value={isDarkMode ? DarkTheme : DefaultTheme}>
+          <Stack
+            screenOptions={{
+              headerStyle: {
+                backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
+              },
+              headerTintColor: isDarkMode ? '#ffffff' : '#000000',
+              headerTitleStyle: {
+                fontWeight: 'bold',
+              },
+            }}
+          >
+            <Stack.Screen
+              name="index"
+              options={{
+                title: "My Truck",
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="auth/login"
+              options={{
+                title: "Login",
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="auth/register"
+              options={{
+                title: "Register",
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="auth/phone-verification"
+              options={{
+                title: "Phone Verification",
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="auth/verify-email"
+              options={{
+                title: "Verify Email",
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="auth/forgot-password"
+              options={{
+                title: "Forgot Password",
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="auth/reset-password"
+              options={{
+                title: "Reset Password",
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="customer/dashboard"
+              options={{
+                title: "Customer Dashboard",
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="customer/profile"
+              options={{
+                title: "Profile",
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="customer/settings"
+              options={{
+                title: "Settings",
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="driver/dashboard"
+              options={{
+                title: "Driver Dashboard",
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="driver/profile"
+              options={{
+                title: "Profile",
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="driver/settings"
+              options={{
+                title: "Settings",
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="notifications"
+              options={{
+                title: "Notifications",
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="settings"
+              options={{
+                title: "Settings",
+                headerShown: false,
+              }}
+            />
+          </Stack>
+          <StatusBar style={isDarkMode ? "light" : "dark"} />
+        </ThemeProvider>
+      </ThemeContext.Provider>
+    </AuthProvider>
   );
 }

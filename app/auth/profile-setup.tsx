@@ -8,7 +8,7 @@ import {
   Image,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { ArrowLeft, Camera, User, Truck, Users } from "lucide-react-native";
+import { ArrowLeft, Camera, User, Truck, Users, Car, FileText } from "lucide-react-native";
 import { useTheme } from "../_layout";
 
 type UserRole = "Customer" | "Driver" | "Affiliate";
@@ -19,11 +19,31 @@ const ProfileSetup = () => {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null);
+  const [plateNumber, setPlateNumber] = useState("");
+  const [plateImage, setPlateImage] = useState<string | null>(null);
+  const [licenseImage, setLicenseImage] = useState<string | null>(null);
 
   const handleSubmit = () => {
     if (fullName && selectedRole) {
+      // Validate driver-specific fields
+      if (selectedRole === "Driver") {
+        if (!plateNumber || !plateImage || !licenseImage) {
+          // Show error message or handle validation
+          return;
+        }
+      }
+
       // In a real app, you would save the profile data here
-      console.log("Profile data:", { fullName, email, role: selectedRole });
+      console.log("Profile data:", { 
+        fullName, 
+        email, 
+        role: selectedRole,
+        ...(selectedRole === "Driver" && {
+          plateNumber,
+          plateImage,
+          licenseImage
+        })
+      });
 
       // Navigate to the appropriate dashboard based on role
       if (selectedRole === "Customer") {
@@ -34,6 +54,15 @@ const ProfileSetup = () => {
         // Affiliate dashboard would go here
         router.push("/");
       }
+    }
+  };
+
+  const handleImageUpload = (type: "plate" | "license") => {
+    // Simulate successful upload for development
+    if (type === "plate") {
+      setPlateImage("plate_photo.jpg");
+    } else {
+      setLicenseImage("license_photo.jpg");
     }
   };
 
@@ -137,10 +166,73 @@ const ProfileSetup = () => {
           </View>
         </View>
 
+        {/* Driver-specific fields */}
+        {selectedRole === "Driver" && (
+          <View className="mb-8">
+            <Text className="text-lg font-semibold mb-4 text-neutral-800 dark:text-white">
+              Vehicle Information
+            </Text>
+
+            <View className="mb-6">
+              <Text className="text-sm font-medium mb-2 text-neutral-700 dark:text-neutral-300">
+                Vehicle Plate Number
+              </Text>
+              <TextInput
+                className="bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg p-4 text-neutral-800 dark:text-white"
+                placeholder="Enter your vehicle plate number"
+                placeholderTextColor={isDarkMode ? "#9ca3af" : "#6b7280"}
+                value={plateNumber}
+                onChangeText={setPlateNumber}
+                autoCapitalize="characters"
+              />
+            </View>
+
+            <View className="mb-6">
+              <Text className="text-sm font-medium mb-2 text-neutral-700 dark:text-neutral-300">
+                Vehicle Plate Photo
+              </Text>
+              <TouchableOpacity
+                onPress={() => handleImageUpload("plate")}
+                className="bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg p-4 flex-row items-center justify-between"
+              >
+                <View className="flex-row items-center">
+                  <Car size={24} color={isDarkMode ? "#9ca3af" : "#6b7280"} />
+                  <Text className="ml-3 text-neutral-800 dark:text-white">
+                    {plateImage ? "Plate photo uploaded" : "Upload plate photo"}
+                  </Text>
+                </View>
+                <Camera size={20} color={isDarkMode ? "#9ca3af" : "#6b7280"} />
+              </TouchableOpacity>
+            </View>
+
+            <View className="mb-6">
+              <Text className="text-sm font-medium mb-2 text-neutral-700 dark:text-neutral-300">
+                Driver's License Photo
+              </Text>
+              <TouchableOpacity
+                onPress={() => handleImageUpload("license")}
+                className="bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-lg p-4 flex-row items-center justify-between"
+              >
+                <View className="flex-row items-center">
+                  <FileText size={24} color={isDarkMode ? "#9ca3af" : "#6b7280"} />
+                  <Text className="ml-3 text-neutral-800 dark:text-white">
+                    {licenseImage ? "License photo uploaded" : "Upload license photo"}
+                  </Text>
+                </View>
+                <Camera size={20} color={isDarkMode ? "#9ca3af" : "#6b7280"} />
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
+
         <TouchableOpacity
           onPress={handleSubmit}
-          className={`py-4 rounded-lg ${!fullName || !selectedRole ? "bg-neutral-300 dark:bg-neutral-700" : "bg-primary-500"}`}
-          disabled={!fullName || !selectedRole}
+          className={`py-4 rounded-lg ${
+            !fullName || !selectedRole || (selectedRole === "Driver" && (!plateNumber || !plateImage || !licenseImage))
+              ? "bg-neutral-300 dark:bg-neutral-700"
+              : "bg-primary-500"
+          }`}
+          disabled={!fullName || !selectedRole || (selectedRole === "Driver" && (!plateNumber || !plateImage || !licenseImage))}
         >
           <Text className="text-white font-semibold text-center">
             Complete Setup

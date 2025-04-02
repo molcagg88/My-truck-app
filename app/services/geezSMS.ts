@@ -30,89 +30,93 @@ interface VerificationResponse {
 
 const GEEZSMS_API_KEY = process.env.EXPO_PUBLIC_GEEZSMS_API_KEY;
 const GEEZSMS_API_URL = "https://api.geezsms.com/v1";
+const DEV_MODE = process.env.EXPO_PUBLIC_DEV_MODE === "true";
+const DEV_OTP = "123456";
 
-export const sendOTP = async (params: SendOTPParams): Promise<OTPResponse> => {
-  try {
-    if (!GEEZSMS_API_KEY) {
-      throw new Error("GeezSMS API key is not configured");
+const geezSMSService = {
+  async sendOTP(phoneNumber: string) {
+    if (DEV_MODE) {
+      console.log("Development mode: OTP would be sent to", phoneNumber);
+      return {
+        success: true,
+        data: {
+          otpId: "dev-otp-id",
+          expiryTime: new Date(Date.now() + 5 * 60 * 1000).toISOString(),
+        },
+      };
     }
 
-    const response = await fetch(`${GEEZSMS_API_URL}/otp/send`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${GEEZSMS_API_KEY}`,
-      },
-      body: JSON.stringify({
-        phone_number: params.phoneNumber,
-        template: params.messageTemplate || "Your verification code is: {code}",
-        length: 6,
-        expiry: 300, // 5 minutes
-      }),
-    });
+    try {
+      const response = await fetch("https://api.geezsms.com/v1/otp/send", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${GEEZSMS_API_KEY}`,
+        },
+        body: JSON.stringify({
+          phoneNumber,
+          message: "Your OTP code is: {otp}",
+          expiryTime: 5, // 5 minutes
+        }),
+      });
 
-    const data = await response.json();
+      const data = await response.json();
+      return {
+        success: response.ok,
+        data: response.ok ? data : null,
+        error: !response.ok ? data.message : null,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: "Failed to send OTP. Please try again.",
+      };
+    }
+  },
 
-    if (!response.ok) {
-      throw new Error(data.message || "Failed to send OTP");
+  async verifyOTP(otpId: string, otp: string) {
+    if (DEV_MODE) {
+      if (otp === DEV_OTP) {
+        return {
+          success: true,
+          data: {
+            message: "OTP verified successfully",
+            userId: "dev-user-id",
+          },
+        };
+      }
+      return {
+        success: false,
+        error: "Invalid OTP code",
+      };
     }
 
-    return {
-      success: true,
-      message: "OTP sent successfully",
-      data: {
-        otpId: data.otp_id,
-        expiresIn: data.expiry,
-      },
-    };
-  } catch (error) {
-    console.error("GeezSMS OTP error:", error);
-    return {
-      success: false,
-      message: error instanceof Error ? error.message : "Failed to send OTP. Please try again.",
-    };
-  }
+    try {
+      const response = await fetch("https://api.geezsms.com/v1/otp/verify", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${GEEZSMS_API_KEY}`,
+        },
+        body: JSON.stringify({
+          otpId,
+          otp,
+        }),
+      });
+
+      const data = await response.json();
+      return {
+        success: response.ok,
+        data: response.ok ? data : null,
+        error: !response.ok ? data.message : null,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: "Failed to verify OTP. Please try again.",
+      };
+    }
+  },
 };
 
-export const verifyOTP = async (
-  params: VerifyOTPParams,
-): Promise<VerificationResponse> => {
-  try {
-    if (!GEEZSMS_API_KEY) {
-      throw new Error("GeezSMS API key is not configured");
-    }
-
-    const response = await fetch(`${GEEZSMS_API_URL}/otp/verify`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${GEEZSMS_API_KEY}`,
-      },
-      body: JSON.stringify({
-        phone_number: params.phoneNumber,
-        code: params.otpCode,
-      }),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || "Failed to verify OTP");
-    }
-
-    return {
-      success: true,
-      message: "OTP verified successfully",
-      data: {
-        isValid: data.is_valid,
-        userId: data.user_id,
-      },
-    };
-  } catch (error) {
-    console.error("GeezSMS verification error:", error);
-    return {
-      success: false,
-      message: error instanceof Error ? error.message : "Failed to verify OTP. Please try again.",
-    };
-  }
-};
+export default geezSMSService;

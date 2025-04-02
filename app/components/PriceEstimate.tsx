@@ -1,7 +1,6 @@
 import React from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text } from "react-native";
 import {
-  ArrowRight,
   Clock,
   DollarSign,
   MapPin,
@@ -13,7 +12,6 @@ interface PriceEstimateProps {
   duration?: number;
   price?: number;
   currency?: string;
-  onConfirm?: () => void;
 }
 
 const PriceEstimate = ({
@@ -21,7 +19,6 @@ const PriceEstimate = ({
   duration = 45,
   price = 850,
   currency = "ETB",
-  onConfirm = () => console.log("Booking confirmed"),
 }: PriceEstimateProps) => {
   return (
     <View className="bg-white p-4 rounded-lg shadow-md w-full border border-gray-200">
@@ -65,15 +62,7 @@ const PriceEstimate = ({
         </Text>
       </View>
 
-      <TouchableOpacity
-        className="bg-red-600 py-3 rounded-lg flex-row justify-center items-center"
-        onPress={onConfirm}
-      >
-        <Text className="text-white font-bold mr-2">Confirm Booking</Text>
-        <ArrowRight size={18} color="white" />
-      </TouchableOpacity>
-
-      <Text className="text-xs text-gray-500 text-center mt-3">
+      <Text className="text-xs text-gray-500 text-center">
         Final price may vary based on actual distance and time
       </Text>
     </View>

@@ -12,7 +12,7 @@ import { ArrowLeft, ArrowRight } from "lucide-react-native";
 import PhoneInput from "../components/PhoneInput";
 import OTPVerification from "../components/OTPVerification";
 import { useTheme } from "../_layout";
-import { sendOTP, verifyOTP } from "../services/geezSMS";
+import geezSMSService from "../services/geezSMS";
 
 const PhoneVerification = () => {
   const router = useRouter();
@@ -29,11 +29,11 @@ const PhoneVerification = () => {
       setIsLoading(true);
       setError(null);
       try {
-        const response = await sendOTP({ phoneNumber: `${countryCode}${phoneNumber}` });
+        const response = await geezSMSService.sendOTP(`${countryCode}${phoneNumber}`);
         if (response.success) {
           setStep("otp");
         } else {
-          setError(response.message);
+          setError(response.error || "Failed to send OTP");
         }
       } catch (err) {
         setError("Failed to send OTP. Please try again.");
@@ -48,14 +48,11 @@ const PhoneVerification = () => {
       setIsLoading(true);
       setError(null);
       try {
-        const response = await verifyOTP({ 
-          phoneNumber: `${countryCode}${phoneNumber}`, 
-          otpCode 
-        });
-        if (response.success && response.data?.isValid) {
+        const response = await geezSMSService.verifyOTP("dev-otp-id", otpCode);
+        if (response.success) {
           router.push("/auth/profile-setup");
         } else {
-          setError(response.message);
+          setError(response.error || "Invalid OTP code");
         }
       } catch (err) {
         setError("Failed to verify OTP. Please try again.");
@@ -69,9 +66,9 @@ const PhoneVerification = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await sendOTP({ phoneNumber: `${countryCode}${phoneNumber}` });
+      const response = await geezSMSService.sendOTP(`${countryCode}${phoneNumber}`);
       if (!response.success) {
-        setError(response.message);
+        setError(response.error || "Failed to resend OTP");
       }
     } catch (err) {
       setError("Failed to resend OTP. Please try again.");

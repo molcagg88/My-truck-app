@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, ScrollView } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
 import { Bell, Settings, MapPin, Calendar } from "lucide-react-native";
 import { useTheme } from "../_layout";
@@ -17,7 +17,7 @@ const CustomerDashboard = () => {
     router.push("/customer/booking");
   };
 
-  const handleViewOrder = (orderId: string) => {
+  const handleOrderPress = (orderId: string) => {
     router.push({
       pathname: "/customer/tracking",
       params: { orderId },
@@ -25,7 +25,7 @@ const CustomerDashboard = () => {
   };
 
   return (
-    <ScrollView className="flex-1 bg-gray-50 dark:bg-neutral-900">
+    <View className="flex-1 bg-gray-50 dark:bg-neutral-900">
       {/* Header */}
       <View className="p-4 flex-row justify-between items-center">
         <View>
@@ -77,9 +77,9 @@ const CustomerDashboard = () => {
       </View>
 
       {/* Tab Content */}
-      <View className="p-4">
+      <View className="flex-1">
         {activeTab === "bookings" ? (
-          <View className="bg-white dark:bg-neutral-800 rounded-lg p-8 items-center justify-center shadow-sm">
+          <View className="flex-1 bg-white dark:bg-neutral-800 rounded-lg p-8 items-center justify-center shadow-sm m-4">
             <Calendar size={40} color={isDarkMode ? "#9ca3af" : "#6b7280"} />
             <Text className="text-neutral-600 dark:text-neutral-400 text-center mt-4 mb-2">
               No active bookings
@@ -95,10 +95,10 @@ const CustomerDashboard = () => {
             </TouchableOpacity>
           </View>
         ) : (
-          <OrderHistoryList onViewOrder={handleViewOrder} />
+          <OrderHistoryList onOrderPress={handleOrderPress} />
         )}
       </View>
-    </ScrollView>
+    </View>
   );
 };
 

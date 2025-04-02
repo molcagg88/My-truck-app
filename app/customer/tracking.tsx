@@ -36,8 +36,8 @@ const TrackingScreen = () => {
     else if (currentStatus === "pickup") setCurrentStatus("in_transit");
     else if (currentStatus === "in_transit") setCurrentStatus("delivered");
     else if (currentStatus === "delivered") {
-      // Show rating dialog or navigate to rating screen
-      router.push("/customer/dashboard");
+      // Navigate to rating screen with order details
+      router.push("/customer/rating");
     }
   };
 
