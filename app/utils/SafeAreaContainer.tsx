@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, ScrollView, StyleSheet, SafeAreaView, Platform, StatusBar, RefreshControl } from 'react-native';
+import { View, ScrollView, StyleSheet, SafeAreaView, Platform, StatusBar, RefreshControl, Text, TextStyle } from 'react-native';
 import { useTheme } from '../_layout';
 
 interface SafeAreaContainerProps {
@@ -14,6 +14,19 @@ interface SafeAreaContainerProps {
   };
   refreshControl?: React.ReactElement;
 }
+
+// Default text styles with Inter font family
+export const textStyles = StyleSheet.create({
+  base: {
+    fontFamily: 'Inter-Regular',
+  },
+  medium: {
+    fontFamily: 'Inter-Medium',
+  },
+  bold: {
+    fontFamily: 'Inter-Bold',
+  },
+});
 
 /**
  * A container component that provides safe area insets and consistent margins

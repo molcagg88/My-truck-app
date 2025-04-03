@@ -34,7 +34,9 @@ export default function RootLayout() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
-    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
+    'Inter-Regular': require("../assets/fonts/inter/Inter-Regular.ttf"),
+    'Inter-Medium': require("../assets/fonts/inter/Inter-Medium.ttf"),
+    'Inter-Bold': require("../assets/fonts/inter/Inter-Bold.ttf"),
   });
 
   const toggleTheme = (darkMode: boolean) => {
@@ -81,10 +83,25 @@ export default function RootLayout() {
     return null;
   }
 
+  // Create modified themes with Inter font
+  const customLightTheme = {
+    ...DefaultTheme,
+    colors: {
+      ...DefaultTheme.colors,
+    },
+  };
+
+  const customDarkTheme = {
+    ...DarkTheme,
+    colors: {
+      ...DarkTheme.colors,
+    },
+  };
+
   return (
     <AuthProvider>
       <ThemeContext.Provider value={{ isDarkMode, toggleTheme }}>
-        <ThemeProvider value={isDarkMode ? DarkTheme : DefaultTheme}>
+        <ThemeProvider value={isDarkMode ? customDarkTheme : customLightTheme}>
           <Stack
             screenOptions={{
               headerStyle: {
@@ -92,6 +109,7 @@ export default function RootLayout() {
               },
               headerTintColor: isDarkMode ? '#ffffff' : '#000000',
               headerTitleStyle: {
+                fontFamily: 'Inter-Bold',
                 fontWeight: 'bold',
               },
             }}

@@ -4,6 +4,11 @@ module.exports = {
   presets: [require("nativewind/preset")],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['Inter-Regular', 'system-ui', 'sans-serif'],
+        medium: ['Inter-Medium', 'sans-serif'],
+        bold: ['Inter-Bold', 'sans-serif'],
+      },
       colors: {
         primary: {
           50: "#fff1f1",

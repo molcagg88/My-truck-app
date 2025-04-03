@@ -1,3 +1,21 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  html, body {
+    font-family: 'Inter-Regular', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+  
+  * {
+    font-family: inherit;
+  }
+  
+  h1, h2, h3, h4, h5, h6, .font-bold {
+    font-family: 'Inter-Bold', sans-serif;
+  }
+  
+  .font-medium {
+    font-family: 'Inter-Medium', sans-serif;
+  }
+}
