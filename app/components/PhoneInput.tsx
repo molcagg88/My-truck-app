@@ -33,23 +33,23 @@ const PhoneInput = ({
   ];
 
   return (
-    <View style={styles.container} className="w-full bg-white p-4 rounded-lg shadow-sm">
+    <View className="w-full bg-white p-4 rounded-lg shadow-sm">
       <Text className="text-gray-700 font-medium mb-2">
         Enter your phone number
       </Text>
-      <View style={styles.container} className="flex-row items-center mb-4">
+      <View className="flex-row items-center mb-4">
         {/* Country code selector */}
         <TouchableOpacity
-          style={styles.touchable}
           className="flex-row items-center bg-gray-100 rounded-l-lg px-2 py-3 border-r border-gray-300"
           onPress={() => setIsCountryCodeOpen(!isCountryCodeOpen)}
+          style={{ pointerEvents: 'auto' }}
         >
           <Text className="text-black font-medium mr-1">{countryCode}</Text>
           <ChevronDown size={16} color="#374151" />
         </TouchableOpacity>
 
         {/* Phone number input */}
-        <View style={styles.container} className="flex-row flex-1 items-center bg-gray-100 rounded-r-lg px-3 py-2">
+        <View className="flex-row flex-1 items-center bg-gray-100 rounded-r-lg px-3 py-2">
           <Phone size={18} color="#374151" className="mr-2" />
           <TextInput
             className="flex-1 text-base text-black h-10"
@@ -65,16 +65,16 @@ const PhoneInput = ({
 
       {/* Country code dropdown (simplified) */}
       {isCountryCodeOpen && (
-        <View style={styles.container} className="bg-white rounded-lg shadow-md mb-4 absolute top-20 left-4 z-10 w-48">
+        <View className="bg-white rounded-lg shadow-md mb-4 absolute top-20 left-4 z-10 w-48">
           {countryCodes.map((item) => (
             <TouchableOpacity
               key={item.code}
-              style={styles.touchable}
               className="px-4 py-3 border-b border-gray-100"
               onPress={() => {
                 onCountryCodeChange?.(item.code);
                 setIsCountryCodeOpen(false);
               }}
+              style={{ pointerEvents: 'auto' }}
             >
               <Text className="text-black">
                 {item.country} ({item.code})
@@ -91,13 +91,7 @@ const PhoneInput = ({
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    pointerEvents: 'auto'
-  },
-  touchable: {
-    pointerEvents: 'auto'
-  }
-});
+// Remove unnecessary StyleSheet since we're using TailwindCSS/NativeWind classes
+const styles = StyleSheet.create({});
 
 export default PhoneInput;

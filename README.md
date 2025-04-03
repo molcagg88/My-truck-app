@@ -1,133 +1,95 @@
-# Truck App Admin Panel
+# My Truck App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app). It's been extended to include a comprehensive admin panel for a truck application with features for job management, payment tracking, driver locations, and activity logs.
+A modern mobile application for booking trucks and managing deliveries, built with Expo and React Native.
 
-## Project Structure
+## About
 
-The project consists of two main parts:
-
-1. **Frontend**: A React Native (Expo) application with a web interface for the admin panel
-2. **Backend**: A Node.js Express API serving the admin panel data
+My Truck is a comprehensive solution for connecting customers with truck drivers for various delivery needs. The app provides an intuitive interface for booking trucks, tracking deliveries, and managing payments.
 
 ## Features
 
-- **Jobs Management**: View and manage jobs, update statuses, assign drivers
-- **Payments Dashboard**: Track payments, view statistics, process payment actions
-- **Driver Tracking**: Real-time driver locations, status management
-- **Activity Logs**: Track system activities and events
-- **Authentication**: Secure access with JWT-based authentication
+- **Phone Number Authentication**: All users are identified by their phone numbers. One-Time Passwords (OTP) are used for secure authentication.
+- **Multi-Role System**: Support for customers, drivers, and administrators.
+- **Truck Booking**: Book different types of trucks based on your delivery needs.
+- **Real-Time Tracking**: Track your delivery in real-time.
+- **Driver Management**: For drivers to accept jobs and manage their schedule.
+- **Admin Dashboard**: For managing users, tracking metrics, and more.
+- **Payment Integration**: Secure payment processing with multiple payment options.
 
-## Setup Instructions
+## Authentication Approach
 
-1. Install dependencies
+My Truck uses phone number as the primary identifier for all users. This approach offers several benefits:
 
-   ```bash
-   npm install
-   cd server
-   npm install
-   cd ..
-   ```
+- **Simplicity**: Users don't need to remember passwords
+- **Security**: OTP verification provides strong security
+- **Accessibility**: Works for users without email addresses
+- **Regional Relevance**: Better suited for markets where phone numbers are the primary means of communication
 
-2. Set up environment variables:
-   
-   ```bash
-   # In the server directory, copy the example env file
-   cd server
-   cp .env.example .env
-   # Edit the .env file with your database credentials
-   ```
+Email addresses are optional and can be added to the user's profile if desired.
 
-3. Seed the database with test data:
+## Technologies Used
 
-   ```bash
-   cd server
-   npm run seed
-   ```
+- **Frontend**: React Native, Expo, NativeWind (TailwindCSS)
+- **Backend**: Node.js, Express, TypeORM
+- **Database**: PostgreSQL
+- **Authentication**: JWT, SMS-based OTP
+- **Payments**: Multiple payment gateway integrations
 
-4. Start both frontend and backend
+## Project Structure
 
-   ```bash
-   npm run dev
-   ```
+The project follows a monorepo structure:
 
-   This will run both the Expo frontend and the Express backend server concurrently.
+- `/app` - React Native Expo application
+- `/server` - Express backend API
 
-5. Alternatively, you can start them separately:
+## Getting Started
 
-   ```bash
-   npm start          # Start frontend (Expo)
-   npm run server     # Start backend server
-   ```
+### Prerequisites
 
-In the output, you'll find options to open the app in a
+- Node.js 14+
+- npm or yarn
+- Expo CLI
+- PostgreSQL (optional, for full functionality)
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+### Installation
 
-The admin panel is optimized for viewing on the web platform.
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/my-truck-app.git
+cd my-truck-app
+```
 
-## Test Users
+2. Install dependencies:
+```bash
+npm install
+cd server
+npm install
+cd ..
+```
 
-The following users are available for testing:
+3. Set up environment variables:
+```bash
+cp .env.example .env
+cd server
+cp .env.example .env
+cd ..
+```
 
-| Email | Password | Role |
-|-------|----------|------|
-| admin@example.com | admin123 | Admin |
-| manager@example.com | manager123 | Manager |
-| driver@example.com | driver123 | Driver |
-| user@example.com | user123 | User |
+4. Start the development servers:
+```bash
+npm run dev
+```
 
-## API Endpoints
+### Test Accounts
 
-### Auth Routes
-- `POST /api/auth/login` - Login with email and password
-- `POST /api/auth/refresh-token` - Refresh authentication token
+For testing purposes, the following accounts are available:
 
-### Admin Routes
+| Phone Number | Role    |
+|--------------|---------|
+| +251900000001 | Customer |
+| +251900000002 | Driver  |
+| +251900000003 | Admin   |
 
-#### Jobs
-- `GET /api/admin/jobs/stats` - Get job statistics
-- `GET /api/admin/jobs` - Get all jobs
-- `PATCH /api/admin/jobs/:id/status` - Update job status
-- `POST /api/admin/jobs/:id/assign` - Assign driver to job
+## License
 
-#### Payments
-- `GET /api/admin/payments/stats` - Get payment statistics
-- `GET /api/admin/payments` - Get all payments
-- `GET /api/admin/payments/:id` - Get payment details
-- `POST /api/admin/payments/:id/process` - Process payment action
-
-#### Drivers
-- `GET /api/admin/drivers/locations` - Get driver locations
-- `GET /api/admin/drivers` - Get all drivers
-- `PATCH /api/admin/drivers/:id/status` - Update driver status
-
-#### Activities
-- `GET /api/admin/activities/recent` - Get recent activities
-
-#### Analytics
-- `GET /api/admin/analytics` - Get analytics data with time range parameter
-
-## Authentication
-
-The system uses JWT (JSON Web Tokens) for authentication. To access the admin panel:
-
-1. Log in with admin credentials to receive a token
-2. The token is automatically attached to API requests
-3. Protected routes verify the token and check user roles
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+This project is licensed under the MIT License - see the LICENSE file for details.

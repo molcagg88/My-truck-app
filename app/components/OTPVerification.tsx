@@ -51,8 +51,8 @@ const OTPVerification = ({
   };
 
   return (
-    <View style={styles.container} className="w-full">
-      <View style={styles.container} className="flex-row justify-between mb-6">
+    <View className="w-full">
+      <View className="flex-row justify-between mb-6">
         {Array(length)
           .fill(0)
           .map((_, index) => (
@@ -69,14 +69,14 @@ const OTPVerification = ({
           ))}
       </View>
 
-      <View style={styles.container} className="flex-row justify-center items-center">
+      <View className="flex-row justify-center items-center">
         <Text className="text-gray-600 dark:text-gray-400">
           Didn't receive code?
         </Text>
         <TouchableOpacity 
-          style={styles.touchable}
           onPress={handleResend} 
           disabled={timer > 0}
+          style={{ pointerEvents: 'auto' }}
         >
           <Text
             className={`ml-2 ${timer > 0 ? "text-gray-400 dark:text-gray-600" : "text-red-600"}`}
@@ -89,13 +89,7 @@ const OTPVerification = ({
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    pointerEvents: 'auto'
-  },
-  touchable: {
-    pointerEvents: 'auto'
-  }
-});
+// Remove unnecessary StyleSheet as we're using TailwindCSS/NativeWind classes
+const styles = StyleSheet.create({});
 
 export default OTPVerification;

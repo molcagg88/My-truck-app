@@ -1,7 +1,8 @@
 import axios from 'axios';
 import { getApiBaseUrl } from './apiUtils';
-import storage from '../utils/storage';
+import * as storage from '../utils/storage';
 
+// Create axios instance with base URL
 const api = axios.create({
   baseURL: getApiBaseUrl(),
   headers: {
@@ -9,24 +10,39 @@ const api = axios.create({
   },
 });
 
-// Add request interceptor to add auth token
-api.interceptors.request.use(async (config) => {
-  const token = await storage.getToken();
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
-
-// Add response interceptor to handle errors
-api.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    if (error.response?.status === 401) {
-      // Handle unauthorized access
-      await storage.removeToken();
-      // You might want to redirect to login here
+// Request interceptor for adding token
+api.interceptors.request.use(
+  async (config) => {
+    console.log(`API Request to: ${config.url}`);
+    const token = await storage.getToken();
+    
+    if (token) {
+      // Verify token has the expected JWT format (header.payload.signature)
+      const parts = token.split('.');
+      if (parts.length !== 3) {
+        console.warn(`WARNING: Token doesn't have expected JWT format (has ${parts.length} parts instead of 3)`);
+      }
+      
+      console.log(`Adding authorization header with token: ${token.substring(0, 20)}...`);
+      config.headers.Authorization = `Bearer ${token}`;
+    } else {
+      console.log('No token found, request sent without authorization header');
     }
+    return config;
+  },
+  (error) => {
+    console.error('API request interceptor error:', error);
+    return Promise.reject(error);
+  }
+);
+
+// Response interceptor for handling errors
+api.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  (error) => {
+    console.error('API response error:', error.response?.status, error.response?.data);
     return Promise.reject(error);
   }
 );

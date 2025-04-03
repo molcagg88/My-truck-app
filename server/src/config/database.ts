@@ -1,16 +1,16 @@
 import { DataSource } from 'typeorm';
 import dotenv from 'dotenv';
 import path from 'path';
-import { Job } from '../entities/Job';
-import { Payment } from '../entities/Payment';
-import { Driver } from '../entities/Driver';
-import { Activity } from '../entities/Activity';
+import { Order } from '../entities/Order';
+import { User } from '../entities/User';
+import { Location } from '../entities/Location';
+import { TruckType } from '../entities/TruckType';
 
 // Load environment variables
 dotenv.config();
 
 // Database type (postgres or sqlite)
-const dbType = process.env.DB_TYPE || 'sqlite';
+const dbType = process.env.DB_TYPE || 'postgres';
 
 let AppDataSource: DataSource;
 
@@ -33,15 +33,24 @@ if (dbType === 'postgres') {
     database: dbName,
     synchronize: process.env.NODE_ENV !== 'production',
     logging: process.env.NODE_ENV !== 'production',
-    entities: [Job, Payment, Driver, Activity],
+    entities: [Order, User, Location, TruckType],
     migrations: ['src/migrations/*.ts'],
-    connectTimeoutMS: 10000,
+    connectTimeoutMS: 2000,
     extra: {
-      family: 4 // Force IPv4 for Windows systems
-    }
+      max: 20, // Maximum number of connections in pool
+      idleTimeoutMillis: 30000, // How long a connection can be idle before being closed
+      connectionTimeoutMillis: 2000, // How long to wait for a connection
+      ssl: process.env.NODE_ENV === 'production' ? {
+        rejectUnauthorized: false
+      } : false
+    },
+    subscribers: [],
+    ssl: process.env.NODE_ENV === 'production' ? {
+      rejectUnauthorized: false
+    } : false,
   });
 } else {
-  // SQLite configuration (default for development)
+  // SQLite configuration (fallback for development)
   const dbPath = path.join(__dirname, '..', '..', 'data', 'database.sqlite');
   
   console.log(`Using SQLite database at ${dbPath}`);
@@ -51,7 +60,7 @@ if (dbType === 'postgres') {
     database: dbPath,
     synchronize: true,
     logging: process.env.NODE_ENV !== 'production',
-    entities: [Job, Payment, Driver, Activity],
+    entities: [Order, User, Location, TruckType],
     migrations: ['src/migrations/*.ts']
   });
 }
@@ -72,8 +81,14 @@ export const initializeDatabase = async () => {
       🚨 Database connection refused! 
       
       Please make sure:
-        1. Database server is running
-        2. The connection details are correct
+        1. PostgreSQL server is running
+        2. The connection details are correct:
+           - Host: ${process.env.DB_HOST}
+           - Port: ${process.env.DB_PORT}
+           - Database: ${process.env.DB_NAME}
+           - Username: ${process.env.DB_USERNAME}
+        3. The database exists
+        4. The user has proper permissions
       `);
     } else if (err.code === 'SQLITE_CANTOPEN') {
       console.error(`

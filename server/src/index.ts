@@ -1,119 +1,85 @@
 import 'reflect-metadata';
-import express, { Application } from 'express';
+import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import adminRoutes from './routes/admin';
-import authRoutes from './routes/auth';
-import { authMiddleware } from './middleware/auth';
-import { errorHandler } from './middleware/error';
-import { initializeDatabase } from './config/database';
-import { httpLogger } from './utils/logger';
-import helmet from 'helmet';
-import rateLimit from 'express-rate-limit';
-import fs from 'fs';
-import path from 'path';
-import { createServer } from 'http';
-import { WebSocketServer } from './websocket';
 import { AppDataSource } from './config/database';
+import authRoutes from './routes/auth';
+import adminRoutes from './routes/admin';
+import customerRoutes from './routes/customer';
+import driverRoutes from './routes/driver';
+import { errorHandler } from './middleware/error';
+import { authMiddleware } from './middleware/auth';
 import { logger } from './utils/logger';
 
 // Load environment variables
 dotenv.config();
 
-// Setup basic Express app
-const app: Application = express();
-const httpServer = createServer(app);
-const wss = new WebSocketServer(httpServer);
-const PORT = process.env.PORT || 3000;
+const app = express();
+const port = process.env.PORT || 3000;
 
-// Initialize database
-initializeDatabase()
-  .then(() => console.log('Database initialized successfully'))
-  .catch(err => {
-    console.error('Error initializing database:', err);
-    process.exit(1);
-  });
+// Middleware
+app.use(cors());
+app.use(express.json());
 
-// Create logs directory if it doesn't exist
-const logsDir = path.join(__dirname, '../logs');
-if (!fs.existsSync(logsDir)) {
-  fs.mkdirSync(logsDir, { recursive: true });
-}
-
-// Security middleware
-app.use(helmet()); // Set security headers
-app.use(cors({
-  origin: true, // Allow all origins in development
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
-  credentials: true
-}));
-
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs
-  standardHeaders: true,
-  message: 'Too many requests from this IP, please try again later.'
-});
-app.use('/api/', limiter);
-
-// Body parsers
-app.use(express.json({ limit: '10kb' }));
-app.use(express.urlencoded({ extended: true, limit: '10kb' }));
-
-// Logging middleware
-app.use(httpLogger);
-
-// Health check endpoint
-app.get('/health', (_req, res) => {
-  res.status(200).json({
-    status: 'success',
-    message: 'Server is running',
-    environment: process.env.NODE_ENV,
-    timestamp: new Date().toISOString()
-  });
+// Request logging
+app.use((req, res, next) => {
+  logger.info(`${req.method} ${req.url}`);
+  next();
 });
 
-// Routes
+// Public routes
 app.use('/api/auth', authRoutes);
-app.use('/api/admin', authMiddleware, adminRoutes);
 
-// 404 handler for undefined routes
-app.all('*', (_req, _res, next) => {
-  next(new Error(`Can't find ${_req.originalUrl} on this server!`));
+// Protected routes - require authentication
+app.use('/api/admin', authMiddleware, adminRoutes);
+app.use('/api/customer', authMiddleware, customerRoutes);
+app.use('/api/driver', authMiddleware, driverRoutes);
+
+// API health check and documentation
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ 
+    status: 'ok', 
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development'
+  });
 });
 
-// Global error handler
+// Basic API information
+app.get('/api', (req, res) => {
+  res.status(200).json({
+    name: 'Truck App API',
+    version: '1.0.0',
+    endpoints: [
+      { path: '/api/auth', description: 'Authentication endpoints' },
+      { path: '/api/admin', description: 'Admin management endpoints' },
+      { path: '/api/customer', description: 'Customer service endpoints' },
+      { path: '/api/driver', description: 'Driver service endpoints' },
+      { path: '/api/health', description: 'API health check' }
+    ]
+  });
+});
+
+// Handle 404 routes
+app.use('/api/*', (req, res) => {
+  res.status(404).json({ 
+    status: 'error', 
+    message: 'API endpoint not found',
+    path: req.originalUrl
+  });
+});
+
+// Error handling
 app.use(errorHandler);
 
 // Initialize database and start server
 AppDataSource.initialize()
   .then(() => {
-    logger.info('Database connection established');
-    httpServer.listen(PORT, () => {
-      logger.info(`Server is running on port ${PORT}`);
+    logger.info('Database connected successfully');
+    app.listen(port, () => {
+      logger.info(`Server is running on port ${port}`);
+      logger.info(`API available at http://localhost:${port}/api`);
     });
   })
   .catch((error) => {
     logger.error('Error connecting to database:', error);
-    process.exit(1);
-  });
-
-// Handle unhandled rejections
-process.on('unhandledRejection', (error: Error) => {
-  console.error('UNHANDLED REJECTION! 💥 Shutting down...');
-  console.error(error.name, error.message, error.stack);
-  httpServer.close(() => {
-    process.exit(1);
-  });
-});
-
-// Handle uncaught exceptions
-process.on('uncaughtException', (error: Error) => {
-  console.error('UNCAUGHT EXCEPTION! 💥 Shutting down...');
-  console.error(error.name, error.message, error.stack);
-  process.exit(1);
-});
-
-export default app; 
+  }); 

@@ -13,7 +13,6 @@ import "../global.css";
 import { Platform, useColorScheme } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AuthProvider } from "./auth/authContext";
-import { useTheme as useAppTheme } from "./_layout";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -32,11 +31,19 @@ export const ThemeContext = createContext<ThemeContextType>({
 export const useTheme = () => useContext(ThemeContext);
 
 export default function RootLayout() {
-  const { isDarkMode, toggleTheme } = useAppTheme();
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
+
+  const toggleTheme = (darkMode: boolean) => {
+    setIsDarkMode(darkMode);
+    // Save theme preference
+    AsyncStorage.setItem("themePreference", darkMode ? "dark" : "light").catch(error => {
+      console.log("Error saving theme preference", error);
+    });
+  };
 
   // Load theme preference from storage
   useEffect(() => {
@@ -44,7 +51,10 @@ export default function RootLayout() {
       try {
         const themePreference = await AsyncStorage.getItem("themePreference");
         if (themePreference !== null) {
-          toggleTheme(themePreference === "dark");
+          setIsDarkMode(themePreference === "dark");
+        } else if (colorScheme) {
+          // If no saved preference, use system theme
+          setIsDarkMode(colorScheme === 'dark');
         }
       } catch (error) {
         console.log("Error loading theme preference", error);
@@ -52,13 +62,6 @@ export default function RootLayout() {
     };
 
     loadThemePreference();
-  }, [toggleTheme]);
-
-  useEffect(() => {
-    // Sync system theme with app theme
-    if (colorScheme) {
-      toggleTheme(colorScheme === 'dark');
-    }
   }, [colorScheme]);
 
   useEffect(() => {
@@ -108,9 +111,9 @@ export default function RootLayout() {
               }}
             />
             <Stack.Screen
-              name="auth/register"
+              name="auth/profile-setup"
               options={{
-                title: "Register",
+                title: "Profile Setup",
                 headerShown: false,
               }}
             />
@@ -122,27 +125,6 @@ export default function RootLayout() {
               }}
             />
             <Stack.Screen
-              name="auth/verify-email"
-              options={{
-                title: "Verify Email",
-                headerShown: false,
-              }}
-            />
-            <Stack.Screen
-              name="auth/forgot-password"
-              options={{
-                title: "Forgot Password",
-                headerShown: false,
-              }}
-            />
-            <Stack.Screen
-              name="auth/reset-password"
-              options={{
-                title: "Reset Password",
-                headerShown: false,
-              }}
-            />
-            <Stack.Screen
               name="customer/dashboard"
               options={{
                 title: "Customer Dashboard",
@@ -150,16 +132,30 @@ export default function RootLayout() {
               }}
             />
             <Stack.Screen
-              name="customer/profile"
+              name="customer/booking"
               options={{
-                title: "Profile",
+                title: "Book a Truck",
                 headerShown: false,
               }}
             />
             <Stack.Screen
-              name="customer/settings"
+              name="customer/payment"
               options={{
-                title: "Settings",
+                title: "Payment",
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="customer/tracking"
+              options={{
+                title: "Track Order",
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="customer/rating"
+              options={{
+                title: "Rate Service",
                 headerShown: false,
               }}
             />
@@ -171,16 +167,9 @@ export default function RootLayout() {
               }}
             />
             <Stack.Screen
-              name="driver/profile"
+              name="driver/job-details"
               options={{
-                title: "Profile",
-                headerShown: false,
-              }}
-            />
-            <Stack.Screen
-              name="driver/settings"
-              options={{
-                title: "Settings",
+                title: "Job Details",
                 headerShown: false,
               }}
             />
@@ -192,7 +181,7 @@ export default function RootLayout() {
               }}
             />
             <Stack.Screen
-              name="settings"
+              name="settings/index"
               options={{
                 title: "Settings",
                 headerShown: false,

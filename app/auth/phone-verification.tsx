@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -7,36 +7,61 @@ import {
   ScrollView,
   ActivityIndicator,
 } from "react-native";
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import { ArrowLeft, ArrowRight } from "lucide-react-native";
 import PhoneInput from "../components/PhoneInput";
 import OTPVerification from "../components/OTPVerification";
 import { useTheme } from "../_layout";
 import geezSMSService from "../services/geezSMS";
+import axios from "axios";
+import { getApiBaseUrl } from "../services/apiUtils";
 
 const PhoneVerification = () => {
   const router = useRouter();
   const { isDarkMode } = useTheme();
+
   const [phoneNumber, setPhoneNumber] = useState("");
   const [countryCode, setCountryCode] = useState("+251");
   const [step, setStep] = useState<"phone" | "otp">("phone");
   const [otpCode, setOtpCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [userExists, setUserExists] = useState<boolean | null>(null);
+  const [formattedPhone, setFormattedPhone] = useState("");
 
   const handlePhoneSubmit = async () => {
     if (phoneNumber.length >= 9) {
       setIsLoading(true);
       setError(null);
+      
+      // Format the phone number for consistency
+      const fullPhoneNumber = `${countryCode}${phoneNumber}`;
+      const formattedNumber = geezSMSService.formatPhoneNumber(fullPhoneNumber);
+      setFormattedPhone(formattedNumber);
+      
       try {
-        const response = await geezSMSService.sendOTP(`${countryCode}${phoneNumber}`);
+        // Check if user exists first
+        const checkResponse = await axios.post(`${getApiBaseUrl()}/auth/check-phone`, {
+          phone: formattedNumber
+        });
+        
+        console.log("User exists check response:", checkResponse.data);
+        
+        // Set whether the user exists or not
+        if (checkResponse.data.success) {
+          setUserExists(checkResponse.data.exists);
+        }
+        
+        // Proceed to send OTP
+        const response = await geezSMSService.sendOTP(formattedNumber);
         if (response.success) {
           setStep("otp");
         } else {
           setError(response.error || "Failed to send OTP");
         }
       } catch (err) {
-        setError("Failed to send OTP. Please try again.");
+        console.error("Error checking phone or sending OTP:", err);
+        setError("Failed to process your request. Please try again.");
       } finally {
         setIsLoading(false);
       }
@@ -48,13 +73,47 @@ const PhoneVerification = () => {
       setIsLoading(true);
       setError(null);
       try {
-        const response = await geezSMSService.verifyOTP("dev-otp-id", otpCode);
+        console.log(`Attempting to verify OTP for phone ${formattedPhone} with code ${otpCode}`);
+        
+        // Pass name as undefined - name will be collected in profile setup
+        const response = await geezSMSService.verifyOTP(
+          formattedPhone,
+          otpCode
+        );
+        
+        console.log('OTP verification response:', JSON.stringify(response, null, 2));
+        
         if (response.success) {
-          router.push("/auth/profile-setup");
+          console.log('Successfully verified OTP with token:', 
+            response.data?.token ? response.data.token.substring(0, 20) + '...' : 'No token received');
+          
+          // Check if the user is new or existing
+          const isNewUser = response.data?.isNewUser;
+          const userRole = response.data?.user?.role;
+          
+          if (isNewUser || userExists === false) {
+            // New user - redirect to profile setup
+            console.log('New user signup - redirecting to profile setup');
+            router.push("/auth/profile-setup");
+          } else {
+            // Existing user - redirect to appropriate dashboard
+            if (userRole === 'CUSTOMER' || userRole === 'customer') {
+              console.log('Existing customer - redirecting to customer dashboard');
+              router.replace("/customer/dashboard");
+            } else if (userRole === 'DRIVER' || userRole === 'driver') {
+              console.log('Existing driver - redirecting to driver dashboard');
+              router.replace("/driver/dashboard");
+            } else {
+              console.log(`Unknown role "${userRole}" - redirecting to profile setup`);
+              router.replace("/auth/profile-setup");
+            }
+          }
         } else {
+          console.log('OTP verification failed:', response.error || 'Verification failed');
           setError(response.error || "Invalid OTP code");
         }
       } catch (err) {
+        console.error('OTP verification error:', err);
         setError("Failed to verify OTP. Please try again.");
       } finally {
         setIsLoading(false);
@@ -66,7 +125,7 @@ const PhoneVerification = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await geezSMSService.sendOTP(`${countryCode}${phoneNumber}`);
+      const response = await geezSMSService.sendOTP(formattedPhone);
       if (!response.success) {
         setError(response.error || "Failed to resend OTP");
       }
@@ -92,18 +151,20 @@ const PhoneVerification = () => {
       contentContainerStyle={{ flexGrow: 1 }}
     >
       <View className="flex-1 p-6">
-        <TouchableOpacity onPress={handleBack} className="mb-6">
+        <TouchableOpacity onPress={handleBack} className="mb-6" style={{ pointerEvents: 'auto' }}>
           <ArrowLeft size={24} color={isDarkMode ? "#ffffff" : "#374151"} />
         </TouchableOpacity>
 
         <View className="mb-8">
           <Text className="text-3xl font-bold mb-2 text-neutral-800 dark:text-white">
-            {step === "phone" ? "Enter your phone" : "Verify your number"}
+            {step === "phone" 
+              ? "Enter your phone" 
+              : "Verify your number"}
           </Text>
           <Text className="text-neutral-600 dark:text-neutral-400">
             {step === "phone"
               ? "We'll send you a verification code"
-              : `We've sent a verification code to ${countryCode}${phoneNumber}`}
+              : `We've sent a verification code to ${formattedPhone}`}
           </Text>
         </View>
 
@@ -140,6 +201,7 @@ const PhoneVerification = () => {
                 ? "bg-neutral-300 dark:bg-neutral-700"
                 : "bg-primary-500"
             }`}
+            style={{ pointerEvents: 'auto' }}
             disabled={
               (step === "phone" && phoneNumber.length < 9) ||
               (step === "otp" && otpCode.length < 6) ||
@@ -160,17 +222,20 @@ const PhoneVerification = () => {
         </View>
 
         <View className="mt-6 items-center">
+          <Text className="text-neutral-600 dark:text-neutral-400 text-center mt-3 mb-2">
+            Phone number is used for all authentication.
+          </Text>
           <Text className="text-neutral-500 dark:text-neutral-400 text-sm">
             By continuing, you agree to our
           </Text>
           <View className="flex-row">
-            <TouchableOpacity>
+            <TouchableOpacity style={{ pointerEvents: 'auto' }}>
               <Text className="text-primary-500 text-sm">Terms of Service</Text>
             </TouchableOpacity>
             <Text className="text-neutral-500 dark:text-neutral-400 text-sm mx-1">
               and
             </Text>
-            <TouchableOpacity>
+            <TouchableOpacity style={{ pointerEvents: 'auto' }}>
               <Text className="text-primary-500 text-sm">Privacy Policy</Text>
             </TouchableOpacity>
           </View>

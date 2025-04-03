@@ -37,6 +37,14 @@ export const isTokenValid = async () => {
     const token = await getToken();
     if (!token) return false;
     
+    // Check token format
+    const parts = token.split('.');
+    if (parts.length !== 3) {
+      console.error('Invalid token format: Expected 3 parts, got', parts.length);
+      return false;
+    }
+    
+    // Use jwtDecode to check expiration
     const decoded = jwtDecode<{ exp: number }>(token);
     const currentTime = Date.now() / 1000;
     
@@ -53,6 +61,14 @@ export const getUserRole = async () => {
     const token = await getToken();
     if (!token) return null;
     
+    // Check token format
+    const parts = token.split('.');
+    if (parts.length !== 3) {
+      console.error('Invalid token format in getUserRole: Expected 3 parts, got', parts.length);
+      return null;
+    }
+    
+    // Get role from decoded token
     const decoded = jwtDecode<{ role: string }>(token);
     return decoded.role;
   } catch (error) {

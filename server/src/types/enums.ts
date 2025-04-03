@@ -1,8 +1,8 @@
 export enum UserRoles {
-  ADMIN = 'ADMIN',
-  MANAGER = 'MANAGER',
-  DRIVER = 'DRIVER',
-  CUSTOMER = 'CUSTOMER'
+  ADMIN = 'admin',
+  MANAGER = 'manager',
+  DRIVER = 'driver',
+  CUSTOMER = 'customer'
 }
 
 export enum JobStatus {
@@ -13,11 +13,20 @@ export enum JobStatus {
   CANCELLED = 'CANCELLED'
 }
 
+export enum OrderStatus {
+  PENDING = 'pending',
+  ACCEPTED = 'accepted',
+  PICKED_UP = 'picked_up',
+  IN_TRANSIT = 'in_transit',
+  DELIVERED = 'delivered',
+  CANCELLED = 'cancelled'
+}
+
 export enum PaymentStatus {
-  PENDING = 'PENDING',
-  PROCESSING = 'PROCESSING',
-  COMPLETED = 'COMPLETED',
-  FAILED = 'FAILED'
+  PENDING = 'pending',
+  COMPLETED = 'completed',
+  FAILED = 'failed',
+  REFUNDED = 'refunded'
 }
 
 export enum DriverStatus {
@@ -32,4 +41,11 @@ export enum ActivityType {
   JOB_COMPLETED = 'JOB_COMPLETED',
   PAYMENT_PROCESSED = 'PAYMENT_PROCESSED',
   DRIVER_STATUS_CHANGED = 'DRIVER_STATUS_CHANGED'
+}
+
+export enum TruckType {
+  SMALL = 'small',
+  MEDIUM = 'medium',
+  LARGE = 'large',
+  XLARGE = 'xlarge'
 } 

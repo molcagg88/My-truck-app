@@ -26,7 +26,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const checkAuth = async () => {
     try {
+      console.log("Checking authentication status...");
+      const token = await storage.getToken();
+      console.log("Token in storage:", token ? `${token.substring(0, 20)}...` : "No token");
+      
       const currentUser = await authService.getCurrentUser();
+      console.log("Current user from API:", currentUser ? `ID: ${currentUser.id}` : "No user");
+      
       setUser(currentUser);
     } catch (error) {
       console.error('Auth check failed:', error);

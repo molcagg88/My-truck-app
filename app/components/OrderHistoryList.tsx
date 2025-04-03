@@ -11,7 +11,7 @@ import {
 interface OrderItem {
   id: string;
   date: string;
-  status: "completed" | "in-progress" | "cancelled";
+  status: "completed" | "in-progress" | "cancelled" | "pending" | "accepted";
   pickupLocation: string;
   destinationLocation: string;
   truckType: string;
@@ -31,6 +31,10 @@ const getStatusColor = (status: OrderItem["status"]) => {
       return "bg-blue-500";
     case "cancelled":
       return "bg-red-500";
+    case "pending":
+      return "bg-yellow-500";
+    case "accepted":
+      return "bg-purple-500";
     default:
       return "bg-gray-500";
   }

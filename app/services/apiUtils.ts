@@ -63,6 +63,15 @@ export const getApiBaseUrl = () => {
     if (Platform.OS === 'web') {
       return 'http://localhost:3000/api';
     }
+    // For Android emulator
+    if (Platform.OS === 'android') {
+      return 'http://10.0.2.2:3000/api';
+    }
+    // For iOS simulator
+    if (Platform.OS === 'ios') {
+      return 'http://localhost:3000/api';
+    }
+    // Default fallback
     return 'http://localhost:3000/api';
   }
   

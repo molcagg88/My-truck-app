@@ -6,12 +6,23 @@ import {
   TouchableOpacity,
   ScrollView,
   Image,
+  ActivityIndicator,
+  Alert,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { ArrowLeft, Camera, User, Truck, Users, Car, FileText } from "lucide-react-native";
 import { useTheme } from "../_layout";
+import authService, { ProfileUpdateResponse } from "../services/authService";
+import storage from "../utils/storage";
 
 type UserRole = "Customer" | "Driver" | "Affiliate";
+
+// Map frontend role types to backend role values
+const roleMapping = {
+  "Customer": "customer",
+  "Driver": "driver",
+  "Affiliate": "affiliate"
+};
 
 const ProfileSetup = () => {
   const router = useRouter();
@@ -22,37 +33,67 @@ const ProfileSetup = () => {
   const [plateNumber, setPlateNumber] = useState("");
   const [plateImage, setPlateImage] = useState<string | null>(null);
   const [licenseImage, setLicenseImage] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (fullName && selectedRole) {
       // Validate driver-specific fields
       if (selectedRole === "Driver") {
         if (!plateNumber || !plateImage || !licenseImage) {
           // Show error message or handle validation
+          Alert.alert("Error", "Please complete all driver information fields");
           return;
         }
       }
 
-      // In a real app, you would save the profile data here
-      console.log("Profile data:", { 
-        fullName, 
-        email, 
-        role: selectedRole,
-        ...(selectedRole === "Driver" && {
-          plateNumber,
-          plateImage,
-          licenseImage
-        })
-      });
-
-      // Navigate to the appropriate dashboard based on role
-      if (selectedRole === "Customer") {
-        router.push("/customer/dashboard");
-      } else if (selectedRole === "Driver") {
-        router.push("/driver/dashboard");
-      } else {
-        // Affiliate dashboard would go here
-        router.push("/");
+      try {
+        setIsLoading(true);
+        
+        // Convert frontend role to backend role value
+        const roleValue = roleMapping[selectedRole];
+        
+        // Create profile update data
+        const profileData = {
+          name: fullName,
+          role: roleValue,
+          ...(email && { email }), // Only include email if provided
+          ...(selectedRole === "Driver" && {
+            vehicleInfo: {
+              plateNumber,
+              plateImage,
+              licenseImage
+            }
+          })
+        };
+        
+        console.log("Updating profile with data:", profileData);
+        
+        // Send profile update to server
+        const updateResponse: ProfileUpdateResponse = await authService.updateProfile(profileData);
+        
+        // Store the new token if provided
+        if (updateResponse.token) {
+          console.log("Received new token after profile update, saving it");
+          await storage.setToken(updateResponse.token);
+        }
+        
+        // Navigate to the appropriate dashboard based on role
+        if (selectedRole === "Customer") {
+          router.replace("/customer/dashboard");
+        } else if (selectedRole === "Driver") {
+          router.replace("/driver/dashboard");
+        } else {
+          // Affiliate dashboard would go here
+          router.replace("/customer/dashboard"); // Temporary fallback
+        }
+      } catch (error) {
+        console.error("Error updating profile:", error);
+        Alert.alert(
+          "Profile Update Failed",
+          "Failed to update your profile. Please try again."
+        );
+      } finally {
+        setIsLoading(false);
       }
     }
   };
@@ -228,15 +269,19 @@ const ProfileSetup = () => {
         <TouchableOpacity
           onPress={handleSubmit}
           className={`py-4 rounded-lg ${
-            !fullName || !selectedRole || (selectedRole === "Driver" && (!plateNumber || !plateImage || !licenseImage))
+            !fullName || !selectedRole || (selectedRole === "Driver" && (!plateNumber || !plateImage || !licenseImage)) || isLoading
               ? "bg-neutral-300 dark:bg-neutral-700"
               : "bg-primary-500"
           }`}
-          disabled={!fullName || !selectedRole || (selectedRole === "Driver" && (!plateNumber || !plateImage || !licenseImage))}
+          disabled={!fullName || !selectedRole || (selectedRole === "Driver" && (!plateNumber || !plateImage || !licenseImage)) || isLoading}
         >
-          <Text className="text-white font-semibold text-center">
-            Complete Setup
-          </Text>
+          {isLoading ? (
+            <ActivityIndicator color="#ffffff" />
+          ) : (
+            <Text className="text-white font-semibold text-center">
+              Complete Setup
+            </Text>
+          )}
         </TouchableOpacity>
       </View>
     </ScrollView>

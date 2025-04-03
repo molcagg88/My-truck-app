@@ -63,18 +63,26 @@ export const errorHandler = (
     });
   }
 
+  // Handle TypeORM errors
+  if (err.name === 'QueryFailedError') {
+    return res.status(400).json({
+      status: 'fail',
+      message: 'Database operation failed',
+    });
+  }
+
   // Handle JWT errors
   if (err.name === 'JsonWebTokenError') {
     return res.status(401).json({
       status: 'fail',
-      message: 'Invalid token. Please log in again.',
+      message: 'Invalid token',
     });
   }
 
   if (err.name === 'TokenExpiredError') {
     return res.status(401).json({
       status: 'fail',
-      message: 'Your token has expired. Please log in again.',
+      message: 'Token expired',
     });
   }
 
@@ -86,10 +94,10 @@ export const errorHandler = (
     });
   }
 
-  // Handle other errors
+  // Handle unknown errors
   console.error('Error:', err);
   return res.status(500).json({
     status: 'error',
-    message: 'Something went wrong!',
+    message: 'Internal server error',
   });
 }; 

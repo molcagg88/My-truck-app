@@ -117,3 +117,434 @@
 {"duration":5,"ip":"::1","level":"http","message":"GET /api/auth/me 500 - 5ms","method":"GET","status":500,"timestamp":"2025-04-02 05:11:17:1117","url":"/api/auth/me","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36"}
 {"duration":5,"ip":"::1","level":"http","message":"GET /api/auth/me 500 - 5ms","method":"GET","status":500,"timestamp":"2025-04-02 05:12:12:1212","url":"/api/auth/me","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36"}
 {"duration":5,"ip":"::1","level":"http","message":"GET /api/auth/me 500 - 5ms","method":"GET","status":500,"timestamp":"2025-04-02 05:12:32:1232","url":"/api/auth/me","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36"}
+{"level":"info","message":"Database connection established","timestamp":"2025-04-02 07:19:03:193"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-02 07:19:03:193"}
+{"level":"info","message":"Database connection established","timestamp":"2025-04-02 07:23:28:2328"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-02 07:23:28:2328"}
+{"level":"info","message":"Database connection established","timestamp":"2025-04-02 07:24:00:240"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-02 07:24:00:240"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T06:13:00.865Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T06:13:00.882Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T06:13:00.884Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T06:13:43.884Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T06:13:43.900Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T06:13:43.903Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T06:15:20.397Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T06:15:20.417Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T06:15:20.420Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T06:16:14.840Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T06:16:30.765Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T06:18:30.499Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T06:18:51.702Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T06:19:06.541Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T06:20:13.200Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T06:20:13.470Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T06:21:36.839Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T06:21:37.805Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T06:21:45.039Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T06:21:55.859Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T06:23:18.212Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T06:23:21.163Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T06:23:37.162Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T06:24:19.731Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T06:24:22.152Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T06:24:45.149Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T06:24:56.363Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T06:27:21.245Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T06:28:03.146Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T06:28:08.355Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T06:29:26.408Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T06:29:51.251Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T06:30:52.562Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T06:31:15.817Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T06:31:34.552Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T06:31:49.171Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T06:32:01.155Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T06:32:27.343Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T06:32:49.255Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T06:33:02.147Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T06:35:31.320Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T06:36:52.481Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T06:37:52.158Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T06:50:07.589Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T06:50:20.788Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T06:56:40.937Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T07:03:18.094Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T07:10:16.785Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T07:10:17.492Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T07:10:25.248Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T07:10:52.232Z"}
+{"level":"info","message":"GET /api/customer/stats","timestamp":"2025-04-03T07:12:04.829Z"}
+{"level":"info","message":"GET /api/customer/orders/active","timestamp":"2025-04-03T07:12:04.837Z"}
+{"level":"info","message":"GET /api/customer/orders/history?page=1&limit=10","timestamp":"2025-04-03T07:12:04.860Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T07:13:45.571Z"}
+{"level":"info","message":"GET /api/customer/stats","timestamp":"2025-04-03T07:13:45.681Z"}
+{"level":"info","message":"GET /api/customer/orders/active","timestamp":"2025-04-03T07:13:45.700Z"}
+{"level":"info","message":"GET /api/customer/orders/history?page=1&limit=10","timestamp":"2025-04-03T07:13:45.705Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T07:13:58.313Z"}
+{"level":"info","message":"GET /api/customer/stats","timestamp":"2025-04-03T07:14:11.963Z"}
+{"level":"info","message":"GET /api/customer/orders/active","timestamp":"2025-04-03T07:14:11.969Z"}
+{"level":"info","message":"GET /api/customer/orders/history?page=1&limit=10","timestamp":"2025-04-03T07:14:11.980Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T07:16:10.145Z"}
+{"level":"info","message":"GET /api/customer/stats","timestamp":"2025-04-03T07:18:32.605Z"}
+{"level":"info","message":"GET /api/customer/orders/active","timestamp":"2025-04-03T07:18:32.689Z"}
+{"level":"info","message":"GET /api/customer/orders/history?page=1&limit=10","timestamp":"2025-04-03T07:18:32.726Z"}
+{"level":"info","message":"GET /api/customer/stats","timestamp":"2025-04-03T07:18:33.043Z"}
+{"level":"info","message":"GET /api/customer/orders/active","timestamp":"2025-04-03T07:18:33.048Z"}
+{"level":"info","message":"GET /api/customer/orders/history?page=1&limit=10","timestamp":"2025-04-03T07:18:33.053Z"}
+{"level":"info","message":"GET /api/customer/stats","timestamp":"2025-04-03T07:18:43.623Z"}
+{"level":"info","message":"GET /api/customer/orders/active","timestamp":"2025-04-03T07:18:43.630Z"}
+{"level":"info","message":"GET /api/customer/orders/history?page=1&limit=10","timestamp":"2025-04-03T07:18:43.634Z"}
+{"level":"info","message":"GET /api/customer/stats","timestamp":"2025-04-03T07:21:43.452Z"}
+{"level":"info","message":"GET /api/customer/orders/active","timestamp":"2025-04-03T07:21:43.478Z"}
+{"level":"info","message":"GET /api/customer/orders/history?page=1&limit=10","timestamp":"2025-04-03T07:21:43.519Z"}
+{"level":"info","message":"GET /api/customer/stats","timestamp":"2025-04-03T07:21:43.881Z"}
+{"level":"info","message":"GET /api/customer/orders/active","timestamp":"2025-04-03T07:21:43.886Z"}
+{"level":"info","message":"GET /api/customer/orders/history?page=1&limit=10","timestamp":"2025-04-03T07:21:43.892Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T07:27:18.344Z"}
+{"level":"info","message":"GET /api/customer/stats","timestamp":"2025-04-03T07:28:05.069Z"}
+{"level":"info","message":"GET /api/customer/orders/active","timestamp":"2025-04-03T07:28:05.084Z"}
+{"level":"info","message":"GET /api/customer/orders/history?page=1&limit=10","timestamp":"2025-04-03T07:28:05.119Z"}
+{"level":"info","message":"GET /api/customer/stats","timestamp":"2025-04-03T07:28:05.503Z"}
+{"level":"info","message":"GET /api/customer/orders/active","timestamp":"2025-04-03T07:28:05.508Z"}
+{"level":"info","message":"GET /api/customer/orders/history?page=1&limit=10","timestamp":"2025-04-03T07:28:05.516Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T07:29:54.027Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T07:29:55.100Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T07:29:57.148Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T07:30:08.321Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T07:35:24.388Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T07:35:24.406Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T07:35:24.408Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T07:36:11.050Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T07:36:11.064Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T07:36:11.066Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T07:37:58.230Z"}
+{"level":"info","message":"POST /api/auth/phone/verify-otp","timestamp":"2025-04-03T07:38:20.409Z"}
+{"level":"info","message":"GET /api/customer/stats","timestamp":"2025-04-03T07:38:21.098Z"}
+{"level":"info","message":"GET /api/customer/orders/active","timestamp":"2025-04-03T07:38:21.154Z"}
+{"level":"info","message":"GET /api/customer/orders/history?page=1&limit=10","timestamp":"2025-04-03T07:38:21.191Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T07:41:05.152Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T07:41:18.147Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T07:41:34.101Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T07:41:34.122Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T07:41:34.124Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T07:41:52.351Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T07:41:52.362Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T07:41:52.364Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T07:42:05.805Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T07:42:05.820Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T07:42:05.822Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T07:42:18.167Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T07:44:08.305Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T07:44:08.320Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T07:44:08.322Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T07:44:46.532Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T07:44:46.550Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T07:44:46.552Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T07:45:47.455Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T07:45:47.469Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T07:45:47.471Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T07:46:10.531Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T07:46:10.546Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T07:46:10.548Z"}
+{"level":"info","message":"POST /api/auth/verify-otp","timestamp":"2025-04-03T07:48:23.801Z"}
+{"level":"info","message":"GET /api/customer/stats","timestamp":"2025-04-03T07:48:23.907Z"}
+{"level":"info","message":"GET /api/customer/orders/active","timestamp":"2025-04-03T07:48:23.923Z"}
+{"level":"info","message":"GET /api/customer/orders/history?page=1&limit=10","timestamp":"2025-04-03T07:48:23.941Z"}
+{"level":"info","message":"GET /api/customer/stats","timestamp":"2025-04-03T07:48:29.894Z"}
+{"level":"info","message":"GET /api/customer/orders/active","timestamp":"2025-04-03T07:48:29.906Z"}
+{"level":"info","message":"GET /api/customer/orders/history?page=1&limit=10","timestamp":"2025-04-03T07:48:29.926Z"}
+{"level":"info","message":"GET /api/customer/stats","timestamp":"2025-04-03T07:48:35.313Z"}
+{"level":"info","message":"GET /api/customer/orders/active","timestamp":"2025-04-03T07:48:35.326Z"}
+{"level":"info","message":"GET /api/customer/orders/history?page=1&limit=10","timestamp":"2025-04-03T07:48:35.336Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T07:49:07.416Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T07:49:07.431Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T07:49:07.432Z"}
+{"level":"info","message":"POST /api/auth/verify-otp","timestamp":"2025-04-03T07:49:34.231Z"}
+{"level":"info","message":"GET /api/customer/stats","timestamp":"2025-04-03T07:49:34.379Z"}
+{"level":"info","message":"GET /api/customer/orders/active","timestamp":"2025-04-03T07:49:34.396Z"}
+{"level":"info","message":"GET /api/customer/orders/history?page=1&limit=10","timestamp":"2025-04-03T07:49:34.416Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T08:00:40.774Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T08:00:40.780Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T08:00:40.780Z"}
+{"level":"info","message":"POST /api/auth/verify-otp","timestamp":"2025-04-03T08:06:51.824Z"}
+{"level":"info","message":"POST /api/auth/verify-otp","timestamp":"2025-04-03T08:07:24.991Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T08:12:34.232Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T08:12:34.246Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T08:12:34.247Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T08:16:12.377Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T08:16:12.391Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T08:16:12.392Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T08:16:43.339Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T08:16:43.358Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T08:16:43.360Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T08:17:20.283Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T08:17:20.298Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T08:17:20.300Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T08:17:46.501Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T08:17:46.520Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T08:17:46.522Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T08:18:01.632Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T08:18:01.646Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T08:18:01.648Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T08:19:25.145Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T08:19:25.161Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T08:19:25.163Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T08:19:34.005Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T08:19:34.019Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T08:19:34.020Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T08:19:55.580Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T08:19:55.595Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T08:19:55.596Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T08:20:15.250Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T08:20:15.264Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T08:20:15.267Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T08:20:49.041Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T08:20:49.055Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T08:20:49.057Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T08:21:26.698Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T08:21:26.716Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T08:21:26.718Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T16:38:37.985Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T16:38:38.000Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T16:38:38.002Z"}
+{"level":"info","message":"GET /api/customer/stats","timestamp":"2025-04-03T16:38:41.946Z"}
+{"level":"info","message":"GET /api/customer/orders/active","timestamp":"2025-04-03T16:38:41.989Z"}
+{"level":"info","message":"GET /api/customer/orders/history?page=1&limit=10","timestamp":"2025-04-03T16:38:42.007Z"}
+{"level":"info","message":"GET /api/customer/stats","timestamp":"2025-04-03T16:40:12.506Z"}
+{"level":"info","message":"GET /api/customer/orders/active","timestamp":"2025-04-03T16:40:12.519Z"}
+{"level":"info","message":"GET /api/customer/orders/history?page=1&limit=10","timestamp":"2025-04-03T16:40:12.541Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T16:45:45.622Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T16:45:45.641Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T16:45:45.643Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T16:46:20.199Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T16:46:20.214Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T16:46:20.216Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T16:46:35.531Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T16:46:35.547Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T16:46:35.549Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T16:47:16.359Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T16:47:16.375Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T16:47:16.378Z"}
+{"level":"info","message":"POST /api/auth/verify-otp","timestamp":"2025-04-03T16:57:19.007Z"}
+{"level":"info","message":"GET /api/customer/stats","timestamp":"2025-04-03T16:57:19.126Z"}
+{"level":"info","message":"GET /api/customer/orders/active","timestamp":"2025-04-03T16:57:19.164Z"}
+{"level":"info","message":"GET /api/customer/orders/history?page=1&limit=10","timestamp":"2025-04-03T16:57:19.179Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T16:57:50.804Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T16:57:50.817Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T16:57:50.819Z"}
+{"level":"info","message":"GET /api/customer/orders/active","timestamp":"2025-04-03T16:59:11.484Z"}
+{"level":"info","message":"GET /api/customer/stats","timestamp":"2025-04-03T16:59:11.511Z"}
+{"level":"info","message":"GET /api/customer/orders/history?page=1&limit=10","timestamp":"2025-04-03T16:59:11.524Z"}
+{"level":"info","message":"POST /api/auth/verify-otp","timestamp":"2025-04-03T17:00:17.446Z"}
+{"level":"info","message":"GET /api/customer/stats","timestamp":"2025-04-03T17:00:17.608Z"}
+{"level":"info","message":"GET /api/customer/orders/active","timestamp":"2025-04-03T17:00:17.657Z"}
+{"level":"info","message":"GET /api/customer/orders/history?page=1&limit=10","timestamp":"2025-04-03T17:00:17.674Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T17:02:13.822Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T17:02:13.841Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T17:02:13.843Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T17:02:34.120Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T17:02:34.137Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T17:02:34.139Z"}
+{"level":"info","message":"POST /api/auth/verify-otp","timestamp":"2025-04-03T17:03:17.767Z"}
+{"level":"info","message":"GET /api/customer/stats","timestamp":"2025-04-03T17:03:17.897Z"}
+{"level":"info","message":"GET /api/customer/orders/active","timestamp":"2025-04-03T17:03:17.942Z"}
+{"level":"info","message":"GET /api/customer/orders/history?page=1&limit=10","timestamp":"2025-04-03T17:03:17.961Z"}
+{"level":"info","message":"GET /api/customer/stats","timestamp":"2025-04-03T17:03:24.177Z"}
+{"level":"info","message":"GET /api/customer/orders/active","timestamp":"2025-04-03T17:03:24.188Z"}
+{"level":"info","message":"GET /api/customer/orders/history?page=1&limit=10","timestamp":"2025-04-03T17:03:24.197Z"}
+{"level":"info","message":"POST /api/auth/verify-otp","timestamp":"2025-04-03T17:03:38.224Z"}
+{"level":"info","message":"GET /api/customer/stats","timestamp":"2025-04-03T17:03:48.529Z"}
+{"level":"info","message":"GET /api/customer/orders/active","timestamp":"2025-04-03T17:03:48.545Z"}
+{"level":"info","message":"GET /api/customer/orders/history?page=1&limit=10","timestamp":"2025-04-03T17:03:48.556Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T17:04:35.251Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T17:04:35.263Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T17:04:35.266Z"}
+{"level":"info","message":"POST /api/auth/verify-otp","timestamp":"2025-04-03T17:18:42.590Z"}
+{"level":"info","message":"GET /api/customer/stats","timestamp":"2025-04-03T17:19:06.783Z"}
+{"level":"info","message":"GET /api/customer/orders/history?page=1&limit=10","timestamp":"2025-04-03T17:19:06.837Z"}
+{"level":"info","message":"GET /api/customer/orders/active","timestamp":"2025-04-03T17:19:06.867Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T17:19:19.515Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T17:19:19.530Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T17:19:19.531Z"}
+{"level":"info","message":"GET /api/customer/stats","timestamp":"2025-04-03T17:20:10.704Z"}
+{"level":"info","message":"GET /api/customer/orders/active","timestamp":"2025-04-03T17:20:10.737Z"}
+{"level":"info","message":"GET /api/customer/orders/history?page=1&limit=10","timestamp":"2025-04-03T17:20:10.758Z"}
+{"level":"info","message":"POST /api/auth/verify-otp","timestamp":"2025-04-03T17:20:44.365Z"}
+{"level":"info","message":"GET /api/customer/stats","timestamp":"2025-04-03T17:20:49.560Z"}
+{"level":"info","message":"GET /api/customer/orders/active","timestamp":"2025-04-03T17:20:49.607Z"}
+{"level":"info","message":"GET /api/customer/orders/history?page=1&limit=10","timestamp":"2025-04-03T17:20:49.630Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T17:21:32.320Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T17:21:32.335Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T17:21:32.337Z"}
+{"level":"info","message":"POST /api/auth/verify-otp","timestamp":"2025-04-03T17:22:07.241Z"}
+{"level":"info","message":"GET /api/customer/stats","timestamp":"2025-04-03T17:22:20.911Z"}
+{"level":"info","message":"GET /api/customer/orders/active","timestamp":"2025-04-03T17:22:20.958Z"}
+{"level":"info","message":"GET /api/customer/orders/history?page=1&limit=10","timestamp":"2025-04-03T17:22:20.997Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T17:25:13.705Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T17:25:13.715Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T17:25:13.716Z"}
+{"level":"info","message":"POST /api/auth/create-test-user","timestamp":"2025-04-03T17:25:25.990Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T17:25:46.962Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T17:25:46.981Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T17:25:46.982Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T17:25:58.852Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T17:25:58.872Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T17:25:58.876Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T17:26:44.495Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T17:26:44.512Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T17:26:44.514Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T17:27:13.929Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T17:27:13.940Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T17:27:13.942Z"}
+{"level":"info","message":"POST /api/auth/verify-otp","timestamp":"2025-04-03T17:29:15.159Z"}
+{"level":"info","message":"GET /api/customer/stats","timestamp":"2025-04-03T17:29:32.981Z"}
+{"level":"info","message":"GET /api/customer/orders/active","timestamp":"2025-04-03T17:29:33.015Z"}
+{"level":"info","message":"GET /api/customer/orders/history?page=1&limit=10","timestamp":"2025-04-03T17:29:33.058Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T17:31:31.331Z"}
+{"level":"info","message":"POST /api/auth/verify-otp","timestamp":"2025-04-03T17:31:44.597Z"}
+{"level":"info","message":"GET /api/customer/stats","timestamp":"2025-04-03T17:31:44.799Z"}
+{"level":"info","message":"GET /api/customer/orders/active","timestamp":"2025-04-03T17:31:44.824Z"}
+{"level":"info","message":"GET /api/customer/orders/history?page=1&limit=10","timestamp":"2025-04-03T17:31:44.858Z"}
+{"level":"info","message":"POST /api/auth/verify-otp","timestamp":"2025-04-03T17:32:10.061Z"}
+{"level":"info","message":"GET /api/customer/stats","timestamp":"2025-04-03T17:32:10.265Z"}
+{"level":"info","message":"GET /api/customer/orders/active","timestamp":"2025-04-03T17:32:10.293Z"}
+{"level":"info","message":"GET /api/customer/orders/history?page=1&limit=10","timestamp":"2025-04-03T17:32:10.330Z"}
+{"level":"info","message":"POST /api/auth/verify-otp","timestamp":"2025-04-03T17:32:45.436Z"}
+{"level":"info","message":"GET /api/customer/stats","timestamp":"2025-04-03T17:32:45.641Z"}
+{"level":"info","message":"GET /api/customer/orders/active","timestamp":"2025-04-03T17:32:45.658Z"}
+{"level":"info","message":"GET /api/customer/orders/history?page=1&limit=10","timestamp":"2025-04-03T17:32:45.673Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T17:33:07.803Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T17:33:07.818Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T17:33:07.820Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T17:34:41.339Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T17:34:41.349Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T17:34:41.350Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T17:34:54.955Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T17:34:55.028Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T17:35:04.907Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T17:35:04.938Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T17:35:19.915Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T17:35:19.953Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T17:35:39.680Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T17:35:39.695Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T17:35:39.697Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T17:35:51.951Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T17:35:52.055Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T17:36:04.276Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T17:36:04.292Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T17:36:04.294Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T17:36:15.488Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T17:36:15.503Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T17:36:15.505Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T17:37:31.468Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T17:37:31.483Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T17:37:31.485Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T17:37:46.832Z"}
+{"level":"info","message":"POST /api/auth/send-otp","timestamp":"2025-04-03T17:38:07.102Z"}
+{"level":"info","message":"POST /api/auth/verify-otp","timestamp":"2025-04-03T17:38:13.088Z"}
+{"level":"info","message":"GET /api/customer/stats","timestamp":"2025-04-03T17:38:13.393Z"}
+{"level":"info","message":"GET /api/customer/orders/active","timestamp":"2025-04-03T17:38:13.426Z"}
+{"level":"info","message":"GET /api/customer/orders/history?page=1&limit=10","timestamp":"2025-04-03T17:38:13.446Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T17:38:35.635Z"}
+{"level":"info","message":"POST /api/auth/send-otp","timestamp":"2025-04-03T17:38:49.996Z"}
+{"level":"info","message":"POST /api/auth/verify-otp","timestamp":"2025-04-03T17:38:57.511Z"}
+{"level":"info","message":"GET /api/customer/stats","timestamp":"2025-04-03T17:38:57.697Z"}
+{"level":"info","message":"GET /api/customer/orders/active","timestamp":"2025-04-03T17:38:57.732Z"}
+{"level":"info","message":"GET /api/customer/orders/history?page=1&limit=10","timestamp":"2025-04-03T17:38:57.782Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T17:39:14.251Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T17:39:14.271Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T17:39:14.274Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T17:44:33.916Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T17:44:33.933Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T17:44:33.936Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T17:46:41.414Z"}
+{"level":"info","message":"POST /api/auth/check-phone","timestamp":"2025-04-03T17:47:11.137Z"}
+{"level":"info","message":"POST /api/auth/send-otp","timestamp":"2025-04-03T17:47:11.264Z"}
+{"level":"info","message":"POST /api/auth/verify-otp","timestamp":"2025-04-03T17:48:06.539Z"}
+{"level":"info","message":"GET /api/customer/stats","timestamp":"2025-04-03T17:48:24.583Z"}
+{"level":"info","message":"GET /api/customer/orders/active","timestamp":"2025-04-03T17:48:24.608Z"}
+{"level":"info","message":"GET /api/customer/orders/history?page=1&limit=10","timestamp":"2025-04-03T17:48:24.640Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T17:49:02.589Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T17:49:02.605Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T17:49:02.607Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T17:49:14.478Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T17:49:46.918Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T17:50:10.247Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T17:50:10.259Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T17:50:10.261Z"}
+{"level":"info","message":"POST /api/auth/check-phone","timestamp":"2025-04-03T17:51:38.094Z"}
+{"level":"info","message":"POST /api/auth/send-otp","timestamp":"2025-04-03T17:51:38.305Z"}
+{"level":"info","message":"POST /api/auth/verify-otp","timestamp":"2025-04-03T17:51:43.644Z"}
+{"level":"info","message":"GET /api/customer/stats","timestamp":"2025-04-03T17:51:44.190Z"}
+{"level":"info","message":"GET /api/customer/orders/active","timestamp":"2025-04-03T17:51:44.221Z"}
+{"level":"info","message":"GET /api/customer/orders/history?page=1&limit=10","timestamp":"2025-04-03T17:51:44.249Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T17:52:02.335Z"}
+{"level":"info","message":"POST /api/auth/check-phone","timestamp":"2025-04-03T17:53:05.442Z"}
+{"level":"info","message":"POST /api/auth/send-otp","timestamp":"2025-04-03T17:53:05.627Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T17:53:18.857Z"}
+{"level":"info","message":"POST /api/auth/check-phone","timestamp":"2025-04-03T17:53:27.622Z"}
+{"level":"info","message":"POST /api/auth/send-otp","timestamp":"2025-04-03T17:53:27.681Z"}
+{"level":"info","message":"POST /api/auth/verify-otp","timestamp":"2025-04-03T17:53:32.179Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T17:54:18.596Z"}
+{"level":"info","message":"POST /api/auth/check-phone","timestamp":"2025-04-03T17:56:16.015Z"}
+{"level":"info","message":"POST /api/auth/send-otp","timestamp":"2025-04-03T17:56:16.248Z"}
+{"level":"info","message":"POST /api/auth/verify-otp","timestamp":"2025-04-03T17:56:20.877Z"}
+{"level":"info","message":"GET /api/customer/stats","timestamp":"2025-04-03T17:56:21.306Z"}
+{"level":"info","message":"GET /api/customer/orders/active","timestamp":"2025-04-03T17:56:21.349Z"}
+{"level":"info","message":"GET /api/customer/orders/history?page=1&limit=10","timestamp":"2025-04-03T17:56:21.373Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T17:56:42.106Z"}
+{"level":"info","message":"POST /api/auth/check-phone","timestamp":"2025-04-03T17:57:02.304Z"}
+{"level":"info","message":"POST /api/auth/send-otp","timestamp":"2025-04-03T17:57:02.364Z"}
+{"level":"info","message":"POST /api/auth/verify-otp","timestamp":"2025-04-03T17:57:08.517Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T17:57:54.803Z"}
+{"level":"info","message":"POST /api/auth/check-phone","timestamp":"2025-04-03T17:58:02.670Z"}
+{"level":"info","message":"POST /api/auth/send-otp","timestamp":"2025-04-03T17:58:02.715Z"}
+{"level":"info","message":"POST /api/auth/verify-otp","timestamp":"2025-04-03T17:58:07.246Z"}
+{"level":"info","message":"GET /api/customer/stats","timestamp":"2025-04-03T17:58:07.722Z"}
+{"level":"info","message":"GET /api/customer/orders/active","timestamp":"2025-04-03T17:58:07.752Z"}
+{"level":"info","message":"GET /api/customer/orders/history?page=1&limit=10","timestamp":"2025-04-03T17:58:07.779Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T17:58:18.845Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T17:58:18.864Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T17:58:18.867Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T18:01:13.927Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T18:01:23.916Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T18:01:41.279Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T18:01:41.296Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T18:01:41.297Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T18:02:29.174Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T18:02:29.193Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T18:02:29.195Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T18:02:49.931Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T18:02:58.924Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T18:03:06.915Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T18:03:14.917Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T18:04:54.919Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T18:05:20.731Z"}
+{"level":"info","message":"POST /api/auth/check-phone","timestamp":"2025-04-03T18:05:40.003Z"}
+{"level":"info","message":"POST /api/auth/send-otp","timestamp":"2025-04-03T18:05:40.043Z"}
+{"level":"info","message":"POST /api/auth/verify-otp","timestamp":"2025-04-03T18:05:45.569Z"}
+{"level":"info","message":"PATCH /api/auth/profile","timestamp":"2025-04-03T18:06:02.410Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T18:06:35.384Z"}
+{"level":"info","message":"POST /api/auth/check-phone","timestamp":"2025-04-03T18:07:02.089Z"}
+{"level":"info","message":"POST /api/auth/send-otp","timestamp":"2025-04-03T18:07:02.132Z"}
+{"level":"info","message":"POST /api/auth/verify-otp","timestamp":"2025-04-03T18:07:07.178Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T18:07:49.614Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T18:07:49.629Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T18:07:49.631Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T18:08:59.383Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T18:08:59.397Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T18:08:59.399Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T18:09:18.240Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T18:09:18.256Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T18:09:18.258Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T18:09:39.802Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T18:09:39.817Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T18:09:39.818Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T18:10:00.304Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T18:10:00.319Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T18:10:00.321Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-03T18:10:16.914Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-03T18:10:16.929Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-03T18:10:16.931Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-03T18:10:25.410Z"}

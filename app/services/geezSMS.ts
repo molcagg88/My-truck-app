@@ -1,4 +1,7 @@
 // GeezSMS OTP verification service integration
+import storage from '../utils/storage';
+import { getApiBaseUrl } from './apiUtils';
+import axios from 'axios';
 
 interface SendOTPParams {
   phoneNumber: string;
@@ -19,101 +22,149 @@ interface VerifyOTPParams {
   otpCode: string;
 }
 
-interface VerificationResponse {
+interface ApiResponse {
   success: boolean;
-  message: string;
-  data?: {
-    isValid?: boolean;
-    userId?: string;
-  };
+  message?: string;
+  error?: string;
+  data?: any;
 }
+
+// Helper function to format phone numbers consistently
+export const formatPhoneNumber = (phone: string): string => {
+  if (!phone) return "";
+  
+  // Clean the input - remove spaces, dashes, parentheses, etc.
+  const cleaned = phone.replace(/\s+/g, '').replace(/[()-]/g, '');
+  
+  // If phone already has a + prefix, assume it's in international format
+  if (cleaned.startsWith('+')) {
+    return cleaned;
+  }
+  
+  // Handle Ethiopian numbers specifically
+  if (cleaned.startsWith('251')) {
+    return `+${cleaned}`;
+  }
+  
+  if (cleaned.startsWith('0')) {
+    // Converting Ethiopian local format (0xx...) to international
+    return `+251${cleaned.substring(1)}`;
+  }
+  
+  // If it's a 9-digit number, assume it's Ethiopian without the 0 prefix
+  if (/^9\d{8}$/.test(cleaned)) {
+    return `+251${cleaned}`;
+  }
+  
+  // If it's a 10-digit number and doesn't match other patterns,
+  // it could be a complete local number (like US/Canada)
+  if (cleaned.length === 10 && !/^0/.test(cleaned)) {
+    return `+251${cleaned}`;
+  }
+  
+  // If no specific format is recognized, preserve as is but ensure + prefix
+  return cleaned.startsWith('+') ? cleaned : `+${cleaned}`;
+};
 
 const GEEZSMS_API_KEY = process.env.EXPO_PUBLIC_GEEZSMS_API_KEY;
 const GEEZSMS_API_URL = "https://api.geezsms.com/v1";
-const DEV_MODE = process.env.EXPO_PUBLIC_DEV_MODE === "true";
-const DEV_OTP = "123456";
+
+const api = axios.create({
+  baseURL: getApiBaseUrl(),
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
 
 const geezSMSService = {
+  formatPhoneNumber,
+  
   async sendOTP(phoneNumber: string) {
-    if (DEV_MODE) {
-      console.log("Development mode: OTP would be sent to", phoneNumber);
-      return {
-        success: true,
-        data: {
-          otpId: "dev-otp-id",
-          expiryTime: new Date(Date.now() + 5 * 60 * 1000).toISOString(),
-        },
-      };
-    }
-
     try {
-      const response = await fetch("https://api.geezsms.com/v1/otp/send", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${GEEZSMS_API_KEY}`,
-        },
-        body: JSON.stringify({
-          phoneNumber,
-          message: "Your OTP code is: {otp}",
-          expiryTime: 5, // 5 minutes
-        }),
+      // Format the phone number to ensure consistency
+      const formattedPhone = formatPhoneNumber(phoneNumber);
+      console.log("Sending OTP to", formattedPhone);
+      
+      // Make API request to send OTP
+      const response = await api.post('/auth/send-otp', {
+        phone: formattedPhone
       });
-
-      const data = await response.json();
+      
       return {
-        success: response.ok,
-        data: response.ok ? data : null,
-        error: !response.ok ? data.message : null,
+        success: response.data.success,
+        message: response.data.message,
+        data: response.data.data,
       };
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Error sending OTP:', error);
       return {
         success: false,
-        error: "Failed to send OTP. Please try again.",
+        error: error.response?.data?.message || "Failed to send OTP. Please try again.",
       };
     }
   },
 
-  async verifyOTP(otpId: string, otp: string) {
-    if (DEV_MODE) {
-      if (otp === DEV_OTP) {
+  async verifyOTP(phoneNumber: string, otp: string, name?: string): Promise<ApiResponse> {
+    try {
+      // Format the phone number to ensure consistency
+      const formattedPhone = formatPhoneNumber(phoneNumber);
+      console.log(`Verifying OTP for phone: ${formattedPhone}`);
+      
+      // Make the API request to verify OTP
+      const response = await api.post('/auth/verify-otp', {
+        phone: formattedPhone,
+        otp,
+        name
+      });
+      
+      console.log(`Server response status: ${response.status}`);
+      
+      // If the server responds with success and token
+      if (response.data.success && response.data.token) {
+        // Ensure the token is a string and validate format
+        const tokenString = String(response.data.token);
+        console.log(`Received token (first 20 chars): ${tokenString.substring(0, 20)}...`);
+        
+        // Validate token format (should be in JWT format: header.payload.signature)
+        const parts = tokenString.split('.');
+        if (parts.length !== 3) {
+          console.warn(`WARNING: Token does not have expected JWT format (has ${parts.length} parts)`);
+          return {
+            success: false,
+            error: 'Invalid token format received from server'
+          };
+        }
+        
+        // Store the token securely
+        try {
+          await storage.setToken(tokenString);
+          console.log('Token saved successfully');
+        } catch (storageError) {
+          console.error('Failed to save token:', storageError);
+          throw new Error('Authentication failed: Unable to save credentials');
+        }
+        
+        // Return success response
         return {
           success: true,
+          message: "Authentication successful",
           data: {
-            message: "OTP verified successfully",
-            userId: "dev-user-id",
+            ...response.data,
+            token: tokenString,
           },
         };
       }
+      
+      // If the API call was successful but authentication failed
       return {
         success: false,
-        error: "Invalid OTP code",
+        error: response.data.message || 'Authentication failed',
       };
-    }
-
-    try {
-      const response = await fetch("https://api.geezsms.com/v1/otp/verify", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${GEEZSMS_API_KEY}`,
-        },
-        body: JSON.stringify({
-          otpId,
-          otp,
-        }),
-      });
-
-      const data = await response.json();
-      return {
-        success: response.ok,
-        data: response.ok ? data : null,
-        error: !response.ok ? data.message : null,
-      };
-    } catch (error) {
+    } catch (error: any) {
+      console.error('OTP verification error:', error);
       return {
         success: false,
-        error: "Failed to verify OTP. Please try again.",
+        error: error.response?.data?.message || 'Failed to verify OTP',
       };
     }
   },

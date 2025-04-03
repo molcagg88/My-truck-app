@@ -3,10 +3,13 @@ import { Job } from '../entities/Job';
 import { Driver } from '../entities/Driver';
 import { Payment } from '../entities/Payment';
 import { Activity } from '../entities/Activity';
+import { User } from '../entities/User';
+import { UserRoles } from '../types/enums';
 import fs from 'fs';
 import path from 'path';
 import { JobStatus, PaymentStatus, DriverStatus, ActivityType } from '../types/enums';
 import { randomDate, randomGeoPoint, randomItem, randomJobStatus, getPaymentStatusForJob } from '../utils/seedHelpers';
+import bcrypt from 'bcryptjs';
 
 // Base coordinates for New York City
 const NYC_LAT = 40.7128;
@@ -115,6 +118,46 @@ const generateActivityDescription = (type: ActivityType, entity: any): string =>
   }
 };
 
+// Add seed users data
+const seedUsers = [
+  {
+    name: "Admin User",
+    email: "admin@example.com",
+    password: "admin123",
+    role: UserRoles.ADMIN,
+    phone: "+251911234567",
+    isEmailVerified: true,
+    isPhoneVerified: true
+  },
+  {
+    name: "Manager User",
+    email: "manager@example.com",
+    password: "manager123",
+    role: UserRoles.MANAGER,
+    phone: "+251922345678",
+    isEmailVerified: true,
+    isPhoneVerified: true
+  },
+  {
+    name: "Driver User",
+    email: "driver@example.com",
+    password: "driver123",
+    role: UserRoles.DRIVER,
+    phone: "+251933456789",
+    isEmailVerified: true,
+    isPhoneVerified: true
+  },
+  {
+    name: "Customer User",
+    email: "customer@example.com",
+    password: "customer123",
+    role: UserRoles.CUSTOMER,
+    phone: "+251944567890",
+    isEmailVerified: true,
+    isPhoneVerified: true
+  }
+];
+
 export const seed = async () => {
   try {
     // Ensure directories exist
@@ -125,6 +168,36 @@ export const seed = async () => {
       await AppDataSource.initialize();
     }
 
+    console.log('Database initialized successfully');
+    
+    // Create users
+    console.log('Creating users...');
+    const userRepository = AppDataSource.getRepository(User);
+    const userEntities = [];
+    
+    for (const userData of seedUsers) {
+      // Check if user already exists
+      const existingUser = await userRepository.findOne({ where: { email: userData.email } });
+      if (!existingUser) {
+        // Create new user
+        const user = new User();
+        user.name = userData.name;
+        user.email = userData.email;
+        user.password = await bcrypt.hash(userData.password, 10);
+        user.phone = userData.phone;
+        user.role = userData.role;
+        user.isEmailVerified = userData.isEmailVerified;
+        user.isPhoneVerified = userData.isPhoneVerified;
+        
+        const savedUser = await userRepository.save(user);
+        console.log(`User created: ${savedUser.name} (${savedUser.role}) with ID: ${savedUser.id}`);
+        userEntities.push(savedUser);
+      } else {
+        console.log(`User already exists: ${existingUser.name} (${existingUser.email})`);
+        userEntities.push(existingUser);
+      }
+    }
+    
     // Clear existing data (optional)
     console.log('Clearing existing data...');
     await AppDataSource.getRepository(Activity).clear();

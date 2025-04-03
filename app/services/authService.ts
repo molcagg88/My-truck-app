@@ -59,6 +59,12 @@ export interface AuthResponse {
   user: User;
 }
 
+export interface ProfileUpdateResponse {
+  message: string;
+  token: string;
+  user: User;
+}
+
 // Auth service
 export const authService = {
   login: async (credentials: LoginCredentials): Promise<AuthResponse> => {
@@ -77,14 +83,25 @@ export const authService = {
 
   getCurrentUser: async (): Promise<User | null> => {
     try {
+      console.log("getCurrentUser called");
+      const token = await storage.getToken();
+      console.log("Token in getCurrentUser:", token ? `${token.substring(0, 20)}...` : "No token");
+      
+      if (!token) {
+        console.log("No token found, returning null");
+        return null;
+      }
+      
       const response = await api.get('/auth/me');
-      return response.data;
+      console.log("getCurrentUser response:", response.data ? "Success" : "No data");
+      return response.data.user;
     } catch (error) {
+      console.error("getCurrentUser error:", error);
       return null;
     }
   },
 
-  updateProfile: async (data: Partial<User>): Promise<User> => {
+  updateProfile: async (data: Partial<User>): Promise<ProfileUpdateResponse> => {
     const response = await api.patch('/auth/profile', data);
     return response.data;
   },
