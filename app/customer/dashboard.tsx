@@ -8,6 +8,7 @@ import BookingCard from "../components/BookingCard";
 import OrderHistoryList from "../components/OrderHistoryList";
 import customerService, { Order, CustomerStats } from "../services/customerService";
 import { handleApiError } from "../services/apiUtils";
+import SafeAreaContainer from "../utils/SafeAreaContainer";
 
 const CustomerDashboard = () => {
   const router = useRouter();
@@ -109,35 +110,38 @@ const CustomerDashboard = () => {
 
   if (loading && !refreshing) {
     return (
-      <View className="flex-1 bg-gray-50 dark:bg-neutral-900 items-center justify-center">
-        <Text className="text-neutral-600 dark:text-neutral-400">Loading dashboard...</Text>
-      </View>
+      <SafeAreaContainer scrollable={false}>
+        <View className="flex-1 items-center justify-center">
+          <Text className="text-neutral-600 dark:text-neutral-400">Loading dashboard...</Text>
+        </View>
+      </SafeAreaContainer>
     );
   }
 
   if (error) {
     return (
-      <View className="flex-1 bg-gray-50 dark:bg-neutral-900 items-center justify-center p-4">
-        <Text className="text-red-500 text-center mb-4">{error}</Text>
-        <TouchableOpacity
-          className="bg-red-500 py-2 px-4 rounded-lg"
-          onPress={fetchDashboardData}
-        >
-          <Text className="text-white font-medium">Retry</Text>
-        </TouchableOpacity>
-      </View>
+      <SafeAreaContainer scrollable={false}>
+        <View className="flex-1 items-center justify-center p-4">
+          <Text className="text-red-500 text-center mb-4">{error}</Text>
+          <TouchableOpacity
+            className="bg-red-500 py-2 px-4 rounded-lg"
+            onPress={fetchDashboardData}
+          >
+            <Text className="text-white font-medium">Retry</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaContainer>
     );
   }
 
   return (
-    <ScrollView 
-      className="flex-1 bg-gray-50 dark:bg-neutral-900"
+    <SafeAreaContainer
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
     >
       {/* Header */}
-      <View className="p-4 flex-row justify-between items-center">
+      <View className="flex-row justify-between items-center mb-4">
         <View>
           <Text className="text-2xl font-bold text-neutral-800 dark:text-white">
             Hello, {user?.name || 'User'}
@@ -200,22 +204,32 @@ const CustomerDashboard = () => {
               <Text className="text-neutral-600 dark:text-neutral-400 text-center mt-4 mb-2">
                 No active bookings
               </Text>
-              <Text className="text-neutral-500 dark:text-neutral-500 text-center text-sm">
-                Book a truck to get started
+              <Text className="text-neutral-500 dark:text-neutral-500 text-center text-sm mb-4">
+                You don't have any active bookings at the moment
               </Text>
               <TouchableOpacity
-                className="mt-4 py-2 px-4 bg-red-500 rounded-lg"
+                className="bg-red-500 py-2 px-6 rounded-lg"
                 onPress={handleBookingInitiated}
               >
                 <Text className="text-white font-medium">Book Now</Text>
               </TouchableOpacity>
             </View>
           )
-        ) : (
+        ) : orderHistory.length > 0 ? (
           <OrderHistoryList orders={orderHistory} onOrderPress={handleOrderPress} />
+        ) : (
+          <View className="flex-1 bg-white dark:bg-neutral-800 rounded-lg p-8 items-center justify-center shadow-sm m-4">
+            <Clock size={40} color={isDarkMode ? "#9ca3af" : "#6b7280"} />
+            <Text className="text-neutral-600 dark:text-neutral-400 text-center mt-4">
+              No order history yet
+            </Text>
+            <Text className="text-neutral-500 dark:text-neutral-500 text-center text-sm">
+              Your completed orders will appear here
+            </Text>
+          </View>
         )}
       </View>
-    </ScrollView>
+    </SafeAreaContainer>
   );
 };
 

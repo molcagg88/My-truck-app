@@ -4,7 +4,6 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  ScrollView,
   Image,
   ActivityIndicator,
   Alert,
@@ -14,6 +13,7 @@ import { ArrowLeft, Camera, User, Truck, Users, Car, FileText } from "lucide-rea
 import { useTheme } from "../_layout";
 import authService, { ProfileUpdateResponse } from "../services/authService";
 import storage from "../utils/storage";
+import SafeAreaContainer from "../utils/SafeAreaContainer";
 
 type UserRole = "Customer" | "Driver" | "Affiliate";
 
@@ -137,8 +137,8 @@ const ProfileSetup = () => {
   );
 
   return (
-    <ScrollView className="flex-1 bg-gray-50 dark:bg-neutral-900">
-      <View className="p-6">
+    <SafeAreaContainer extraPadding={{ top: 10 }}>
+      <View className="p-0">
         <TouchableOpacity onPress={() => router.back()} className="mb-6">
           <ArrowLeft size={24} color={isDarkMode ? "#ffffff" : "#374151"} />
         </TouchableOpacity>
@@ -284,7 +284,7 @@ const ProfileSetup = () => {
           )}
         </TouchableOpacity>
       </View>
-    </ScrollView>
+    </SafeAreaContainer>
   );
 };
 

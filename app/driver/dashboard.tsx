@@ -12,6 +12,7 @@ import { useRouter } from "expo-router";
 import RequestsList from "../components/RequestsList";
 import { Bell, Settings, MapPin, Clock, Truck, Package, Gavel, Check, X } from "lucide-react-native";
 import PaymentModal from "../components/PaymentModal";
+import SafeAreaContainer from "../utils/SafeAreaContainer";
 
 const COMMITMENT_FEE = 400;
 
@@ -190,205 +191,226 @@ export default function DriverDashboard() {
   }, []);
 
   return (
-    <View className={`flex-1 ${isDarkMode ? "bg-neutral-900" : "bg-neutral-50"}`}>
-      <ScrollView 
-        className="flex-1"
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-      >
-        <View className="p-4">
-          {/* Header */}
-          <View className="flex-row justify-between items-center mb-4">
-            <Text
-              className={`text-2xl font-bold ${
-                isDarkMode ? "text-white" : "text-neutral-900"
-              }`}
-            >
+    <SafeAreaContainer
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
+      <View>
+        {/* Header */}
+        <View className="flex-row justify-between items-center mb-4">
+          <View>
+            <Text className="text-2xl font-bold text-neutral-800 dark:text-white">
               Driver Dashboard
             </Text>
+            <View className="flex-row items-center mt-1">
+              <View
+                className={`h-3 w-3 rounded-full mr-2 ${
+                  isOnline ? "bg-green-500" : "bg-red-500"
+                }`}
+              />
+              <Text className="text-neutral-600 dark:text-neutral-400">
+                {isOnline ? "Online" : "Offline"}
+              </Text>
+            </View>
+          </View>
+          <View className="flex-row">
+            <TouchableOpacity
+              className="mr-4"
+              onPress={() => router.push("/notifications")}
+            >
+              <Bell size={24} color={isDarkMode ? "#ffffff" : "#374151"} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => router.push("/settings")}>
+              <Settings size={24} color={isDarkMode ? "#ffffff" : "#374151"} />
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Status Card */}
+        <View
+          className={`mb-6 p-4 rounded-lg ${
+            isOnline
+              ? "bg-green-50 dark:bg-green-900"
+              : "bg-red-50 dark:bg-red-900"
+          }`}
+        >
+          <View className="flex-row justify-between items-center">
+            <View>
+              <Text
+                className={`text-lg font-semibold ${
+                  isOnline
+                    ? "text-green-700 dark:text-green-300"
+                    : "text-red-700 dark:text-red-300"
+                }`}
+              >
+                {isOnline ? "You're online" : "You're offline"}
+              </Text>
+              <Text
+                className={`${
+                  isOnline
+                    ? "text-green-600 dark:text-green-400"
+                    : "text-red-600 dark:text-red-400"
+                }`}
+              >
+                {isOnline
+                  ? "You're visible to customers"
+                  : "You're not receiving any jobs"}
+              </Text>
+            </View>
             <TouchableOpacity
               onPress={handleToggleOnline}
-              disabled={hasActiveJob}
-              className={`px-4 py-2 rounded-lg ${
+              className={`py-2 px-4 rounded-lg ${
                 isOnline
-                  ? hasActiveJob 
-                    ? "bg-neutral-400"
-                    : "bg-green-500"
-                  : "bg-red-500"
+                  ? "bg-white dark:bg-neutral-800"
+                  : "bg-white dark:bg-neutral-800"
               }`}
             >
-              <Text className="text-white font-medium">
+              <Text
+                className={`font-medium ${
+                  isOnline
+                    ? "text-green-600 dark:text-green-400"
+                    : "text-red-600 dark:text-red-400"
+                }`}
+              >
                 {isOnline ? "Go Offline" : "Go Online"}
               </Text>
             </TouchableOpacity>
           </View>
+        </View>
 
-          {/* Stats Cards */}
-          <View className="flex-row space-x-4 mb-4">
-            <View
-              className={`flex-1 p-4 rounded-lg ${
-                isDarkMode ? "bg-neutral-800" : "bg-white"
-              }`}
-            >
-              <Text
-                className={`text-lg font-semibold mb-2 ${
-                  isDarkMode ? "text-white" : "text-neutral-900"
-                }`}
-              >
-                Active Jobs
-              </Text>
-              <Text
-                className={`text-3xl font-bold ${
-                  isDarkMode ? "text-white" : "text-neutral-900"
-                }`}
-              >
-                {activeJobs.length}
-              </Text>
-            </View>
-            <View
-              className={`flex-1 p-4 rounded-lg ${
-                isDarkMode ? "bg-neutral-800" : "bg-white"
-              }`}
-            >
-              <Text
-                className={`text-lg font-semibold mb-2 ${
-                  isDarkMode ? "text-white" : "text-neutral-900"
-                }`}
-              >
-                Available Jobs
-              </Text>
-              <Text
-                className={`text-3xl font-bold ${
-                  isDarkMode ? "text-white" : "text-neutral-900"
-                }`}
-              >
-                {jobRequests.length}
-              </Text>
-            </View>
-          </View>
+        {/* Job Requests */}
+        <View className="mb-6">
+          <Text className="text-xl font-semibold text-neutral-800 dark:text-white mb-4">
+            Job Requests
+          </Text>
+          <RequestsList
+            requests={jobRequests}
+            onAccept={handleAccept}
+            onDecline={handleDecline}
+            onBid={handleBid}
+            onAcceptBid={handleAcceptBid}
+            onDeclineBid={handleDeclineBid}
+            onCounterBid={handleCounterBid}
+            driverId="driver123"
+          />
+        </View>
 
-          {/* Job Requests Section */}
-          {isOnline && jobRequests.length > 0 && (
-            <View className="mb-4">
-              <Text
-                className={`text-lg font-semibold mb-2 ${
-                  isDarkMode ? "text-white" : "text-neutral-900"
-                }`}
+        {/* Active Jobs */}
+        <View className="mb-6">
+          <Text className="text-xl font-semibold text-neutral-800 dark:text-white mb-4">
+            Active Jobs
+          </Text>
+          {activeJobs.length > 0 ? (
+            activeJobs.map((job) => (
+              <TouchableOpacity
+                key={job.id}
+                className="bg-white dark:bg-neutral-800 p-4 rounded-lg shadow-sm mb-4"
+                onPress={() => router.push({
+                  pathname: "/driver/job-details",
+                  params: { jobId: job.id }
+                })}
               >
-                Job Requests
+                <View className="flex-row justify-between items-start mb-3">
+                  <View className="flex-1">
+                    <Text className="text-lg font-semibold text-neutral-800 dark:text-white">
+                      Delivery Job #{job.id}
+                    </Text>
+                    <Text className="text-neutral-600 dark:text-neutral-400">
+                      Distance: {job.distance}
+                    </Text>
+                  </View>
+                  <View className="bg-green-100 dark:bg-green-900 py-1 px-3 rounded-full">
+                    <Text className="text-green-800 dark:text-green-200 text-sm">Active</Text>
+                  </View>
+                </View>
+                <View className="flex-row items-center mb-2">
+                  <MapPin
+                    size={18}
+                    color={isDarkMode ? "#9ca3af" : "#6b7280"}
+                    className="mr-2"
+                  />
+                  <Text className="text-neutral-600 dark:text-neutral-400 flex-1">
+                    {job.pickup}
+                  </Text>
+                </View>
+                <View className="flex-row items-center mb-3">
+                  <MapPin
+                    size={18}
+                    color={isDarkMode ? "#9ca3af" : "#6b7280"}
+                    className="mr-2"
+                  />
+                  <Text className="text-neutral-600 dark:text-neutral-400 flex-1">
+                    {job.destination}
+                  </Text>
+                </View>
+                <View className="flex-row justify-between items-center pt-2 border-t border-gray-200 dark:border-neutral-700">
+                  <View className="flex-row items-center">
+                    <Clock
+                      size={16}
+                      color={isDarkMode ? "#9ca3af" : "#6b7280"}
+                      className="mr-1"
+                    />
+                    <Text className="text-neutral-500 dark:text-neutral-500">
+                      {job.estimatedTime}
+                    </Text>
+                  </View>
+                  <Text className="font-semibold text-neutral-800 dark:text-white">
+                    ETB {job.price.toLocaleString()}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            ))
+          ) : (
+            <View className="bg-white dark:bg-neutral-800 p-8 rounded-lg items-center justify-center">
+              <Truck size={40} color={isDarkMode ? "#9ca3af" : "#6b7280"} />
+              <Text className="text-neutral-600 dark:text-neutral-400 text-center mt-4 mb-2">
+                No active jobs
               </Text>
-              <RequestsList
-                requests={jobRequests}
-                onAccept={handleAccept}
-                onDecline={handleDecline}
-                onBid={handleBid}
-                onAcceptBid={handleAcceptBid}
-                onDeclineBid={handleDeclineBid}
-                onCounterBid={handleCounterBid}
-                driverId="driver123"
-                refreshing={refreshing}
-                onRefresh={onRefresh}
-              />
-            </View>
-          )}
-
-          {/* Active Jobs Section */}
-          {activeJobs.length > 0 && (
-            <View className="mb-4">
-              <Text
-                className={`text-lg font-semibold mb-2 ${
-                  isDarkMode ? "text-white" : "text-neutral-900"
-                }`}
-              >
-                Active Jobs
-              </Text>
-              <RequestsList
-                requests={activeJobs}
-                onAccept={() => {}}
-                onDecline={() => {}}
-                onBid={() => {}}
-                onAcceptBid={() => {}}
-                onDeclineBid={() => {}}
-                onCounterBid={() => {}}
-                driverId="driver123"
-              />
-            </View>
-          )}
-
-          {/* Empty States */}
-          {!isOnline && (
-            <View className="items-center justify-center py-8">
-              <Text
-                className={`text-lg ${
-                  isDarkMode ? "text-neutral-400" : "text-neutral-600"
-                }`}
-              >
-                You are currently offline. Go online to see job requests.
-              </Text>
-            </View>
-          )}
-
-          {isOnline && jobRequests.length === 0 && !hasActiveJob && (
-            <View className="items-center justify-center py-8">
-              <Text
-                className={`text-lg ${
-                  isDarkMode ? "text-neutral-400" : "text-neutral-600"
-                }`}
-              >
-                No job requests available at the moment.
+              <Text className="text-neutral-500 dark:text-neutral-500 text-center text-sm">
+                Accept a job request to start earning
               </Text>
             </View>
           )}
         </View>
-      </ScrollView>
+      </View>
 
-      {/* Modals */}
-      <PaymentModal
-        visible={showPaymentModal}
-        onClose={handlePaymentFailure}
-        onSuccess={handlePaymentSuccess}
-        amount={COMMITMENT_FEE}
-        jobId={selectedJob?.id || ""}
-      />
-
+      {/* Warning Modal */}
       <Modal
+        transparent={true}
         visible={showWarning}
-        transparent
         animationType="fade"
         onRequestClose={() => setShowWarning(false)}
       >
         <View className="flex-1 justify-center items-center bg-black/50">
-          <View
-            className={`p-6 rounded-lg mx-4 ${
-              isDarkMode ? "bg-neutral-800" : "bg-white"
-            }`}
-          >
-            <Text
-              className={`text-lg font-semibold mb-4 ${
-                isDarkMode ? "text-white" : "text-neutral-900"
-              }`}
-            >
+          <View className="bg-white dark:bg-neutral-800 m-5 p-5 rounded-lg w-[90%]">
+            <Text className="text-lg font-semibold text-neutral-800 dark:text-white mb-3">
+              Notice
+            </Text>
+            <Text className="text-neutral-600 dark:text-neutral-400 mb-4">
               {warningMessage}
             </Text>
             <TouchableOpacity
+              className="bg-red-500 py-2 rounded-lg"
               onPress={() => setShowWarning(false)}
-              className={`p-3 rounded-lg ${
-                isDarkMode ? "bg-neutral-700" : "bg-neutral-100"
-              }`}
             >
-              <Text
-                className={`text-center ${
-                  isDarkMode ? "text-white" : "text-neutral-900"
-                }`}
-              >
-                OK
-              </Text>
+              <Text className="text-white text-center font-medium">Close</Text>
             </TouchableOpacity>
           </View>
         </View>
       </Modal>
-    </View>
+
+      {/* Payment Modal */}
+      {selectedJob && (
+        <PaymentModal
+          visible={showPaymentModal}
+          onClose={handlePaymentFailure}
+          onSuccess={handlePaymentSuccess}
+          amount={COMMITMENT_FEE}
+          jobId={selectedJob.id}
+        />
+      )}
+    </SafeAreaContainer>
   );
 }
 

@@ -1,8 +1,9 @@
 import React, { useEffect } from "react";
-import { View, Text, TouchableOpacity, Image, StatusBar, Animated, Dimensions, Platform, SafeAreaView } from "react-native";
+import { View, Text, TouchableOpacity, Image, Animated, Dimensions, Platform } from "react-native";
 import { useRouter } from "expo-router";
 import { useTheme } from "./_layout";
 import { ArrowRight } from "lucide-react-native";
+import SafeAreaContainer from "./utils/SafeAreaContainer";
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -30,11 +31,9 @@ export default function HomeScreen() {
   }, []);
 
   return (
-    <SafeAreaView className="flex-1 bg-white dark:bg-gray-900">
-      <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} />
-      
+    <SafeAreaContainer scrollable={false} extraPadding={{ top: 10 }}>
       <Animated.View 
-        className="flex-1 px-6 pt-12"
+        className="flex-1"
         style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}
       >
         {/* Header and Logo */}
@@ -75,7 +74,7 @@ export default function HomeScreen() {
       </Animated.View>
 
       {/* Footer - Terms and Privacy */}
-      <View className="pb-10 px-6">
+      <View className="pb-10">
         <Text className="text-gray-500 dark:text-gray-400 text-xs text-center">
           By continuing, you agree to our{" "}
           <Text className="font-medium">Terms of Service</Text> and{" "}
@@ -86,6 +85,6 @@ export default function HomeScreen() {
           We use phone number verification for all users
         </Text>
       </View>
-    </SafeAreaView>
+    </SafeAreaContainer>
   );
 } 

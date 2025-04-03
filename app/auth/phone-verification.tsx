@@ -15,6 +15,7 @@ import { useTheme } from "../_layout";
 import geezSMSService from "../services/geezSMS";
 import axios from "axios";
 import { getApiBaseUrl } from "../services/apiUtils";
+import SafeAreaContainer from "../utils/SafeAreaContainer";
 
 const PhoneVerification = () => {
   const router = useRouter();
@@ -146,11 +147,8 @@ const PhoneVerification = () => {
   };
 
   return (
-    <ScrollView
-      className="flex-1 bg-gray-50 dark:bg-neutral-900"
-      contentContainerStyle={{ flexGrow: 1 }}
-    >
-      <View className="flex-1 p-6">
+    <SafeAreaContainer extraPadding={{ top: 10 }}>
+      <View className="flex-1">
         <TouchableOpacity onPress={handleBack} className="mb-6" style={{ pointerEvents: 'auto' }}>
           <ArrowLeft size={24} color={isDarkMode ? "#ffffff" : "#374151"} />
         </TouchableOpacity>
@@ -241,7 +239,7 @@ const PhoneVerification = () => {
           </View>
         </View>
       </View>
-    </ScrollView>
+    </SafeAreaContainer>
   );
 };
 
