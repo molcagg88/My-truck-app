@@ -7,6 +7,7 @@ import {
   StyleSheet,
 } from "react-native";
 import { ChevronDown, Phone, ArrowRight } from "lucide-react-native";
+import { useTheme } from "../_layout";
 
 interface PhoneInputProps {
   value: string;
@@ -26,6 +27,7 @@ const PhoneInput = ({
   isLoading = false,
 }: PhoneInputProps) => {
   const [isCountryCodeOpen, setIsCountryCodeOpen] = useState(false);
+  const { isDarkMode } = useTheme();
 
   // Country codes for the dropdown (simplified for demo)
   const countryCodes = [
@@ -33,28 +35,36 @@ const PhoneInput = ({
   ];
 
   return (
-    <View className="w-full bg-white p-4 rounded-lg shadow-sm">
-      <Text className="text-gray-700 font-medium mb-2">
+    <View className={`w-full p-4 rounded-lg shadow-sm ${isDarkMode ? 'bg-neutral-800' : 'bg-white'}`}>
+      <Text className={`font-medium mb-2 ${isDarkMode ? 'text-neutral-200' : 'text-gray-700'}`}>
         Enter your phone number
       </Text>
       <View className="flex-row items-center mb-4">
         {/* Country code selector */}
         <TouchableOpacity
-          className="flex-row items-center bg-gray-100 rounded-l-lg px-2 py-3 border-r border-gray-300"
+          className={`flex-row items-center rounded-l-lg px-2 h-12 justify-center border-r ${
+            isDarkMode 
+              ? 'bg-neutral-700 border-neutral-600' 
+              : 'bg-gray-100 border-gray-300'
+          }`}
           onPress={() => setIsCountryCodeOpen(!isCountryCodeOpen)}
           style={{ pointerEvents: 'auto' }}
         >
-          <Text className="text-black font-medium mr-1">{countryCode}</Text>
-          <ChevronDown size={16} color="#374151" />
+          <Text className={`font-medium mr-1 ${isDarkMode ? 'text-white' : 'text-black'}`}>
+            {countryCode}
+          </Text>
+          <ChevronDown size={16} color={isDarkMode ? "#FFFFFF" : "#374151"} />
         </TouchableOpacity>
 
         {/* Phone number input */}
-        <View className="flex-row flex-1 items-center bg-gray-100 rounded-r-lg px-3 py-2">
-          <Phone size={18} color="#374151" className="mr-2" />
+        <View className={`flex-row flex-1 items-center rounded-r-lg px-3 h-12 ${
+          isDarkMode ? 'bg-neutral-700' : 'bg-gray-100'
+        }`}>
+          <Phone size={18} color={isDarkMode ? "#FFFFFF" : "#374151"} className="mr-2" />
           <TextInput
-            className="flex-1 text-base text-black h-10"
+            className={`flex-1 text-base ${isDarkMode ? 'text-white' : 'text-black'}`}
             placeholder={placeholder}
-            placeholderTextColor="#6B7280"
+            placeholderTextColor={isDarkMode ? "#9CA3AF" : "#6B7280"}
             keyboardType="phone-pad"
             value={value}
             onChangeText={onChangeText}
@@ -65,18 +75,22 @@ const PhoneInput = ({
 
       {/* Country code dropdown (simplified) */}
       {isCountryCodeOpen && (
-        <View className="bg-white rounded-lg shadow-md mb-4 absolute top-20 left-4 z-10 w-48">
+        <View className={`rounded-lg shadow-md mb-4 absolute top-20 left-4 z-10 w-48 ${
+          isDarkMode ? 'bg-neutral-800' : 'bg-white'
+        }`}>
           {countryCodes.map((item) => (
             <TouchableOpacity
               key={item.code}
-              className="px-4 py-3 border-b border-gray-100"
+              className={`px-4 py-3 border-b ${
+                isDarkMode ? 'border-neutral-700' : 'border-gray-100'
+              }`}
               onPress={() => {
                 onCountryCodeChange?.(item.code);
                 setIsCountryCodeOpen(false);
               }}
               style={{ pointerEvents: 'auto' }}
             >
-              <Text className="text-black">
+              <Text className={isDarkMode ? 'text-white' : 'text-black'}>
                 {item.country} ({item.code})
               </Text>
             </TouchableOpacity>
@@ -84,7 +98,9 @@ const PhoneInput = ({
         </View>
       )}
 
-      <Text className="text-gray-500 text-xs mt-3 text-center">
+      <Text className={`text-xs mt-3 text-center ${
+        isDarkMode ? 'text-neutral-400' : 'text-gray-500'
+      }`}>
         We'll send a verification code to this number via GeezSMS
       </Text>
     </View>

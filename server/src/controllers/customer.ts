@@ -5,6 +5,10 @@ import { User } from '../entities/User';
 import { Location } from '../entities/Location';
 import { TruckType } from '../entities/TruckType';
 import { Between } from 'typeorm';
+import { Job } from '../entities/Job';
+import { JobStatus } from '../types/enums';
+import { AppError } from '../utils/AppError';
+import { NextFunction } from 'express';
 
 export class CustomerController {
   private orderRepository = AppDataSource.getRepository(Order);
@@ -265,6 +269,54 @@ export class CustomerController {
     } catch (error) {
       console.error('Error getting truck types:', error);
       res.status(500).json({ message: 'Error getting truck types' });
+    }
+  };
+
+  // Add getPendingPayments method
+  getPendingPayments = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.user?.id;
+      
+      if (!userId) {
+        throw new AppError('Unauthorized', 401);
+      }
+      
+      // Get all jobs with payment_pending status for this customer
+      const jobRepository = AppDataSource.getRepository(Job);
+      const pendingPaymentJobs = await jobRepository.find({
+        where: {
+          customerId: userId,
+          status: JobStatus.PAYMENT_PENDING
+        },
+        relations: ['driver', 'payment'],
+        order: {
+          createdAt: 'DESC'
+        }
+      });
+      
+      // Format the response to include only necessary information
+      const formattedJobs = pendingPaymentJobs.map(job => ({
+        id: job.id,
+        status: job.status,
+        amount: job.amount,
+        driverId: job.driverId,
+        driver: job.driver ? {
+          id: job.driver.id,
+          name: job.driver.name,
+          phone: job.driver.phone,
+          rating: job.driver.rating
+        } : null,
+        createdAt: job.createdAt,
+        updatedAt: job.updatedAt
+      }));
+      
+      return res.status(200).json({
+        status: 'success',
+        results: formattedJobs.length,
+        data: formattedJobs
+      });
+    } catch (error) {
+      next(error);
     }
   };
 } 

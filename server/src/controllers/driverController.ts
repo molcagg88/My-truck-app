@@ -4,7 +4,7 @@ import { logger } from '../utils/logger';
 import { AppError } from '../middleware/error';
 
 export class DriverController {
-  getLocations = async (req: Request, res: Response, next: NextFunction) => {
+  static async getLocations(req: Request, res: Response, next: NextFunction) {
     try {
       // Mock data for driver locations
       const locations = Array.from({ length: 5 }, (_, i) => ({
@@ -23,12 +23,12 @@ export class DriverController {
         data: locations
       });
     } catch (error) {
-      console.error(`Error fetching driver locations: ${(error as Error).message}`);
+      logger.error(`Error fetching driver locations: ${(error as Error).message}`);
       next(error);
     }
   }
 
-  getAllDrivers = async (req: Request, res: Response, next: NextFunction) => {
+  static async getAllDrivers(req: Request, res: Response, next: NextFunction) {
     try {
       const { status } = req.query;
       const page = Number(req.query.page) || 1;
@@ -53,12 +53,12 @@ export class DriverController {
         data: drivers
       });
     } catch (error) {
-      console.error(`Error fetching drivers: ${(error as Error).message}`);
+      logger.error(`Error fetching drivers: ${(error as Error).message}`);
       next(error);
     }
   }
 
-  updateStatus = async (req: Request, res: Response, next: NextFunction) => {
+  static async updateStatus(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
       const { status } = req.body;
@@ -80,12 +80,12 @@ export class DriverController {
         data: driver
       });
     } catch (error) {
-      console.error(`Error updating driver status: ${(error as Error).message}`);
+      logger.error(`Error updating driver status: ${(error as Error).message}`);
       next(error);
     }
   }
 
-  updateLocation = async (req: Request, res: Response, next: NextFunction) => {
+  static async updateLocation(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
       const { latitude, longitude } = req.body;

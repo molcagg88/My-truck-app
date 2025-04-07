@@ -1,7 +1,10 @@
 import React from "react";
 import { View, Text, FlatList, TouchableOpacity } from "react-native";
-import { Bell, Package, Truck } from "lucide-react-native";
+import { ArrowLeft, Bell, Package, Truck } from "lucide-react-native";
 import { useTheme } from "./_layout";
+import { useRouter } from "expo-router";
+import SafeAreaContainer from "./utils/SafeAreaContainer";
+import Typography from "./utils/typography";
 
 interface Notification {
   id: string;
@@ -14,6 +17,8 @@ interface Notification {
 
 const NotificationsScreen = () => {
   const { isDarkMode } = useTheme();
+  const router = useRouter();
+  
   const notifications: Notification[] = [
     {
       id: "1",
@@ -63,12 +68,17 @@ const NotificationsScreen = () => {
   );
 
   return (
-    <View className="flex-1 bg-gray-50 dark:bg-neutral-900">
-      <View className="p-4 border-b border-gray-200 dark:border-gray-700">
-        <Text className="text-2xl font-bold text-gray-900 dark:text-white">
-          Notifications
-        </Text>
+    <SafeAreaContainer extraPadding={{ top: 10 }} scrollable={false}>
+      <View className="mb-6 flex-row items-center">
+        <TouchableOpacity 
+          onPress={() => router.back()}
+          className="pr-4"
+        >
+          <ArrowLeft size={24} color={isDarkMode ? "#ffffff" : "#000000"} />
+        </TouchableOpacity>
+        <Typography variant="h2">Notifications</Typography>
       </View>
+      
       {notifications.length > 0 ? (
         <FlatList
           data={notifications}
@@ -84,7 +94,7 @@ const NotificationsScreen = () => {
           </Text>
         </View>
       )}
-    </View>
+    </SafeAreaContainer>
   );
 };
 

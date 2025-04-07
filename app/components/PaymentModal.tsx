@@ -53,7 +53,7 @@ export default function PaymentModal({
     >
       <View className="flex-1 justify-center items-center bg-black/50">
         <View
-          className={`p-6 rounded-lg mx-4 ${
+          className={`p-6 rounded-lg mx-4 shadow-lg ${
             isDarkMode ? "bg-neutral-800" : "bg-white"
           }`}
         >
@@ -65,13 +65,13 @@ export default function PaymentModal({
             >
               Confirm Payment
             </Text>
-            <TouchableOpacity onPress={onClose}>
+            <TouchableOpacity onPress={onClose} className="p-1">
               <X size={24} color={isDarkMode ? "#ffffff" : "#374151"} />
             </TouchableOpacity>
           </View>
 
           <Text
-            className={`text-lg mb-4 ${
+            className={`text-base mb-6 ${
               isDarkMode ? "text-neutral-300" : "text-neutral-600"
             }`}
           >
@@ -80,20 +80,22 @@ export default function PaymentModal({
           </Text>
 
           {error && (
-            <Text className="text-red-500 mb-4 text-center">{error}</Text>
+            <Text className="text-red-500 mb-4 text-center font-medium">{error}</Text>
           )}
 
           <View className="flex-row space-x-4">
             <TouchableOpacity
               onPress={onClose}
               disabled={loading}
-              className={`flex-1 p-3 rounded-lg ${
-                isDarkMode ? "bg-neutral-700" : "bg-neutral-100"
+              className={`flex-1 p-3 rounded-lg border ${
+                isDarkMode 
+                  ? "bg-neutral-700 border-neutral-600" 
+                  : "bg-neutral-100 border-neutral-200"
               }`}
             >
               <Text
-                className={`text-center ${
-                  isDarkMode ? "text-white" : "text-neutral-900"
+                className={`text-center font-medium ${
+                  isDarkMode ? "text-white" : "text-neutral-800"
                 }`}
               >
                 Cancel
@@ -102,12 +104,12 @@ export default function PaymentModal({
             <TouchableOpacity
               onPress={handlePayment}
               disabled={loading}
-              className="flex-1 bg-red-500 p-3 rounded-lg"
+              className={`flex-1 bg-red-600 p-3 rounded-lg ${loading ? 'opacity-70' : ''}`}
             >
               {loading ? (
                 <ActivityIndicator color="#FFFFFF" />
               ) : (
-                <Text className="text-white text-center">Confirm Payment</Text>
+                <Text className="text-white text-center font-medium">Confirm Payment</Text>
               )}
             </TouchableOpacity>
           </View>

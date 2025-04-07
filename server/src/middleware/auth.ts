@@ -5,6 +5,7 @@ import { UserRoles } from '../types/enums';
 import { AppDataSource } from '../config/database';
 import { User } from '../entities/User';
 import bcrypt from 'bcryptjs';
+import { config } from '../config/config';
 
 declare global {
   namespace Express {
@@ -13,6 +14,53 @@ declare global {
     }
   }
 }
+
+/**
+ * Middleware to authenticate JWT tokens
+ * This is an alias of authMiddleware for clearer naming
+ */
+export const authenticateJWT = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ message: 'No token, authorization denied' });
+    }
+
+    const token = authHeader.split(' ')[1];
+    
+    if (!token) {
+      return res.status(401).json({ message: 'No token, authorization denied' });
+    }
+
+    try {
+      const jwtSecret = config.jwtSecret || process.env.JWT_SECRET as string;
+      
+      // Verify token and get decoded data
+      const decoded = jwt.verify(token, jwtSecret) as any;
+      
+      const userRepository = AppDataSource.getRepository(User);
+      const user = await userRepository.findOne({ where: { id: decoded.id } });
+      
+      if (!user) {
+        return res.status(401).json({ message: 'User not found' });
+      }
+      
+      req.user = user;
+      next();
+    } catch (error: any) {
+      console.error('JWT verification error:', error.message);
+      return res.status(401).json({ message: 'Token is not valid' });
+    }
+  } catch (err) {
+    console.error('Auth middleware error:', err);
+    res.status(500).json({ message: 'Server Error' });
+  }
+};
 
 export const authMiddleware = async (
   req: Request,
@@ -37,7 +85,7 @@ export const authMiddleware = async (
     }
 
     try {
-      const jwtSecret = process.env.JWT_SECRET as string;
+      const jwtSecret = config.jwtSecret || process.env.JWT_SECRET as string;
       console.log('Using JWT secret (first 5 chars):', jwtSecret.substring(0, 5) + '...');
       
       // Check token format before verification
@@ -81,7 +129,7 @@ export const authMiddleware = async (
 
 export const verifyToken = async (token: string) => {
   try {
-    const secret = process.env.JWT_SECRET;
+    const secret = config.jwtSecret || process.env.JWT_SECRET;
     
     if (!secret) {
       console.error('JWT_SECRET environment variable is not set!');

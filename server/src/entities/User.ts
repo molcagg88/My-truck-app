@@ -1,6 +1,9 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, BeforeInsert, BeforeUpdate } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, BeforeInsert, BeforeUpdate, OneToMany } from 'typeorm';
 import bcrypt from 'bcryptjs';
 import { UserRoles } from '../types/enums';
+import { Bid } from './Bid';
+
+export type UserRole = 'customer' | 'driver' | 'admin';
 
 @Entity('users')
 export class User {
@@ -21,10 +24,10 @@ export class User {
 
   @Column({
     type: 'enum',
-    enum: UserRoles,
-    default: UserRoles.CUSTOMER
+    enum: ['customer', 'driver', 'admin'],
+    default: 'customer'
   })
-  role: UserRoles;
+  role: UserRole;
 
   @Column({ default: false })
   isEmailVerified: boolean;
@@ -35,11 +38,14 @@ export class User {
   @Column({ nullable: true })
   lastLoginAt: Date;
 
-  @Column({ type: 'decimal', precision: 3, scale: 2, default: 0 })
+  @Column({ type: 'float', default: 0 })
   rating: number;
 
-  @Column({ default: false })
-  isVerified: boolean;
+  @Column({ type: 'int', default: 0 })
+  totalRatings: number;
+
+  @Column({ default: true })
+  isActive: boolean;
 
   @Column({ nullable: true })
   profileImage: string;
@@ -49,6 +55,9 @@ export class User {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @OneToMany(() => Bid, bid => bid.driver)
+  bids: Bid[];
 
   @BeforeInsert()
   @BeforeUpdate()

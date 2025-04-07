@@ -1,31 +1,39 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { User } from './User';
 
-@Entity()
+@Entity('locations')
 export class Location {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({ type: 'uuid' })
   userId: string;
 
-  @Column()
-  name: string;
+  @ManyToOne(() => User)
+  @JoinColumn({ name: 'userId' })
+  user: User;
 
-  @Column()
-  address: string;
+  @Column({ type: 'varchar', default: 'user' })
+  userType: string;
 
-  @Column('decimal', { precision: 10, scale: 8 })
+  @Column({ type: 'decimal', precision: 10, scale: 7 })
   latitude: number;
-
-  @Column('decimal', { precision: 11, scale: 8 })
+  
+  @Column({ type: 'decimal', precision: 10, scale: 7 })
   longitude: number;
-
-  @Column({ default: false })
-  isDefault: boolean;
-
+  
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
+  accuracy: number;
+  
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
+  heading: number;
+  
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
+  speed: number;
+  
+  @Column({ type: 'timestamp', nullable: true })
+  locationTimestamp: Date;
+  
   @CreateDateColumn()
   createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
 } 

@@ -7,7 +7,7 @@ import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import "react-native-reanimated";
 import "../global.css";
 import { Platform, useColorScheme } from "react-native";
@@ -17,35 +17,48 @@ import { AuthProvider } from "./auth/authContext";
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
-// Create a theme context to manage dark mode across the app
-export type ThemeContextType = {
+// Create theme context
+type ThemeContextType = {
   isDarkMode: boolean;
-  toggleTheme: (isDarkMode: boolean) => void;
+  toggleTheme: () => void;
 };
 
-export const ThemeContext = createContext<ThemeContextType>({
+const ThemeContext = createContext<ThemeContextType>({
   isDarkMode: false,
   toggleTheme: () => {},
 });
 
+// Custom hook to use theme
 export const useTheme = () => useContext(ThemeContext);
 
 export default function RootLayout() {
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  // Get device color scheme
   const colorScheme = useColorScheme();
+  const [isDarkMode, setIsDarkMode] = useState(colorScheme === 'dark');
   const [loaded] = useFonts({
     'Inter-Regular': require("../assets/fonts/inter/Inter-Regular.ttf"),
     'Inter-Medium': require("../assets/fonts/inter/Inter-Medium.ttf"),
     'Inter-Bold': require("../assets/fonts/inter/Inter-Bold.ttf"),
   });
 
-  const toggleTheme = (darkMode: boolean) => {
-    setIsDarkMode(darkMode);
-    // Save theme preference
-    AsyncStorage.setItem("themePreference", darkMode ? "dark" : "light").catch(error => {
-      console.log("Error saving theme preference", error);
-    });
+  // Update dark mode if system preference changes
+  useEffect(() => {
+    setIsDarkMode(colorScheme === 'dark');
+  }, [colorScheme]);
+  
+  // Toggle theme manually
+  const toggleTheme = () => {
+    setIsDarkMode(prev => !prev);
   };
+  
+  // Memoize theme values
+  const themeContext = useMemo(
+    () => ({
+      isDarkMode,
+      toggleTheme,
+    }),
+    [isDarkMode]
+  );
 
   // Load theme preference from storage
   useEffect(() => {
@@ -100,17 +113,20 @@ export default function RootLayout() {
 
   return (
     <AuthProvider>
-      <ThemeContext.Provider value={{ isDarkMode, toggleTheme }}>
+      <ThemeContext.Provider value={themeContext}>
         <ThemeProvider value={isDarkMode ? customDarkTheme : customLightTheme}>
           <Stack
             screenOptions={{
               headerStyle: {
-                backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
+                backgroundColor: isDarkMode ? '#1e293b' : '#ffffff',
               },
-              headerTintColor: isDarkMode ? '#ffffff' : '#000000',
+              headerTintColor: isDarkMode ? '#f8fafc' : '#0f172a',
               headerTitleStyle: {
                 fontFamily: 'Inter-Bold',
                 fontWeight: 'bold',
+              },
+              contentStyle: {
+                backgroundColor: isDarkMode ? '#0f172a' : '#f1f5f9',
               },
             }}
           >

@@ -28,4 +28,7 @@ router.delete('/locations/saved/:id', customerController.deleteSavedLocation);
 // Truck Types
 router.get('/truck-types', customerController.getTruckTypes);
 
+// Payment related routes
+router.get('/payments/pending', customerController.getPendingPayments);
+
 export default router; 

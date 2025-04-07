@@ -3,7 +3,7 @@ import { ActivityService } from '../services/activityService';
 import { logger } from '../utils/logger';
 
 export class ActivityController {
-  getRecentActivities = async (req: Request, res: Response, next: NextFunction) => {
+  static async getRecentActivities(req: Request, res: Response, next: NextFunction) {
     try {
       const limit = Number(req.query.limit) || 10;
       
@@ -52,7 +52,7 @@ export class ActivityController {
         data: activities
       });
     } catch (error) {
-      console.error(`Error fetching recent activities: ${(error as Error).message}`);
+      logger.error(`Error fetching recent activities: ${(error as Error).message}`);
       next(error);
     }
   }

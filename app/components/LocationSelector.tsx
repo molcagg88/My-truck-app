@@ -19,21 +19,23 @@ const LocationSelector = ({
   const { isDarkMode } = useTheme();
 
   return (
-    <View className="bg-neutral-800 dark:bg-neutral-900 rounded-lg p-4 shadow-sm">
+    <View className={`rounded-lg p-4 shadow-sm ${isDarkMode ? 'bg-neutral-800' : 'bg-white border border-gray-200'}`}>
       {/* Pickup Location */}
       <View className="mb-4">
         <View className="flex-row items-center mb-2">
           <MapPin size={18} color="#dc2626" />
-          <Text className="ml-2 text-neutral-200 dark:text-neutral-100 font-medium">
+          <Text className={`ml-2 font-medium ${isDarkMode ? 'text-white' : 'text-neutral-800'}`}>
             Pickup Location
           </Text>
         </View>
         <TouchableOpacity
-          className="bg-neutral-700 dark:bg-neutral-800 p-3 rounded-lg"
+          className={`p-3 rounded-lg ${isDarkMode ? 'bg-neutral-700' : 'bg-neutral-100'}`}
           onPress={() => onPickupChange(pickupLocation)}
         >
           <Text
-            className={`${pickupLocation ? "text-neutral-100 dark:text-white" : "text-neutral-400 dark:text-neutral-500"}`}
+            className={pickupLocation 
+              ? (isDarkMode ? 'text-white' : 'text-neutral-800') 
+              : (isDarkMode ? 'text-neutral-400' : 'text-neutral-500')}
           >
             {pickupLocation || "Enter pickup location"}
           </Text>
@@ -42,27 +44,29 @@ const LocationSelector = ({
 
       {/* Connector */}
       <View className="flex-row items-center justify-center mb-4">
-        <View className="w-0.5 h-6 bg-neutral-600 dark:bg-neutral-700" />
-        <View className="bg-neutral-600 dark:bg-neutral-700 rounded-full p-1">
-          <ArrowDown size={16} color={isDarkMode ? "#9ca3af" : "#6b7280"} />
+        <View className={`w-0.5 h-6 ${isDarkMode ? 'bg-neutral-600' : 'bg-neutral-300'}`} />
+        <View className={`rounded-full p-1 ${isDarkMode ? 'bg-neutral-600' : 'bg-neutral-300'}`}>
+          <ArrowDown size={16} color={isDarkMode ? "#ffffff" : "#6b7280"} />
         </View>
-        <View className="w-0.5 h-6 bg-neutral-600 dark:bg-neutral-700" />
+        <View className={`w-0.5 h-6 ${isDarkMode ? 'bg-neutral-600' : 'bg-neutral-300'}`} />
       </View>
 
       {/* Destination Location */}
       <View>
         <View className="flex-row items-center mb-2">
           <MapPin size={18} color="#3b82f6" />
-          <Text className="ml-2 text-neutral-200 dark:text-neutral-100 font-medium">
+          <Text className={`ml-2 font-medium ${isDarkMode ? 'text-white' : 'text-neutral-800'}`}>
             Destination
           </Text>
         </View>
         <TouchableOpacity
-          className="bg-neutral-700 dark:bg-neutral-800 p-3 rounded-lg"
+          className={`p-3 rounded-lg ${isDarkMode ? 'bg-neutral-700' : 'bg-neutral-100'}`}
           onPress={() => onDestinationChange(destinationLocation)}
         >
           <Text
-            className={`${destinationLocation ? "text-neutral-100 dark:text-white" : "text-neutral-400 dark:text-neutral-500"}`}
+            className={destinationLocation 
+              ? (isDarkMode ? 'text-white' : 'text-neutral-800') 
+              : (isDarkMode ? 'text-neutral-400' : 'text-neutral-500')}
           >
             {destinationLocation || "Enter destination"}
           </Text>

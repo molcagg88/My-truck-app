@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, TouchableOpacity, Linking } from "react-native";
 import { Image } from "expo-image";
 import { Phone, MessageCircle, Star } from "lucide-react-native";
+import { useTheme } from "../_layout";
 
 interface DriverInfoProps {
   driverName?: string;
@@ -20,6 +21,8 @@ const DriverInfo = ({
   vehicleInfo = "Isuzu Truck - Medium",
   licensePlate = "AA 12345",
 }: DriverInfoProps) => {
+  const { isDarkMode } = useTheme();
+  
   const handleCall = () => {
     Linking.openURL(`tel:${phoneNumber}`);
   };
@@ -29,7 +32,9 @@ const DriverInfo = ({
   };
 
   return (
-    <View className="w-full bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-100 dark:border-gray-700">
+    <View className={`w-full rounded-lg p-4 shadow-sm border ${
+      isDarkMode ? 'bg-neutral-800 border-neutral-700' : 'bg-white border-gray-100'
+    }`}>
       <View className="flex-row items-center">
         <Image
           source={{ uri: driverImage }}
@@ -38,20 +43,20 @@ const DriverInfo = ({
         />
         <View className="ml-4 flex-1">
           <View className="flex-row items-center justify-between">
-            <Text className="text-lg font-bold text-gray-900 dark:text-white">
+            <Text className={`text-lg font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
               {driverName}
             </Text>
             <View className="flex-row items-center">
               <Star size={16} color="#FFD700" fill="#FFD700" />
-              <Text className="ml-1 text-sm font-medium text-gray-700 dark:text-gray-300">
+              <Text className={`ml-1 text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                 {rating}
               </Text>
             </View>
           </View>
-          <Text className="text-sm text-gray-600 dark:text-gray-400">
+          <Text className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
             {vehicleInfo}
           </Text>
-          <Text className="text-sm text-gray-600 dark:text-gray-400">
+          <Text className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
             License: {licensePlate}
           </Text>
         </View>
@@ -68,14 +73,15 @@ const DriverInfo = ({
 
         <TouchableOpacity
           onPress={handleMessage}
-          className="flex-1 ml-2 flex-row items-center justify-center bg-gray-200 dark:bg-gray-700 py-2 rounded-md"
+          className={`flex-1 ml-2 flex-row items-center justify-center py-2 rounded-md ${
+            isDarkMode ? 'bg-neutral-700' : 'bg-gray-200'
+          }`}
         >
           <MessageCircle
             size={16}
-            color={"#374151"}
-            className="dark:text-white"
+            color={isDarkMode ? "#FFFFFF" : "#374151"}
           />
-          <Text className="ml-2 text-gray-800 dark:text-white font-medium">
+          <Text className={`ml-2 font-medium ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
             Message
           </Text>
         </TouchableOpacity>

@@ -8,6 +8,7 @@ import {
   StyleSheet,
 } from "react-native";
 import { Truck, Info } from "lucide-react-native";
+import { useTheme } from "../_layout";
 
 interface TruckType {
   id: string;
@@ -27,6 +28,7 @@ const TruckTypeSelector = ({
   selectedTruckId = "",
   onSelectTruck = () => {},
 }: TruckTypeSelectorProps) => {
+  const { isDarkMode } = useTheme();
   const [truckTypes] = useState<TruckType[]>([
     {
       id: "1",
@@ -67,10 +69,10 @@ const TruckTypeSelector = ({
   ]);
 
   return (
-    <View className="bg-white p-4 rounded-lg shadow-md w-full">
+    <View className={`p-4 rounded-lg shadow-md w-full ${isDarkMode ? 'bg-neutral-800' : 'bg-white'}`}>
       <View className="flex-row items-center mb-4">
         <Truck size={24} color="#FF0000" />
-        <Text className="text-lg font-bold ml-2 text-gray-800">
+        <Text className={`text-lg font-bold ml-2 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
           Select Truck Type
         </Text>
       </View>
@@ -84,7 +86,11 @@ const TruckTypeSelector = ({
           <TouchableOpacity
             key={truck.id}
             onPress={() => onSelectTruck(truck.id)}
-            className={`mr-4 rounded-lg border-2 ${selectedTruckId === truck.id ? "border-red-500" : "border-gray-200"} overflow-hidden w-[150px]`}
+            className={`mr-4 rounded-lg border-2 ${
+              selectedTruckId === truck.id 
+                ? "border-red-500" 
+                : isDarkMode ? "border-neutral-700" : "border-gray-200"
+            } overflow-hidden w-[150px]`}
             style={selectedTruckId === truck.id ? styles.selectedShadow : {}}
           >
             <Image
@@ -92,12 +98,16 @@ const TruckTypeSelector = ({
               className="w-full h-[100px]"
               resizeMode="cover"
             />
-            <View className="p-3 bg-white">
-              <Text className="font-bold text-gray-800">{truck.name}</Text>
+            <View className={`p-3 ${isDarkMode ? 'bg-neutral-700' : 'bg-white'}`}>
+              <Text className={`font-bold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
+                {truck.name}
+              </Text>
               <View className="flex-row items-center mt-1">
-                <Text className="text-sm text-gray-600">{truck.capacity}</Text>
+                <Text className={`text-sm ${isDarkMode ? 'text-neutral-300' : 'text-gray-600'}`}>
+                  {truck.capacity}
+                </Text>
                 <TouchableOpacity className="ml-auto">
-                  <Info size={16} color="#666" />
+                  <Info size={16} color={isDarkMode ? "#9CA3AF" : "#666666"} />
                 </TouchableOpacity>
               </View>
               <Text className="text-sm text-red-500 font-semibold mt-2">
@@ -109,8 +119,8 @@ const TruckTypeSelector = ({
       </ScrollView>
 
       {selectedTruckId && (
-        <View className="mt-4 p-3 bg-gray-50 rounded-lg">
-          <Text className="text-sm text-gray-600">
+        <View className={`mt-4 p-3 rounded-lg ${isDarkMode ? 'bg-neutral-700' : 'bg-gray-50'}`}>
+          <Text className={`text-sm ${isDarkMode ? 'text-neutral-300' : 'text-gray-600'}`}>
             {truckTypes.find((t) => t.id === selectedTruckId)?.description ||
               "Select a truck type to see details"}
           </Text>
@@ -123,7 +133,6 @@ const TruckTypeSelector = ({
 const styles = StyleSheet.create({
   container: {
     padding: 16,
-    backgroundColor: '#fff',
     borderRadius: 8,
     boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
   },

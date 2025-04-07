@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity, ScrollView, RefreshControl } from "react-native";
+import { View, Text, TouchableOpacity, ScrollView, RefreshControl, Alert, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
-import { Bell, Settings, MapPin, Calendar, Package, Truck, Clock, DollarSign } from "lucide-react-native";
+import { Bell, Settings, MapPin, Calendar, Package, Truck, Clock, DollarSign, AlertCircle, List } from "lucide-react-native";
 import { useTheme } from "../_layout";
 import { useAuth } from "../auth/authContext";
 import BookingCard from "../components/BookingCard";
 import OrderHistoryList from "../components/OrderHistoryList";
+import JobPaymentModal from "../components/JobPaymentModal";
+import SafeAreaContainer from "../utils/SafeAreaContainer";
 import customerService, { Order, CustomerStats } from "../services/customerService";
 import { handleApiError } from "../services/apiUtils";
-import SafeAreaContainer from "../utils/SafeAreaContainer";
 
 const CustomerDashboard = () => {
   const router = useRouter();
@@ -17,26 +18,49 @@ const CustomerDashboard = () => {
   const [activeTab, setActiveTab] = useState<"bookings" | "history">("bookings");
   const [stats, setStats] = useState<CustomerStats | null>(null);
   const [activeOrders, setActiveOrders] = useState<Order[]>([]);
+  const [paymentPendingOrders, setPaymentPendingOrders] = useState<Order[]>([]);
   const [orderHistory, setOrderHistory] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // State for payment modal
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [selectedJob, setSelectedJob] = useState<Order | null>(null);
 
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
       setError(null);
-      const [statsData, activeOrdersData, historyData] = await Promise.all([
-        customerService.getStats(),
-        customerService.getActiveOrders(),
-        customerService.getOrderHistory()
-      ]);
-      setStats(statsData);
-      setActiveOrders(activeOrdersData);
-      setOrderHistory(historyData);
-    } catch (error: any) {
-      console.error('Error fetching dashboard data:', error);
-      setError(handleApiError(error, 'Failed to load dashboard data. Please try again.'));
+
+      // Read active orders from localStorage
+      const storedActiveOrders = parseInt(localStorage.getItem('activeOrders') || '0', 10);
+      
+      // Create mock orders based on the count
+      const mockActiveOrders: Order[] = Array(storedActiveOrders).fill(null).map((_, index) => ({
+        id: `order-${index + 1}`,
+        status: 'pending',
+        pickupLocation: 'Sample Location',
+        destinationLocation: 'Sample Location',
+        price: 350,
+        date: new Date().toISOString(),
+        truckType: 'Small Truck'
+      }));
+
+      setActiveOrders(mockActiveOrders);
+      setPaymentPendingOrders([]); // No pending payments for now
+      setOrderHistory([]); // No history for now
+
+      // Set mock stats
+      setStats({
+        activeOrders: storedActiveOrders,
+        totalOrders: storedActiveOrders,
+        completedOrders: 0,
+        totalSpent: 0
+      });
+    } catch (err) {
+      console.error("Error fetching dashboard data:", err);
+      setError("Failed to load dashboard data");
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -52,7 +76,7 @@ const CustomerDashboard = () => {
     fetchDashboardData();
   };
 
-  const handleBookingInitiated = () => {
+  const handleBookingPress = () => {
     router.push("/customer/booking");
   };
 
@@ -62,50 +86,23 @@ const CustomerDashboard = () => {
       params: { orderId },
     });
   };
-
-  const renderStats = () => {
-    if (!stats) return null;
-
-    return (
-      <View className="flex-row flex-wrap justify-between px-4 mb-4">
-        <View className="bg-white dark:bg-neutral-800 rounded-lg p-4 w-[48%] mb-4 shadow-sm">
-          <View className="flex-row items-center mb-2">
-            <Package size={20} color="#ef4444" />
-            <Text className="ml-2 text-neutral-600 dark:text-neutral-400">Active Orders</Text>
-          </View>
-          <Text className="text-2xl font-bold text-neutral-800 dark:text-white">
-            {stats.activeOrders}
-          </Text>
-        </View>
-        <View className="bg-white dark:bg-neutral-800 rounded-lg p-4 w-[48%] mb-4 shadow-sm">
-          <View className="flex-row items-center mb-2">
-            <Clock size={20} color="#ef4444" />
-            <Text className="ml-2 text-neutral-600 dark:text-neutral-400">Total Orders</Text>
-          </View>
-          <Text className="text-2xl font-bold text-neutral-800 dark:text-white">
-            {stats.totalOrders}
-          </Text>
-        </View>
-        <View className="bg-white dark:bg-neutral-800 rounded-lg p-4 w-[48%] shadow-sm">
-          <View className="flex-row items-center mb-2">
-            <Truck size={20} color="#ef4444" />
-            <Text className="ml-2 text-neutral-600 dark:text-neutral-400">Completed</Text>
-          </View>
-          <Text className="text-2xl font-bold text-neutral-800 dark:text-white">
-            {stats.completedOrders}
-          </Text>
-        </View>
-        <View className="bg-white dark:bg-neutral-800 rounded-lg p-4 w-[48%] shadow-sm">
-          <View className="flex-row items-center mb-2">
-            <DollarSign size={20} color="#ef4444" />
-            <Text className="ml-2 text-neutral-600 dark:text-neutral-400">Total Spent</Text>
-          </View>
-          <Text className="text-2xl font-bold text-neutral-800 dark:text-white">
-            ETB {stats.totalSpent.toLocaleString()}
-          </Text>
-        </View>
-      </View>
+  
+  const handlePaymentSuccess = async () => {
+    Alert.alert(
+      "Payment Successful",
+      "Your payment has been processed successfully. The driver will be notified.",
+      [{ text: "OK" }]
     );
+    await fetchDashboardData();
+  };
+  
+  const handlePayButtonPress = (order: Order) => {
+    setSelectedJob(order);
+    setShowPaymentModal(true);
+  };
+
+  const handleActiveOrdersPress = () => {
+    router.push("/customer/requests");
   };
 
   if (loading && !refreshing) {
@@ -164,10 +161,52 @@ const CustomerDashboard = () => {
       </View>
 
       {/* Stats */}
-      {renderStats()}
-
+      {stats && (
+        <View className="flex-row flex-wrap justify-between px-4 mb-4">
+          <TouchableOpacity 
+            className="bg-white dark:bg-neutral-800 rounded-lg p-4 w-[48%] mb-4 shadow-sm"
+            onPress={handleActiveOrdersPress}
+          >
+            <View className="flex-row items-center mb-2">
+              <Package size={20} color="#ef4444" />
+              <Text className="ml-2 text-neutral-600 dark:text-neutral-400">Active Orders</Text>
+            </View>
+            <Text className="text-2xl font-bold text-neutral-800 dark:text-white">
+              {stats.activeOrders}
+            </Text>
+          </TouchableOpacity>
+          <View className="bg-white dark:bg-neutral-800 rounded-lg p-4 w-[48%] mb-4 shadow-sm">
+            <View className="flex-row items-center mb-2">
+              <Clock size={20} color="#ef4444" />
+              <Text className="ml-2 text-neutral-600 dark:text-neutral-400">Total Orders</Text>
+            </View>
+            <Text className="text-2xl font-bold text-neutral-800 dark:text-white">
+              {stats.totalOrders}
+            </Text>
+          </View>
+          <View className="bg-white dark:bg-neutral-800 rounded-lg p-4 w-[48%] shadow-sm">
+            <View className="flex-row items-center mb-2">
+              <Truck size={20} color="#ef4444" />
+              <Text className="ml-2 text-neutral-600 dark:text-neutral-400">Completed</Text>
+            </View>
+            <Text className="text-2xl font-bold text-neutral-800 dark:text-white">
+              {stats.completedOrders}
+            </Text>
+          </View>
+          <View className="bg-white dark:bg-neutral-800 rounded-lg p-4 w-[48%] shadow-sm">
+            <View className="flex-row items-center mb-2">
+              <DollarSign size={20} color="#ef4444" />
+              <Text className="ml-2 text-neutral-600 dark:text-neutral-400">Total Spent</Text>
+            </View>
+            <Text className="text-2xl font-bold text-neutral-800 dark:text-white">
+              ETB {stats.totalSpent.toLocaleString()}
+            </Text>
+          </View>
+        </View>
+      )}
+      
       {/* Booking Card */}
-      <BookingCard onBookingInitiated={handleBookingInitiated} />
+      <BookingCard onBookingInitiated={handleBookingPress} />
 
       {/* Tabs */}
       <View className="flex-row border-b border-gray-200 dark:border-neutral-800 mx-4 mt-4">
@@ -209,7 +248,7 @@ const CustomerDashboard = () => {
               </Text>
               <TouchableOpacity
                 className="bg-red-500 py-2 px-6 rounded-lg"
-                onPress={handleBookingInitiated}
+                onPress={handleBookingPress}
               >
                 <Text className="text-white font-medium">Book Now</Text>
               </TouchableOpacity>
@@ -229,6 +268,21 @@ const CustomerDashboard = () => {
           </View>
         )}
       </View>
+
+      {/* Payment Modal */}
+      {selectedJob && (
+        <JobPaymentModal
+          isVisible={showPaymentModal}
+          onClose={() => setShowPaymentModal(false)}
+          onPaymentSuccess={handlePaymentSuccess}
+          jobId={selectedJob.id}
+          bidAmount={selectedJob.price}
+          bidderName={selectedJob.driver?.name || 'Assigned Driver'}
+          pickupLocation={selectedJob.pickupLocation}
+          destinationLocation={selectedJob.destinationLocation}
+          isDarkMode={isDarkMode}
+        />
+      )}
     </SafeAreaContainer>
   );
 };

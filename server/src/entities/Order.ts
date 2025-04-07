@@ -1,17 +1,18 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 import { User } from './User';
+import { Bid } from './Bid';
 
-export type OrderStatus = 'pending' | 'accepted' | 'in-progress' | 'completed' | 'cancelled';
+export type OrderStatus = 'pending' | 'accepted' | 'in-progress' | 'completed' | 'cancelled' | 'payment_pending';
 
 @Entity()
 export class Order {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({ type: 'uuid' })
   customerId: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'uuid', nullable: true })
   driverId: string;
 
   @Column()
@@ -28,7 +29,7 @@ export class Order {
 
   @Column({
     type: 'enum',
-    enum: ['pending', 'accepted', 'in-progress', 'completed', 'cancelled'],
+    enum: ['pending', 'accepted', 'in-progress', 'completed', 'cancelled', 'payment_pending'],
     default: 'pending'
   })
   status: OrderStatus;
@@ -42,6 +43,9 @@ export class Order {
   @Column({ nullable: true })
   ratingComment: string;
 
+  @Column({ default: false })
+  isPaid: boolean;
+
   @CreateDateColumn()
   createdAt: Date;
 
@@ -51,4 +55,7 @@ export class Order {
   @ManyToOne(() => User, { nullable: true })
   @JoinColumn({ name: 'driverId' })
   driver: User;
+
+  @OneToMany(() => Bid, bid => bid.order)
+  bids: Bid[];
 } 

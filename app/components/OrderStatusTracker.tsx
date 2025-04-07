@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Check, Clock, Truck, Package, MapPin } from "lucide-react-native";
+import { useTheme } from "../_layout";
 
 interface OrderStatusTrackerProps {
   currentStatus?: "confirmed" | "pickup" | "in_transit" | "delivered";
@@ -11,6 +12,8 @@ const OrderStatusTracker = ({
   currentStatus = "confirmed",
   estimatedDeliveryTime = "45 min",
 }: OrderStatusTrackerProps) => {
+  const { isDarkMode } = useTheme();
+  
   const statuses = [
     { id: "confirmed", label: "Confirmed", icon: Check },
     { id: "pickup", label: "Pickup", icon: Package },
@@ -23,13 +26,40 @@ const OrderStatusTracker = ({
     (status) => status.id === currentStatus,
   );
 
+  // Dynamic styles based on theme
+  const dynamicStyles = {
+    container: {
+      backgroundColor: isDarkMode ? '#262626' : '#FFFFFF',
+      borderColor: isDarkMode ? '#404040' : '#E5E7EB',
+      borderWidth: 1,
+    },
+    title: {
+      color: isDarkMode ? '#FFFFFF' : '#1F2937',
+    },
+    estimatedTimeText: {
+      color: isDarkMode ? '#D1D5DB' : '#4B5563',
+    },
+    iconContainer: {
+      backgroundColor: isDarkMode ? '#525252' : '#E5E7EB',
+    },
+    connector: {
+      backgroundColor: isDarkMode ? '#525252' : '#E5E7EB',
+    },
+    statusLabel: {
+      color: isDarkMode ? '#9CA3AF' : '#6B7280',
+    },
+    activeStatusLabel: {
+      color: isDarkMode ? '#FFFFFF' : '#1F2937',
+    },
+  };
+
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, dynamicStyles.container]}>
       <View style={styles.header}>
-        <Text style={styles.title}>Order Status</Text>
+        <Text style={[styles.title, dynamicStyles.title]}>Order Status</Text>
         <View style={styles.estimatedTime}>
           <Clock size={16} color="#FF3B30" />
-          <Text style={styles.estimatedTimeText}>
+          <Text style={[styles.estimatedTimeText, dynamicStyles.estimatedTimeText]}>
             ETA: {estimatedDeliveryTime}
           </Text>
         </View>
@@ -46,12 +76,13 @@ const OrderStatusTracker = ({
               <View
                 style={[
                   styles.iconContainer,
+                  dynamicStyles.iconContainer,
                   isActive ? styles.activeIconContainer : {},
                 ]}
               >
                 <StatusIcon
                   size={16}
-                  color={isActive ? "#FFFFFF" : "#9CA3AF"}
+                  color={isActive ? "#FFFFFF" : isDarkMode ? "#9CA3AF" : "#6B7280"}
                 />
               </View>
 
@@ -59,6 +90,7 @@ const OrderStatusTracker = ({
                 <View
                   style={[
                     styles.connector,
+                    dynamicStyles.connector,
                     index < currentStatusIndex ? styles.activeConnector : {},
                   ]}
                 />
@@ -67,7 +99,8 @@ const OrderStatusTracker = ({
               <Text
                 style={[
                   styles.statusLabel,
-                  isActive ? styles.activeStatusLabel : {},
+                  dynamicStyles.statusLabel,
+                  isActive ? [styles.activeStatusLabel, dynamicStyles.activeStatusLabel] : {},
                 ]}
               >
                 {status.label}
@@ -83,7 +116,6 @@ const OrderStatusTracker = ({
 const styles = StyleSheet.create({
   container: {
     width: "100%",
-    backgroundColor: "#FFFFFF",
     borderRadius: 12,
     padding: 16,
     boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
@@ -97,7 +129,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#1F2937",
   },
   estimatedTime: {
     flexDirection: "row",
@@ -106,7 +137,7 @@ const styles = StyleSheet.create({
   },
   estimatedTimeText: {
     fontSize: 14,
-    color: "#4B5563",
+    marginLeft: 4,
   },
   statusContainer: {
     flexDirection: "row",
@@ -124,7 +155,6 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: "#E5E7EB",
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 8,
@@ -139,7 +169,6 @@ const styles = StyleSheet.create({
     right: -50,
     width: 100,
     height: 2,
-    backgroundColor: "#E5E7EB",
     zIndex: 0,
   },
   activeConnector: {
@@ -147,12 +176,10 @@ const styles = StyleSheet.create({
   },
   statusLabel: {
     fontSize: 12,
-    color: "#6B7280",
     textAlign: "center",
     marginTop: 4,
   },
   activeStatusLabel: {
-    color: "#1F2937",
     fontWeight: "600",
   },
 });

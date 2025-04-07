@@ -16,6 +16,8 @@ import { useColorScheme } from "react-native";
 import { Star } from "lucide-react-native";
 import BidResponseModal from "./BidResponseModal";
 import { sendBidNotification, sendCounterBidNotification, sendBidAcceptedNotification, sendBidDeclinedNotification } from "../services/notifications";
+import { handleApiError } from "../services/apiUtils";
+import biddingService from "../services/bidding";
 
 interface JobRequest {
   id: string;
@@ -73,12 +75,25 @@ const RequestsList: React.FC<RequestsListProps> = ({
   const handleBidSubmit = async (amount: number) => {
     if (selectedJob) {
       try {
-        await onBid(selectedJob.id, amount);
-        await sendBidNotification("customer-id", selectedJob.id, amount);
+        await biddingService.createBid({
+          jobId: selectedJob.id,
+          proposedPrice: amount
+        });
+        
+        // Call the parent component's onBid method to update UI
+        onBid(selectedJob.id, amount);
+        
+        // If implemented, send notification
+        try {
+          await sendBidNotification("customer-id", selectedJob.id, amount);
+        } catch (notificationError) {
+          console.error("Failed to send notification:", notificationError);
+        }
+        
         setShowBidModal(false);
         Alert.alert("Success", "Your bid has been placed successfully!");
       } catch (error) {
-        Alert.alert("Error", "Failed to place bid. Please try again.");
+        Alert.alert("Error", handleApiError(error, "Failed to place bid. Please try again."));
       }
     }
   };
@@ -116,24 +131,51 @@ const RequestsList: React.FC<RequestsListProps> = ({
     try {
       switch (action) {
         case "accept":
+          await biddingService.acceptBid(selectedJob.id);
+          // Call the parent component's method to update UI
           await onAcceptBid(selectedJob.id);
-          await sendBidAcceptedNotification(selectedJob.driverId!, selectedJob.id, selectedJob.currentBid!);
+          
+          // If notification service is implemented
+          try {
+            await sendBidAcceptedNotification(selectedJob.driverId!, selectedJob.id, selectedJob.currentBid!);
+          } catch (notificationError) {
+            console.error("Failed to send notification:", notificationError);
+          }
           break;
+          
         case "decline":
+          await biddingService.declineBid(selectedJob.id);
+          // Call the parent component's method to update UI
           await onDeclineBid(selectedJob.id);
-          await sendBidDeclinedNotification(selectedJob.driverId!, selectedJob.id);
+          
+          // If notification service is implemented
+          try {
+            await sendBidDeclinedNotification(selectedJob.driverId!, selectedJob.id);
+          } catch (notificationError) {
+            console.error("Failed to send notification:", notificationError);
+          }
           break;
+          
         case "counter":
           if (amount) {
+            await biddingService.counterBid(selectedJob.id, amount);
+            // Call the parent component's method to update UI
             await onCounterBid(selectedJob.id, amount);
-            await sendCounterBidNotification(selectedJob.driverId!, selectedJob.id, amount);
+            
+            // If notification service is implemented
+            try {
+              await sendCounterBidNotification(selectedJob.driverId!, selectedJob.id, amount);
+            } catch (notificationError) {
+              console.error("Failed to send notification:", notificationError);
+            }
           }
           break;
       }
+      
       setShowBidResponseModal(false);
       Alert.alert("Success", `Bid ${action}ed successfully!`);
     } catch (error) {
-      Alert.alert("Error", `Failed to ${action} bid. Please try again.`);
+      Alert.alert("Error", handleApiError(error, `Failed to ${action} bid. Please try again.`));
     }
   };
 

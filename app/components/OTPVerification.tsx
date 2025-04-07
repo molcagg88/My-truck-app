@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native";
+import { useTheme } from "../_layout";
 
 interface OTPVerificationProps {
   value?: string;
@@ -16,6 +17,7 @@ const OTPVerification = ({
 }: OTPVerificationProps) => {
   const [timer, setTimer] = useState(60);
   const inputRefs = useRef<Array<TextInput | null>>([]);
+  const { isDarkMode } = useTheme();
 
   useEffect(() => {
     if (timer > 0) {
@@ -59,7 +61,11 @@ const OTPVerification = ({
             <TextInput
               key={index}
               ref={(ref) => (inputRefs.current[index] = ref)}
-              className="w-12 h-14 text-center text-xl font-bold rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white border border-gray-200 dark:border-gray-600"
+              className={`w-12 h-14 text-center text-xl font-bold rounded-lg border ${
+                isDarkMode 
+                  ? 'bg-neutral-700 border-neutral-600 text-white' 
+                  : 'bg-gray-100 border-gray-200 text-gray-800'
+              }`}
               maxLength={1}
               keyboardType="number-pad"
               value={value[index] || ""}
@@ -70,7 +76,7 @@ const OTPVerification = ({
       </View>
 
       <View className="flex-row justify-center items-center">
-        <Text className="text-gray-600 dark:text-gray-400">
+        <Text className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>
           Didn't receive code?
         </Text>
         <TouchableOpacity 
@@ -79,7 +85,11 @@ const OTPVerification = ({
           style={{ pointerEvents: 'auto' }}
         >
           <Text
-            className={`ml-2 ${timer > 0 ? "text-gray-400 dark:text-gray-600" : "text-red-600"}`}
+            className={`ml-2 ${
+              timer > 0 
+                ? isDarkMode ? "text-gray-600" : "text-gray-400" 
+                : "text-red-600"
+            }`}
           >
             {timer > 0 ? `Resend in ${timer}s` : "Resend"}
           </Text>

@@ -1,18 +1,18 @@
 import express from 'express';
 import { JobController } from '../controllers/jobController';
 import { DriverController } from '../controllers/driverController';
+import { EarningController } from '../controllers/earningController';
+import { RatingController } from '../controllers/ratingController';
 import { restrictTo } from '../middleware/auth';
 import { UserRoles } from '../types/enums';
 
 const router = express.Router();
-const jobController = new JobController();
-const driverController = new DriverController();
 
 // Ensure all routes are restricted to drivers only
 router.use(restrictTo(UserRoles.DRIVER));
 
 // Driver job management
-router.get('/jobs', jobController.getAllJobs);
+router.get('/jobs', JobController.getAllJobs);
 router.get('/jobs/:id', async (req, res) => {
   // Get job details for a specific job assigned to this driver
   const { id } = req.params;
@@ -34,53 +34,19 @@ router.get('/jobs/:id', async (req, res) => {
   });
 });
 
-router.patch('/jobs/:id/status', jobController.updateStatus);
+router.patch('/jobs/:id/status', JobController.updateStatus);
 
 // Driver status and location management
-router.patch('/status', async (req, res) => {
-  const { status } = req.body;
-  res.json({
-    status: 'success',
-    data: {
-      id: 'driver-1',
-      status,
-      updatedAt: new Date().toISOString()
-    }
-  });
-});
-
-router.post('/location', async (req, res) => {
-  const { latitude, longitude } = req.body;
-  res.json({
-    status: 'success',
-    data: {
-      latitude,
-      longitude,
-      timestamp: new Date().toISOString()
-    }
-  });
-});
+router.patch('/status', DriverController.updateStatus);
+router.post('/location', DriverController.updateLocation);
 
 // Driver earnings
-router.get('/earnings', async (req, res) => {
-  res.json({
-    status: 'success',
-    data: {
-      today: {
-        amount: 120.50,
-        jobs: 5
-      },
-      week: {
-        amount: 750.75,
-        jobs: 28
-      },
-      month: {
-        amount: 3250.25,
-        jobs: 115
-      }
-    }
-  });
-});
+router.get('/earnings', EarningController.getDriverEarnings);
+router.get('/earnings/summary', EarningController.getEarningsSummary);
+
+// Driver ratings
+router.get('/ratings', RatingController.getDriverRatings);
+router.get('/ratings/summary', RatingController.getDriverRatingSummary);
 
 // Driver profile
 router.get('/profile', async (req, res) => {

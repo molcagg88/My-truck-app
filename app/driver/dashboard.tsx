@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import {
   View,
   Text,
@@ -11,7 +11,6 @@ import { useTheme } from "../_layout";
 import { useRouter } from "expo-router";
 import RequestsList from "../components/RequestsList";
 import { Bell, Settings, MapPin, Clock, Truck, Package, Gavel, Check, X } from "lucide-react-native";
-import PaymentModal from "../components/PaymentModal";
 import SafeAreaContainer from "../utils/SafeAreaContainer";
 
 const COMMITMENT_FEE = 400;
@@ -99,8 +98,9 @@ export default function DriverDashboard() {
   const [showWarning, setShowWarning] = useState(false);
   const [warningMessage, setWarningMessage] = useState("");
   const [refreshing, setRefreshing] = useState(false);
-  const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [selectedJob, setSelectedJob] = useState<JobRequest | null>(null);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [confirmAction, setConfirmAction] = useState<"accept" | "acceptBid" | null>(null);
 
   const hasActiveJob = activeJobs.length > 0;
 
@@ -112,7 +112,8 @@ export default function DriverDashboard() {
     }
 
     setSelectedJob(jobRequests.find(job => job.id === jobId) || null);
-    setShowPaymentModal(true);
+    setConfirmAction("accept");
+    setShowConfirmModal(true);
   };
 
   const handleDecline = (jobId: string) => {
@@ -137,7 +138,8 @@ export default function DriverDashboard() {
     }
 
     setSelectedJob(jobRequests.find(job => job.id === jobId) || null);
-    setShowPaymentModal(true);
+    setConfirmAction("acceptBid");
+    setShowConfirmModal(true);
   };
 
   const handleDeclineBid = (jobId: string) => {
@@ -156,23 +158,6 @@ export default function DriverDashboard() {
     );
   };
 
-  const handlePaymentSuccess = async () => {
-    if (selectedJob) {
-      const updatedJob = { ...selectedJob, status: "accepted" as const, driverId: "driver123" };
-      setActiveJobs([...activeJobs, updatedJob]);
-      setJobRequests(jobRequests.filter(job => job.id !== selectedJob.id));
-      setShowPaymentModal(false);
-      setSelectedJob(null);
-      setShowWarning(true);
-      setWarningMessage("Job accepted! Please keep your location on and confirm checkpoints every 2 hours.");
-    }
-  };
-
-  const handlePaymentFailure = () => {
-    setShowPaymentModal(false);
-    setSelectedJob(null);
-  };
-
   const handleToggleOnline = () => {
     if (hasActiveJob) {
       setWarningMessage("Cannot go offline while you have an active job. Please complete your current job first.");
@@ -182,13 +167,48 @@ export default function DriverDashboard() {
     setIsOnline(!isOnline);
   };
 
+  const confirmAcceptJob = () => {
+    setShowConfirmModal(false);
+    if (selectedJob) {
+      const updatedJob = { ...selectedJob, status: "accepted" as const, driverId: "driver123" };
+      setActiveJobs([...activeJobs, updatedJob]);
+      setJobRequests(jobRequests.filter(job => job.id !== selectedJob.id));
+      setSelectedJob(null);
+      setShowWarning(true);
+      setWarningMessage("Job accepted! Please keep your location on and confirm checkpoints every 2 hours.");
+    }
+  };
+
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-    // Simulate fetching new data
+    
+    // Only fetch new job requests if driver is online
+    if (isOnline) {
+      // Simulate fetching new job requests data
+      // In a real app, this would be an API call
+      console.log("Fetching new job requests...");
+    }
+    
+    // Always fetch active jobs regardless of online status
+    console.log("Fetching active jobs...");
+    
     setTimeout(() => {
       setRefreshing(false);
     }, 1000);
-  }, []);
+  }, [isOnline]);
+
+  // Handle online status changes
+  useEffect(() => {
+    if (!isOnline) {
+      // Clear job requests when going offline
+      setJobRequests([]);
+    } else {
+      // Fetch job requests when going online
+      setJobRequests(
+        sampleRequests.filter(job => job.status === "pending" || job.status === "bidding")
+      );
+    }
+  }, [isOnline]);
 
   return (
     <SafeAreaContainer
@@ -280,21 +300,38 @@ export default function DriverDashboard() {
         </View>
 
         {/* Job Requests */}
-        <View className="mb-6">
-          <Text className="text-xl font-semibold text-neutral-800 dark:text-white mb-4">
-            Job Requests
-          </Text>
-          <RequestsList
-            requests={jobRequests}
-            onAccept={handleAccept}
-            onDecline={handleDecline}
-            onBid={handleBid}
-            onAcceptBid={handleAcceptBid}
-            onDeclineBid={handleDeclineBid}
-            onCounterBid={handleCounterBid}
-            driverId="driver123"
-          />
-        </View>
+        {isOnline ? (
+          <View className="mb-6">
+            <Text className="text-xl font-semibold text-neutral-800 dark:text-white mb-4">
+              Job Requests
+            </Text>
+            <RequestsList
+              requests={jobRequests}
+              onAccept={handleAccept}
+              onDecline={handleDecline}
+              onBid={handleBid}
+              onAcceptBid={handleAcceptBid}
+              onDeclineBid={handleDeclineBid}
+              onCounterBid={handleCounterBid}
+              driverId="driver123"
+            />
+          </View>
+        ) : (
+          <View className="mb-6">
+            <Text className="text-xl font-semibold text-neutral-800 dark:text-white mb-4">
+              Job Requests
+            </Text>
+            <View className="bg-neutral-100 dark:bg-neutral-800 p-6 rounded-lg items-center justify-center">
+              <Gavel size={40} color={isDarkMode ? "#9ca3af" : "#6b7280"} />
+              <Text className="text-neutral-600 dark:text-neutral-400 text-center mt-4 mb-2 font-medium">
+                You're currently offline
+              </Text>
+              <Text className="text-neutral-500 dark:text-neutral-500 text-center text-sm">
+                Go online to view and accept job requests
+              </Text>
+            </View>
+          </View>
+        )}
 
         {/* Active Jobs */}
         <View className="mb-6">
@@ -400,16 +437,90 @@ export default function DriverDashboard() {
         </View>
       </Modal>
 
-      {/* Payment Modal */}
-      {selectedJob && (
-        <PaymentModal
-          visible={showPaymentModal}
-          onClose={handlePaymentFailure}
-          onSuccess={handlePaymentSuccess}
-          amount={COMMITMENT_FEE}
-          jobId={selectedJob.id}
-        />
-      )}
+      {/* Acceptance Confirmation Modal */}
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={showConfirmModal}
+        onRequestClose={() => setShowConfirmModal(false)}
+      >
+        <View className="flex-1 justify-center items-center bg-black/50">
+          <View className={`w-11/12 p-6 rounded-xl ${isDarkMode ? 'bg-neutral-800' : 'bg-white'}`}>
+            <View className="items-center mb-4">
+              <Truck size={48} color="#3B82F6" />
+              <Text className={`text-xl font-bold mt-2 ${isDarkMode ? 'text-white' : 'text-neutral-800'}`}>
+                Confirm Job Acceptance
+              </Text>
+            </View>
+            
+            {selectedJob && (
+              <View className={`p-4 rounded-lg mb-4 ${isDarkMode ? 'bg-neutral-700' : 'bg-gray-100'}`}>
+                <View className="flex-row items-center mb-2">
+                  <MapPin size={16} color={isDarkMode ? "#9CA3AF" : "#4B5563"} />
+                  <Text className={`ml-2 ${isDarkMode ? 'text-neutral-300' : 'text-neutral-600'}`}>
+                    From: <Text className={`font-medium ${isDarkMode ? 'text-white' : 'text-neutral-800'}`}>{selectedJob.pickup}</Text>
+                  </Text>
+                </View>
+                
+                <View className="flex-row items-center mb-2">
+                  <MapPin size={16} color={isDarkMode ? "#9CA3AF" : "#4B5563"} />
+                  <Text className={`ml-2 ${isDarkMode ? 'text-neutral-300' : 'text-neutral-600'}`}>
+                    To: <Text className={`font-medium ${isDarkMode ? 'text-white' : 'text-neutral-800'}`}>{selectedJob.destination}</Text>
+                  </Text>
+                </View>
+                
+                <View className="flex-row items-center mb-2">
+                  <Clock size={16} color={isDarkMode ? "#9CA3AF" : "#4B5563"} />
+                  <Text className={`ml-2 ${isDarkMode ? 'text-neutral-300' : 'text-neutral-600'}`}>
+                    Est. time: <Text className={`font-medium ${isDarkMode ? 'text-white' : 'text-neutral-800'}`}>{selectedJob.estimatedTime}</Text>
+                  </Text>
+                </View>
+                
+                <View className="flex-row items-center">
+                  <Package size={16} color={isDarkMode ? "#9CA3AF" : "#4B5563"} />
+                  <Text className={`ml-2 ${isDarkMode ? 'text-neutral-300' : 'text-neutral-600'}`}>
+                    Price: <Text className={`font-medium ${isDarkMode ? 'text-white' : 'text-neutral-800'}`}>
+                      {confirmAction === "acceptBid" && selectedJob.currentBid 
+                        ? `${selectedJob.currentBid} ETB` 
+                        : `${selectedJob.price} ETB`}
+                    </Text>
+                  </Text>
+                </View>
+              </View>
+            )}
+            
+            <Text className={`mb-4 ${isDarkMode ? 'text-neutral-300' : 'text-neutral-600'}`}>
+              By accepting this job, you are committing to complete the delivery as specified. A commitment fee of {COMMITMENT_FEE} ETB will be charged, which will be refunded upon successful delivery.
+            </Text>
+            
+            <View className="flex-row justify-between">
+              <TouchableOpacity
+                className={`flex-1 py-3 rounded-lg mr-2 ${isDarkMode ? 'bg-neutral-700' : 'bg-gray-200'}`}
+                onPress={() => setShowConfirmModal(false)}
+              >
+                <View className="flex-row justify-center items-center">
+                  <X size={18} color={isDarkMode ? "#F9FAFB" : "#1F2937"} />
+                  <Text className={`ml-2 font-medium ${isDarkMode ? 'text-white' : 'text-neutral-800'}`}>
+                    Cancel
+                  </Text>
+                </View>
+              </TouchableOpacity>
+              
+              <TouchableOpacity
+                className="flex-1 py-3 bg-blue-500 rounded-lg ml-2"
+                onPress={confirmAcceptJob}
+              >
+                <View className="flex-row justify-center items-center">
+                  <Check size={18} color="#FFFFFF" />
+                  <Text className="ml-2 text-white font-medium">
+                    Confirm
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaContainer>
   );
 }

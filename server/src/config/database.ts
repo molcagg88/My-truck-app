@@ -5,6 +5,8 @@ import { Order } from '../entities/Order';
 import { User } from '../entities/User';
 import { Location } from '../entities/Location';
 import { TruckType } from '../entities/TruckType';
+import { Payment } from '../models/Payment';
+import { Bid } from '../entities/Bid';
 
 // Load environment variables
 dotenv.config();
@@ -17,7 +19,7 @@ let AppDataSource: DataSource;
 if (dbType === 'postgres') {
   // PostgreSQL configuration
   const dbHost = process.env.DB_HOST || 'localhost';
-  const dbPort = parseInt(process.env.DB_PORT || '5432', 10);
+  const dbPort = parseInt(process.env.DB_PORT || '4060', 10);
   const dbUsername = process.env.DB_USERNAME || 'postgres';
   const dbPassword = process.env.DB_PASSWORD || 'postgres';
   const dbName = process.env.DB_NAME || 'truck_app';
@@ -31,23 +33,16 @@ if (dbType === 'postgres') {
     username: dbUsername,
     password: dbPassword,
     database: dbName,
-    synchronize: process.env.NODE_ENV !== 'production',
-    logging: process.env.NODE_ENV !== 'production',
-    entities: [Order, User, Location, TruckType],
+    synchronize: true,
+    logging: true,
+    entities: [Order, User, Location, TruckType, Payment, Bid],
     migrations: ['src/migrations/*.ts'],
     connectTimeoutMS: 2000,
     extra: {
-      max: 20, // Maximum number of connections in pool
-      idleTimeoutMillis: 30000, // How long a connection can be idle before being closed
-      connectionTimeoutMillis: 2000, // How long to wait for a connection
-      ssl: process.env.NODE_ENV === 'production' ? {
-        rejectUnauthorized: false
-      } : false
+      max: 20,
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 2000,
     },
-    subscribers: [],
-    ssl: process.env.NODE_ENV === 'production' ? {
-      rejectUnauthorized: false
-    } : false,
   });
 } else {
   // SQLite configuration (fallback for development)
@@ -59,8 +54,8 @@ if (dbType === 'postgres') {
     type: 'sqlite',
     database: dbPath,
     synchronize: true,
-    logging: process.env.NODE_ENV !== 'production',
-    entities: [Order, User, Location, TruckType],
+    logging: true,
+    entities: [Order, User, Location, TruckType, Payment, Bid],
     migrations: ['src/migrations/*.ts']
   });
 }
@@ -71,6 +66,13 @@ export const initializeDatabase = async () => {
   try {
     await AppDataSource.initialize();
     console.log('Database connection established');
+    
+    // Log all registered entities
+    const entityMetadatas = AppDataSource.entityMetadatas;
+    console.log('Registered entities:');
+    entityMetadatas.forEach(metadata => {
+      console.log(`- ${metadata.name}`);
+    });
   } catch (error) {
     console.error('Error connecting to database:', error);
     

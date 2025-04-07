@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, ScrollView, Image } from "react-native";
+import { View, Text, TouchableOpacity, Image, Modal, StyleSheet } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import {
   ArrowLeft,
@@ -9,10 +9,14 @@ import {
   DollarSign,
   Phone,
   MessageCircle,
+  AlertCircle,
+  CheckCircle,
 } from "lucide-react-native";
 import { useTheme } from "../_layout";
 import NavigationMap from "../components/NavigationMap";
 import OrderStatusTracker from "../components/OrderStatusTracker";
+import SafeAreaContainer from "../utils/SafeAreaContainer";
+import Typography from "../utils/typography";
 
 const JobDetailsScreen = () => {
   const router = useRouter();
@@ -21,6 +25,12 @@ const JobDetailsScreen = () => {
   const [currentStatus, setCurrentStatus] = useState<
     "confirmed" | "pickup" | "in_transit" | "delivered"
   >("pickup");
+  
+  // Add state for confirmation modal
+  const [isConfirmationVisible, setIsConfirmationVisible] = useState(false);
+  const [confirmationAction, setConfirmationAction] = useState("");
+  const [confirmationTitle, setConfirmationTitle] = useState("");
+  const [confirmationMessage, setConfirmationMessage] = useState("");
 
   // Mock job details
   const jobDetails = {
@@ -41,13 +51,51 @@ const JobDetailsScreen = () => {
     cargoWeight: "~150 kg",
   };
 
-  const handleUpdateStatus = () => {
-    if (currentStatus === "confirmed") setCurrentStatus("pickup");
-    else if (currentStatus === "pickup") setCurrentStatus("in_transit");
-    else if (currentStatus === "in_transit") setCurrentStatus("delivered");
-    else if (currentStatus === "delivered") {
+  const showConfirmation = (action: string, title: string, message: string) => {
+    setConfirmationAction(action);
+    setConfirmationTitle(title);
+    setConfirmationMessage(message);
+    setIsConfirmationVisible(true);
+  };
+
+  const handleConfirmAction = () => {
+    setIsConfirmationVisible(false);
+    
+    // Handle the actual status update
+    if (confirmationAction === "start_delivery") {
+      setCurrentStatus("in_transit");
+    } else if (confirmationAction === "confirm_delivery") {
+      setCurrentStatus("delivered");
+    } else if (confirmationAction === "complete_job") {
       // Complete the job and return to dashboard
       router.push("/driver/dashboard");
+    }
+  };
+
+  const handleUpdateStatus = () => {
+    if (currentStatus === "confirmed") {
+      setCurrentStatus("pickup");
+    } else if (currentStatus === "pickup") {
+      // Show confirmation for starting delivery
+      showConfirmation(
+        "start_delivery",
+        "Start Delivery?",
+        "Confirm that you have picked up all items and are ready to start the delivery."
+      );
+    } else if (currentStatus === "in_transit") {
+      // Show confirmation for delivery completion
+      showConfirmation(
+        "confirm_delivery",
+        "Confirm Delivery?",
+        "Confirm that you have successfully delivered all items to the customer."
+      );
+    } else if (currentStatus === "delivered") {
+      // Show confirmation for completing the job
+      showConfirmation(
+        "complete_job",
+        "Complete Job?",
+        "This will mark the job as completed and you'll be redirected to the dashboard."
+      );
     }
   };
 
@@ -67,21 +115,26 @@ const JobDetailsScreen = () => {
   };
 
   return (
-    <ScrollView className="flex-1 bg-gray-50 dark:bg-neutral-900">
+    <SafeAreaContainer extraPadding={{ top: 10 }}>
       <View className="flex-1">
-        {/* Map View */}
-        <View className="h-64 w-full">
-          <NavigationMap />
+        {/* Header with back button */}
+        <View className="flex-row items-center mb-4">
           <TouchableOpacity
-            className="absolute top-4 left-4 bg-white dark:bg-neutral-800 rounded-full p-2"
             onPress={() => router.back()}
+            className="mr-3"
           >
             <ArrowLeft size={24} color={isDarkMode ? "#ffffff" : "#374151"} />
           </TouchableOpacity>
+          <Typography variant="h2">Job Details</Typography>
+        </View>
+
+        {/* Map View */}
+        <View className="h-64 w-full rounded-lg overflow-hidden mb-4">
+          <NavigationMap />
         </View>
 
         {/* Job Details */}
-        <View className="p-4">
+        <View>
           <View className="flex-row justify-between items-center mb-4">
             <Text className="text-xl font-bold text-neutral-800 dark:text-white">
               Job #{jobDetails.id.substring(0, 6)}
@@ -253,8 +306,126 @@ const JobDetailsScreen = () => {
           </TouchableOpacity>
         </View>
       </View>
-    </ScrollView>
+
+      {/* Confirmation Modal */}
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={isConfirmationVisible}
+        onRequestClose={() => setIsConfirmationVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[
+            styles.modalContent,
+            isDarkMode ? { backgroundColor: '#1f2937' } : { backgroundColor: '#ffffff' }
+          ]}>
+            <View style={styles.modalHeader}>
+              <AlertCircle size={24} color="#f59e0b" />
+              <Text style={[
+                styles.modalTitle,
+                isDarkMode ? { color: '#ffffff' } : { color: '#374151' }
+              ]}>
+                {confirmationTitle}
+              </Text>
+            </View>
+            
+            <Text style={[
+              styles.modalMessage,
+              isDarkMode ? { color: '#d1d5db' } : { color: '#4b5563' }
+            ]}>
+              {confirmationMessage}
+            </Text>
+            
+            <View style={styles.modalActions}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.cancelButton]}
+                onPress={() => setIsConfirmationVisible(false)}
+              >
+                <Text style={styles.cancelButtonText}>Cancel</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity
+                style={[styles.modalButton, styles.confirmButton]}
+                onPress={handleConfirmAction}
+              >
+                <CheckCircle size={16} color="#ffffff" />
+                <Text style={styles.confirmButtonText}>Confirm</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+    </SafeAreaContainer>
   );
 };
+
+const styles = StyleSheet.create({
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    padding: 20,
+  },
+  modalContent: {
+    borderRadius: 12,
+    padding: 20,
+    width: '90%',
+    maxWidth: 350,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginLeft: 10,
+  },
+  modalMessage: {
+    fontSize: 14,
+    marginBottom: 20,
+    lineHeight: 20,
+  },
+  modalActions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  modalButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    flex: 1,
+  },
+  cancelButton: {
+    backgroundColor: 'transparent',
+    marginRight: 8,
+  },
+  cancelButtonText: {
+    color: '#9ca3af',
+    fontWeight: '500',
+  },
+  confirmButton: {
+    backgroundColor: '#3b82f6',
+    marginLeft: 8,
+  },
+  confirmButtonText: {
+    color: '#ffffff',
+    fontWeight: '500',
+    marginLeft: 6,
+  },
+});
 
 export default JobDetailsScreen;

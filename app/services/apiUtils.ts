@@ -1,20 +1,51 @@
-import { AxiosError } from 'axios';
+import axios, { AxiosError } from 'axios';
 import { Alert, Platform } from 'react-native';
 import Constants from 'expo-constants';
 
 // Handle API errors consistently
-export const handleApiError = (error: any, defaultMessage: string): string => {
-  if (error.response) {
-    // The request was made and the server responded with a status code
-    // that falls out of the range of 2xx
-    return error.response.data.message || defaultMessage;
-  } else if (error.request) {
-    // The request was made but no response was received
-    return 'No response from server. Please check your connection.';
-  } else {
-    // Something happened in setting up the request that triggered an Error
-    return error.message || defaultMessage;
+export const handleApiError = (error: unknown, defaultMessage: string = 'An error occurred'): Error => {
+  console.error('API Error:', error);
+
+  if (axios.isAxiosError(error)) {
+    const axiosError = error as AxiosError;
+    
+    // Handle network errors
+    if (!axiosError.response) {
+      Alert.alert('Network Error', 'Please check your internet connection and try again.');
+      return new Error('Network error');
+    }
+
+    // Handle specific error status codes
+    const status = axiosError.response.status;
+    const data = axiosError.response.data as { message?: string };
+
+    switch (status) {
+      case 400:
+        Alert.alert('Bad Request', data.message || 'Please check your input and try again.');
+        break;
+      case 401:
+        Alert.alert('Unauthorized', 'Please login again to continue.');
+        // You might want to handle logout here
+        break;
+      case 403:
+        Alert.alert('Forbidden', 'You do not have permission to perform this action.');
+        break;
+      case 404:
+        Alert.alert('Not Found', 'The requested resource was not found.');
+        break;
+      case 500:
+        Alert.alert('Server Error', 'Something went wrong on our end. Please try again later.');
+        break;
+      default:
+        Alert.alert('Error', data.message || defaultMessage);
+    }
+
+    return new Error(data.message || defaultMessage);
   }
+
+  // Handle non-Axios errors
+  Alert.alert('Error', defaultMessage);
+  return new Error(defaultMessage);
 };
 
 // Format API response data consistently
@@ -52,38 +83,82 @@ export const formatValidationErrors = (error: AxiosError<any>) => {
   return errors;
 };
 
-export const getApiBaseUrl = () => {
-  // Check for environment variable first
-  if (process.env.EXPO_PUBLIC_API_URL) {
-    return process.env.EXPO_PUBLIC_API_URL;
-  }
-
-  // In development, use platform-specific URLs
+// Get the base URL based on the environment
+export const getApiBaseUrl = (): string => {
   if (__DEV__) {
-    if (Platform.OS === 'web') {
-      return 'http://localhost:3000/api';
-    }
-    // For Android emulator
-    if (Platform.OS === 'android') {
-      return 'http://10.0.2.2:3000/api';
-    }
-    // For iOS simulator
-    if (Platform.OS === 'ios') {
-      return 'http://localhost:3000/api';
-    }
-    // Default fallback
     return 'http://localhost:3000/api';
   }
-  
-  // In production, use the actual API URL
-  return Constants.expoConfig?.extra?.apiUrl || 'https://your-production-api.com/api';
+  return 'https://api.your-production-domain.com/api';
+};
+
+// Format currency
+export const formatCurrency = (amount: number): string => {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+  }).format(amount);
+};
+
+// Format date
+export const formatDate = (date: string | Date): string => {
+  return new Date(date).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+};
+
+// Get order status color
+export const getStatusColor = (status: string): string => {
+  switch (status) {
+    case 'pending':
+      return '#FFA500'; // Orange
+    case 'payment_pending':
+      return '#FFD700'; // Gold
+    case 'accepted':
+      return '#32CD32'; // Lime Green
+    case 'in-progress':
+      return '#4169E1'; // Royal Blue
+    case 'completed':
+      return '#008000'; // Green
+    case 'cancelled':
+      return '#FF0000'; // Red
+    default:
+      return '#808080'; // Gray
+  }
+};
+
+// Get order status text
+export const getStatusText = (status: string): string => {
+  switch (status) {
+    case 'pending':
+      return 'Pending';
+    case 'payment_pending':
+      return 'Payment Pending';
+    case 'accepted':
+      return 'Accepted';
+    case 'in-progress':
+      return 'In Progress';
+    case 'completed':
+      return 'Completed';
+    case 'cancelled':
+      return 'Cancelled';
+    default:
+      return status;
+  }
 };
 
 const apiUtils = {
   handleApiError,
   formatApiResponse,
   formatValidationErrors,
-  getApiBaseUrl
+  getApiBaseUrl,
+  formatCurrency,
+  formatDate,
+  getStatusColor,
+  getStatusText
 };
 
 export default apiUtils; 

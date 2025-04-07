@@ -36,6 +36,13 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "apiUrl": "https://api.my-truck-app.com/api",
+      "devApiUrl": "http://localhost:3000/api",
+      "eas": {
+        "projectId": "your-eas-project-id"
+      }
     }
   }
 }

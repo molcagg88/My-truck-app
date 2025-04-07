@@ -1,9 +1,10 @@
 import React, { useEffect } from "react";
-import { View, Text, TouchableOpacity, Image, Animated, Dimensions, Platform } from "react-native";
+import { View, Text, TouchableOpacity, Image, Animated, Dimensions, Platform, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { useTheme } from "./_layout";
 import { ArrowRight } from "lucide-react-native";
 import SafeAreaContainer from "./utils/SafeAreaContainer";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -70,6 +71,45 @@ export default function HomeScreen() {
               <ArrowRight size={20} color={isDarkMode ? "#000000" : "#FFFFFF"} />
             </View>
           </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.card,
+              { backgroundColor: isDarkMode ? "#1f2937" : "#ffffff" }
+            ]}
+            onPress={() => router.push("/screens/MapDemoScreen")}
+          >
+            <View style={styles.cardIcon}>
+              <Ionicons
+                name="map-outline"
+                size={24}
+                color={isDarkMode ? "#3b82f6" : "#3b82f6"}
+              />
+            </View>
+            <View style={styles.cardContent}>
+              <Text
+                style={[
+                  styles.cardTitle,
+                  { color: isDarkMode ? "#f3f4f6" : "#1f2937" }
+                ]}
+              >
+                Map Demo
+              </Text>
+              <Text
+                style={[
+                  styles.cardDescription,
+                  { color: isDarkMode ? "#9ca3af" : "#6b7280" }
+                ]}
+              >
+                Try our mocked map implementation
+              </Text>
+            </View>
+            <Ionicons
+              name="chevron-forward"
+              size={20}
+              color={isDarkMode ? "#9ca3af" : "#6b7280"}
+            />
+          </TouchableOpacity>
         </View>
       </Animated.View>
 
@@ -87,4 +127,39 @@ export default function HomeScreen() {
       </View>
     </SafeAreaContainer>
   );
-} 
+}
+
+const styles = StyleSheet.create({
+  card: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  cardIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 16,
+  },
+  cardContent: {
+    flex: 1,
+  },
+  cardTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  cardDescription: {
+    fontSize: 14,
+  }
+}); 

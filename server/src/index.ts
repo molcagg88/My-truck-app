@@ -7,9 +7,15 @@ import authRoutes from './routes/auth';
 import adminRoutes from './routes/admin';
 import customerRoutes from './routes/customer';
 import driverRoutes from './routes/driver';
+import paymentRoutes from './routes/paymentRoutes';
+import locationRoutes from './routes/locationRoutes';
+import jobRoutes from './routes/job';
+import biddingRoutes from './routes/bidding';
 import { errorHandler } from './middleware/error';
 import { authMiddleware } from './middleware/auth';
 import { logger } from './utils/logger';
+import { WebSocketServer } from './websocket/server';
+import { createServer } from 'http';
 
 // Load environment variables
 dotenv.config();
@@ -20,44 +26,56 @@ const port = process.env.PORT || 3000;
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Request logging
+// Simple logger for requests
 app.use((req, res, next) => {
-  logger.info(`${req.method} ${req.url}`);
+  logger.info(`${req.method} ${req.originalUrl}`);
   next();
 });
 
 // Public routes
 app.use('/api/auth', authRoutes);
+app.use('/api/payments', paymentRoutes); // Add payment routes - public for handling redirects
 
 // Protected routes - require authentication
 app.use('/api/admin', authMiddleware, adminRoutes);
 app.use('/api/customer', authMiddleware, customerRoutes);
 app.use('/api/driver', authMiddleware, driverRoutes);
+app.use('/api/jobs', authMiddleware, jobRoutes);
+app.use('/api/bidding', biddingRoutes);
 
-// API health check and documentation
+// Health check endpoint
 app.get('/api/health', (req, res) => {
-  res.status(200).json({ 
+  res.json({ 
     status: 'ok', 
-    timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development'
+    message: 'API is running',
+    time: new Date().toISOString()
   });
 });
 
-// Basic API information
+// Root API information
 app.get('/api', (req, res) => {
-  res.status(200).json({
-    name: 'Truck App API',
+  res.json({
+    name: 'Truck Booking API',
     version: '1.0.0',
+    description: 'Backend API for the truck booking application',
+    documentation: '/api/docs',
     endpoints: [
-      { path: '/api/auth', description: 'Authentication endpoints' },
-      { path: '/api/admin', description: 'Admin management endpoints' },
-      { path: '/api/customer', description: 'Customer service endpoints' },
-      { path: '/api/driver', description: 'Driver service endpoints' },
-      { path: '/api/health', description: 'API health check' }
+      '/api/auth',
+      '/api/admin',
+      '/api/customer',
+      '/api/driver',
+      '/api/payments',
     ]
   });
 });
+
+// Register routes
+app.use('/api/location', locationRoutes);
+
+// Error handling middleware
+app.use(errorHandler);
 
 // Handle 404 routes
 app.use('/api/*', (req, res) => {
@@ -68,18 +86,38 @@ app.use('/api/*', (req, res) => {
   });
 });
 
-// Error handling
-app.use(errorHandler);
+// Initialize server
+const server = createServer(app);
 
-// Initialize database and start server
+// Initialize WebSocket server (after HTTP server is created)
+let wss: WebSocketServer;
+
+// Connect to database and start server
 AppDataSource.initialize()
   .then(() => {
     logger.info('Database connected successfully');
-    app.listen(port, () => {
+    server.listen(port, () => {
       logger.info(`Server is running on port ${port}`);
       logger.info(`API available at http://localhost:${port}/api`);
+      
+      // Initialize WebSocket server after HTTP server is running
+      wss = new WebSocketServer(server);
+      logger.info('🔌 WebSocket server initialized');
     });
   })
   .catch((error) => {
     logger.error('Error connecting to database:', error);
-  }); 
+    process.exit(1);
+  });
+
+// Handle graceful shutdown
+process.on('SIGINT', () => {
+  logger.info('Shutting down server...');
+  if (wss) {
+    wss.close();
+  }
+  server.close(() => {
+    logger.info('Server shut down');
+    process.exit(0);
+  });
+}); 

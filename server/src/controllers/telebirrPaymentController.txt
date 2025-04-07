@@ -1,0 +1,539 @@
+// REFERENCE FILE - THIS IS MEANT TO BE IMPLEMENTED ON YOUR SERVER
+// This file demonstrates how to implement the required backend endpoints
+// for the Telebirr H5 C2B payment integration
+
+import { Request, Response } from 'express';
+import crypto from 'crypto';
+import axios from 'axios';
+import { v4 as uuidv4 } from 'uuid';
+
+// Configuration - These would come from environment variables in a real implementation
+const TELEBIRR_API_URL = 'https://api.telebirr.com/api/cbepay/payments';
+const APP_ID = 'YOUR_APP_ID'; // App ID provided by Telebirr
+const APP_KEY = 'YOUR_APP_KEY'; // App Key provided by Telebirr
+const PUBLIC_KEY = `-----BEGIN PUBLIC KEY-----
+YOUR_PUBLIC_KEY_FROM_TELEBIRR
+-----END PUBLIC KEY-----`; // Public Key provided by Telebirr
+const NOTIFY_URL = 'https://your-domain.com/api/payments/telebirr/callback';
+const RETURN_URL = 'https://your-domain.com/api/payments/telebirr/success';
+const TIMEOUT_EXPRESS = '30'; // Payment timeout in minutes
+const NONCE = ''; // Optional nonce string
+
+// Create H5 Payment
+export const createPayment = async (req: Request, res: Response) => {
+  try {
+    const { amount, referenceId, subject, customerName, customerPhone } = req.body;
+
+    // Validate inputs
+    if (!amount || !referenceId || !subject) {
+      return res.status(400).json({ success: false, message: 'Missing required fields' });
+    }
+
+    // Generate unique out trade number
+    const outTradeNo = `TLB-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+    
+    // Prepare API request payload
+    const requestPayload = {
+      outTradeNo,
+      subject,
+      totalAmount: amount.toString(),
+      shortCode: 'YOUR_SHORT_CODE', // Your short code provided by Telebirr
+      notifyUrl: NOTIFY_URL,
+      returnUrl: RETURN_URL,
+      timeoutExpress: TIMEOUT_EXPRESS,
+      nonce: NONCE || uuidv4(),
+      appId: APP_ID,
+      timestamp: Date.now().toString(),
+    };
+
+    // Convert payload to JSON string
+    const requestJson = JSON.stringify(requestPayload);
+
+    // Encrypt the payload using Telebirr's public key
+    const encryptedData = encryptWithPublicKey(requestJson, PUBLIC_KEY);
+
+    // Create the final request body
+    const telebirrRequestBody = {
+      appId: APP_ID,
+      sign: calculateSignature(requestJson, APP_KEY),
+      ussd: encryptedData,
+    };
+
+    // Make API call to Telebirr
+    const response = await axios.post(TELEBIRR_API_URL, telebirrRequestBody, {
+      headers: { 'Content-Type': 'application/json' }
+    });
+
+    // Process Telebirr response
+    if (response.data && response.data.code === '0') {
+      // Extract the payment URL
+      const toPayUrl = decryptResponseData(response.data.data, APP_KEY);
+
+      // Save payment details to database for later verification
+      await savePaymentToDatabase({
+        outTradeNo,
+        referenceId,
+        amount,
+        subject,
+        customerName,
+        customerPhone,
+        status: 'PENDING',
+        createdAt: new Date(),
+      });
+
+      // Return success with payment URL
+      return res.status(200).json({ 
+        success: true, 
+        toPayUrl, 
+        outTradeNo 
+      });
+    } else {
+      // Handle error response from Telebirr
+      return res.status(400).json({ 
+        success: false, 
+        message: response.data?.message || 'Failed to initiate payment' 
+      });
+    }
+  } catch (error) {
+    console.error('Error creating Telebirr payment:', error);
+    return res.status(500).json({ 
+      success: false, 
+      message: 'Internal server error' 
+    });
+  }
+};
+
+// Verify Payment Status
+export const verifyPayment = async (req: Request, res: Response) => {
+  try {
+    const { outTradeNo } = req.params;
+
+    if (!outTradeNo) {
+      return res.status(400).json({ success: false, message: 'Missing outTradeNo' });
+    }
+
+    // Retrieve payment from database
+    const payment = await getPaymentFromDatabase(outTradeNo);
+
+    if (!payment) {
+      return res.status(404).json({ success: false, message: 'Payment not found' });
+    }
+
+    // If payment is already verified as successful
+    if (payment.status === 'TRADE_SUCCESS') {
+      return res.status(200).json({
+        success: true,
+        status: 'TRADE_SUCCESS',
+        outTradeNo,
+        totalAmount: payment.amount,
+      });
+    }
+
+    // Prepare verification request
+    const requestPayload = {
+      outTradeNo,
+      appId: APP_ID,
+      timestamp: Date.now().toString(),
+      nonce: NONCE || uuidv4(),
+    };
+
+    // Convert payload to JSON string
+    const requestJson = JSON.stringify(requestPayload);
+
+    // Encrypt the payload
+    const encryptedData = encryptWithPublicKey(requestJson, PUBLIC_KEY);
+
+    // Create final request body
+    const telebirrRequestBody = {
+      appId: APP_ID,
+      sign: calculateSignature(requestJson, APP_KEY),
+      ussd: encryptedData,
+    };
+
+    // Make API call to Telebirr to verify payment
+    const response = await axios.post(`${TELEBIRR_API_URL}/query`, telebirrRequestBody, {
+      headers: { 'Content-Type': 'application/json' }
+    });
+
+    // Process response
+    if (response.data && response.data.code === '0') {
+      const decryptedData = decryptResponseData(response.data.data, APP_KEY);
+      const parsedData = JSON.parse(decryptedData);
+
+      // Update payment status in database
+      await updatePaymentStatus(outTradeNo, parsedData.tradeStatus);
+
+      return res.status(200).json({
+        success: true,
+        status: parsedData.tradeStatus,
+        outTradeNo,
+        totalAmount: payment.amount,
+      });
+    } else {
+      return res.status(400).json({ 
+        success: false, 
+        message: response.data?.message || 'Failed to verify payment' 
+      });
+    }
+  } catch (error) {
+    console.error('Error verifying Telebirr payment:', error);
+    return res.status(500).json({ 
+      success: false, 
+      message: 'Internal server error' 
+    });
+  }
+};
+
+// Payment Callback (Webhook)
+export const handleCallback = async (req: Request, res: Response) => {
+  try {
+    const { outTradeNo, tradeStatus, totalAmount } = req.body;
+
+    // Verify callback authenticity using signature verification
+    const isValidSignature = verifyCallbackSignature(req.body, req.headers['x-telebirr-signature']);
+
+    if (!isValidSignature) {
+      return res.status(403).json({ success: false, message: 'Invalid signature' });
+    }
+
+    // Update payment status in database
+    await updatePaymentStatus(outTradeNo, tradeStatus);
+
+    // Return success response to Telebirr
+    return res.status(200).json({ success: true });
+  } catch (error) {
+    console.error('Error handling Telebirr callback:', error);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+// Success Redirect Page
+export const successPage = (req: Request, res: Response) => {
+  const { outTradeNo } = req.query;
+  
+  // Render a success page that will communicate back to the WebView
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Payment Success</title>
+      <style>
+        body {
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          background-color: #f9f9f9;
+          color: #333;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          height: 100vh;
+          margin: 0;
+          padding: 20px;
+          text-align: center;
+        }
+        .success-icon {
+          width: 80px;
+          height: 80px;
+          background-color: #10b981;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-bottom: 20px;
+        }
+        .success-icon svg {
+          width: 40px;
+          height: 40px;
+          fill: none;
+          stroke: white;
+          stroke-width: 2;
+          stroke-linecap: round;
+          stroke-linejoin: round;
+        }
+        h1 {
+          font-size: 24px;
+          margin-bottom: 10px;
+        }
+        p {
+          font-size: 16px;
+          color: #666;
+          margin-bottom: 30px;
+        }
+        .redirect-text {
+          font-size: 14px;
+          color: #999;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="success-icon">
+        <svg viewBox="0 0 24 24">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      </div>
+      <h1>Payment Successful!</h1>
+      <p>Your payment has been processed successfully.</p>
+      <p class="redirect-text">Returning to the app...</p>
+      
+      <script>
+        // Send message to WebView
+        setTimeout(function() {
+          if (window.ReactNativeWebView) {
+            window.ReactNativeWebView.postMessage(JSON.stringify({
+              type: 'payment_status',
+              status: 'success',
+              outTradeNo: '${outTradeNo}'
+            }));
+          }
+        }, 1500);
+      </script>
+    </body>
+    </html>
+  `;
+  
+  res.send(html);
+};
+
+// Failure Redirect Page
+export const failurePage = (req: Request, res: Response) => {
+  const { outTradeNo, message } = req.query;
+  
+  // Render a failure page
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Payment Failed</title>
+      <style>
+        body {
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          background-color: #f9f9f9;
+          color: #333;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          height: 100vh;
+          margin: 0;
+          padding: 20px;
+          text-align: center;
+        }
+        .error-icon {
+          width: 80px;
+          height: 80px;
+          background-color: #ef4444;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-bottom: 20px;
+        }
+        .error-icon svg {
+          width: 40px;
+          height: 40px;
+          fill: none;
+          stroke: white;
+          stroke-width: 2;
+          stroke-linecap: round;
+          stroke-linejoin: round;
+        }
+        h1 {
+          font-size: 24px;
+          margin-bottom: 10px;
+        }
+        p {
+          font-size: 16px;
+          color: #666;
+          margin-bottom: 30px;
+        }
+        .redirect-text {
+          font-size: 14px;
+          color: #999;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="error-icon">
+        <svg viewBox="0 0 24 24">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </div>
+      <h1>Payment Failed</h1>
+      <p>${message || 'There was an issue processing your payment.'}</p>
+      <p class="redirect-text">Returning to the app...</p>
+      
+      <script>
+        // Send message to WebView
+        setTimeout(function() {
+          if (window.ReactNativeWebView) {
+            window.ReactNativeWebView.postMessage(JSON.stringify({
+              type: 'payment_status',
+              status: 'failure',
+              message: '${message || 'Payment failed. Please try again.'}',
+              outTradeNo: '${outTradeNo}'
+            }));
+          }
+        }, 1500);
+      </script>
+    </body>
+    </html>
+  `;
+  
+  res.send(html);
+};
+
+// Cancel Redirect Page
+export const cancelPage = (req: Request, res: Response) => {
+  const { outTradeNo } = req.query;
+  
+  // Render a cancel page
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Payment Cancelled</title>
+      <style>
+        body {
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          background-color: #f9f9f9;
+          color: #333;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          height: 100vh;
+          margin: 0;
+          padding: 20px;
+          text-align: center;
+        }
+        .cancel-icon {
+          width: 80px;
+          height: 80px;
+          background-color: #f59e0b;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-bottom: 20px;
+        }
+        .cancel-icon svg {
+          width: 40px;
+          height: 40px;
+          fill: none;
+          stroke: white;
+          stroke-width: 2;
+          stroke-linecap: round;
+          stroke-linejoin: round;
+        }
+        h1 {
+          font-size: 24px;
+          margin-bottom: 10px;
+        }
+        p {
+          font-size: 16px;
+          color: #666;
+          margin-bottom: 30px;
+        }
+        .redirect-text {
+          font-size: 14px;
+          color: #999;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="cancel-icon">
+        <svg viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+      </div>
+      <h1>Payment Cancelled</h1>
+      <p>You have cancelled the payment process.</p>
+      <p class="redirect-text">Returning to the app...</p>
+      
+      <script>
+        // Send message to WebView
+        setTimeout(function() {
+          if (window.ReactNativeWebView) {
+            window.ReactNativeWebView.postMessage(JSON.stringify({
+              type: 'payment_status',
+              status: 'cancel',
+              outTradeNo: '${outTradeNo}'
+            }));
+          }
+        }, 1500);
+      </script>
+    </body>
+    </html>
+  `;
+  
+  res.send(html);
+};
+
+// Helper function to encrypt data with Telebirr's public key
+function encryptWithPublicKey(data: string, publicKey: string): string {
+  const buffer = Buffer.from(data);
+  const encrypted = crypto.publicEncrypt(
+    {
+      key: publicKey,
+      padding: crypto.constants.RSA_PKCS1_PADDING,
+    },
+    buffer
+  );
+  return encrypted.toString('base64');
+}
+
+// Helper function to decrypt response data with app key
+function decryptResponseData(encryptedData: string, appKey: string): string {
+  const decipher = crypto.createDecipheriv(
+    'aes-128-cbc',
+    appKey.substr(0, 16),
+    appKey.substr(0, 16)
+  );
+  let decrypted = decipher.update(encryptedData, 'base64', 'utf8');
+  decrypted += decipher.final('utf8');
+  return decrypted;
+}
+
+// Helper function to calculate signature
+function calculateSignature(data: string, appKey: string): string {
+  return crypto.createHmac('sha256', appKey).update(data).digest('hex');
+}
+
+// Helper function to verify callback signature
+function verifyCallbackSignature(payload: any, signature: string): boolean {
+  const data = JSON.stringify(payload);
+  const calculatedSignature = calculateSignature(data, APP_KEY);
+  return calculatedSignature === signature;
+}
+
+// Mock function to save payment to database
+async function savePaymentToDatabase(payment: any): Promise<void> {
+  // Implement database save logic here
+  console.log('Saving payment to database:', payment);
+}
+
+// Mock function to get payment from database
+async function getPaymentFromDatabase(outTradeNo: string): Promise<any> {
+  // Implement database retrieval logic here
+  console.log('Retrieving payment from database:', outTradeNo);
+  return {
+    outTradeNo,
+    amount: '500.00',
+    status: 'PENDING',
+  };
+}
+
+// Mock function to update payment status
+async function updatePaymentStatus(outTradeNo: string, status: string): Promise<void> {
+  // Implement database update logic here
+  console.log('Updating payment status:', outTradeNo, status);
+} 

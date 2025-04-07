@@ -13,6 +13,7 @@ import {
   Wallet,
   AlertCircle,
 } from "lucide-react-native";
+import { useTheme } from "../_layout";
 
 interface PaymentMethod {
   id: string;
@@ -37,18 +38,19 @@ const PaymentOptions = ({
   paymentError = null,
 }: PaymentOptionsProps) => {
   const [selected, setSelected] = useState(selectedMethod);
+  const { isDarkMode } = useTheme();
 
   const paymentMethods: PaymentMethod[] = [
     {
       id: "telebirr",
       name: "Telebirr",
-      icon: <Wallet size={24} color="#E53935" />,
+      icon: <Wallet size={24} color="#FF3B30" />,
       description: "Pay directly with your Telebirr account",
     },
     {
       id: "cash",
       name: "Pay on Delivery",
-      icon: <CreditCard size={24} color="#333" />,
+      icon: <CreditCard size={24} color={isDarkMode ? "#ffffff" : "#333333"} />,
       description: "Pay cash when your delivery arrives",
     },
   ];
@@ -60,13 +62,23 @@ const PaymentOptions = ({
   };
 
   return (
-    <View className="bg-white p-4 rounded-lg shadow-sm">
-      <Text className="text-lg font-bold mb-4">Payment Method</Text>
+    <View className={`p-4 rounded-lg shadow-sm ${isDarkMode ? 'bg-neutral-800' : 'bg-white'}`}>
+      <Text className={`text-lg font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-neutral-800'}`}>
+        Payment Method
+      </Text>
 
       {paymentMethods.map((method) => (
         <TouchableOpacity
           key={method.id}
-          className={`flex-row items-center p-3 mb-2 border rounded-lg ${isProcessing ? "opacity-70" : ""} ${selected === method.id ? "border-red-500 bg-red-50" : "border-gray-200"}`}
+          className={`flex-row items-center p-3 mb-2 border rounded-lg ${isProcessing ? "opacity-70" : ""} 
+            ${selected === method.id 
+              ? isDarkMode
+                ? "border-red-500 bg-red-900/30"
+                : "border-red-500 bg-red-50" 
+              : isDarkMode
+                ? "border-neutral-700 bg-neutral-700"
+                : "border-gray-200 bg-white"
+            }`}
           onPress={() => handleSelect(method.id)}
           disabled={isProcessing}
         >
@@ -75,8 +87,12 @@ const PaymentOptions = ({
           </View>
 
           <View className="flex-1">
-            <Text className="font-semibold text-base">{method.name}</Text>
-            <Text className="text-gray-500 text-sm">{method.description}</Text>
+            <Text className={`font-semibold text-base ${isDarkMode ? 'text-white' : 'text-neutral-800'}`}>
+              {method.name}
+            </Text>
+            <Text className={`text-sm ${isDarkMode ? 'text-neutral-300' : 'text-gray-500'}`}>
+              {method.description}
+            </Text>
           </View>
 
           <View className="w-6 h-6 justify-center items-center">
@@ -85,40 +101,33 @@ const PaymentOptions = ({
                 <Check size={14} color="white" />
               </View>
             ) : (
-              <ChevronRight size={18} color="#9CA3AF" />
+              <ChevronRight size={18} color={isDarkMode ? "#9CA3AF" : "#6B7280"} />
             )}
           </View>
         </TouchableOpacity>
       ))}
 
       {paymentError && (
-        <View className="mt-2 p-3 bg-red-50 rounded-lg flex-row items-center">
+        <View className={`mt-2 p-3 rounded-lg flex-row items-center ${isDarkMode ? 'bg-red-900/30' : 'bg-red-50'}`}>
           <AlertCircle size={18} color="#EF4444" />
-          <Text className="ml-2 text-red-600">{paymentError}</Text>
+          <Text className="ml-2 text-red-500 font-medium">{paymentError}</Text>
         </View>
       )}
 
       {isProcessing && (
-        <View className="mt-2 p-3 bg-blue-50 rounded-lg flex-row items-center justify-center">
-          <ActivityIndicator size="small" color="#3B82F6" />
-          <Text className="ml-2 text-blue-600">Processing payment...</Text>
+        <View className={`mt-2 p-3 rounded-lg flex-row items-center justify-center ${isDarkMode ? 'bg-blue-900/30' : 'bg-blue-50'}`}>
+          <ActivityIndicator size="small" color={isDarkMode ? "#60A5FA" : "#3B82F6"} />
+          <Text className={`ml-2 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'} font-medium`}>
+            Processing payment...
+          </Text>
         </View>
       )}
 
-      <View className="mt-4 p-3 bg-gray-50 rounded-lg">
-        <View className="flex-row justify-between mb-2">
-          <Text className="text-gray-500">Subtotal</Text>
-          <Text className="font-medium">{amount.toFixed(2)} ETB</Text>
-        </View>
-        <View className="flex-row justify-between mb-2">
-          <Text className="text-gray-500">Service Fee</Text>
-          <Text className="font-medium">25.00 ETB</Text>
-        </View>
-        <View className="h-px bg-gray-200 my-2" />
+      <View className={`mt-4 p-3 rounded-lg ${isDarkMode ? 'bg-neutral-700' : 'bg-gray-50'}`}>
         <View className="flex-row justify-between">
-          <Text className="font-bold">Total</Text>
+          <Text className={`font-bold ${isDarkMode ? 'text-white' : 'text-neutral-800'}`}>Total</Text>
           <Text className="font-bold text-red-500">
-            {(amount + 25).toFixed(2)} ETB
+            {amount.toFixed(2)} ETB
           </Text>
         </View>
       </View>

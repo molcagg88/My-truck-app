@@ -154,12 +154,12 @@ const PhoneVerification = () => {
         </TouchableOpacity>
 
         <View className="mb-8">
-          <Text className="text-3xl font-bold mb-2 text-neutral-800 dark:text-white">
+          <Text className={`text-3xl font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-neutral-800'}`}>
             {step === "phone" 
               ? "Enter your phone" 
               : "Verify your number"}
           </Text>
-          <Text className="text-neutral-600 dark:text-neutral-400">
+          <Text className={isDarkMode ? 'text-neutral-400' : 'text-neutral-600'}>
             {step === "phone"
               ? "We'll send you a verification code"
               : `We've sent a verification code to ${formattedPhone}`}
@@ -167,8 +167,8 @@ const PhoneVerification = () => {
         </View>
 
         {error && (
-          <View className="mb-4 p-4 bg-red-100 dark:bg-red-900 rounded-lg">
-            <Text className="text-red-600 dark:text-red-200">{error}</Text>
+          <View className={`mb-4 p-4 rounded-lg ${isDarkMode ? 'bg-red-900' : 'bg-red-100'}`}>
+            <Text className={isDarkMode ? 'text-red-200' : 'text-red-600'}>{error}</Text>
           </View>
         )}
 
@@ -196,8 +196,8 @@ const PhoneVerification = () => {
               (step === "phone" && phoneNumber.length < 9) ||
               (step === "otp" && otpCode.length < 6) ||
               isLoading
-                ? "bg-neutral-300 dark:bg-neutral-700"
-                : "bg-primary-500"
+                ? isDarkMode ? 'bg-neutral-700' : 'bg-neutral-300'
+                : 'bg-primary-500'
             }`}
             style={{ pointerEvents: 'auto' }}
             disabled={
@@ -220,17 +220,17 @@ const PhoneVerification = () => {
         </View>
 
         <View className="mt-6 items-center">
-          <Text className="text-neutral-600 dark:text-neutral-400 text-center mt-3 mb-2">
+          <Text className={`text-center mt-3 mb-2 ${isDarkMode ? 'text-neutral-400' : 'text-neutral-600'}`}>
             Phone number is used for all authentication.
           </Text>
-          <Text className="text-neutral-500 dark:text-neutral-400 text-sm">
+          <Text className={`text-sm ${isDarkMode ? 'text-neutral-400' : 'text-neutral-500'}`}>
             By continuing, you agree to our
           </Text>
           <View className="flex-row">
             <TouchableOpacity style={{ pointerEvents: 'auto' }}>
               <Text className="text-primary-500 text-sm">Terms of Service</Text>
             </TouchableOpacity>
-            <Text className="text-neutral-500 dark:text-neutral-400 text-sm mx-1">
+            <Text className={`text-sm mx-1 ${isDarkMode ? 'text-neutral-400' : 'text-neutral-500'}`}>
               and
             </Text>
             <TouchableOpacity style={{ pointerEvents: 'auto' }}>
