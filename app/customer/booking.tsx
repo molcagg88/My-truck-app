@@ -9,6 +9,9 @@ import PriceEstimate from "../components/PriceEstimate";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import SafeAreaContainer from "../utils/SafeAreaContainer";
 import Typography from "../utils/typography";
+import storage from "../utils/storage";
+import customerService from "../services/customerService";
+import { handleApiError } from "../services/apiUtils";
 
 const BookingScreen = () => {
   const router = useRouter();
@@ -101,16 +104,33 @@ const BookingScreen = () => {
     }
   };
 
-  const handleConfirmOrder = () => {
+  const handleConfirmOrder = async () => {
     setShowConfirmationModal(false);
-    // Simulate API call or processing delay
-    setTimeout(() => {
-      // Update active orders count in localStorage
-      const currentActiveOrders = parseInt(localStorage.getItem('activeOrders') || '0', 10);
-      localStorage.setItem('activeOrders', (currentActiveOrders + 1).toString());
+    try {
+      // Create the order through the API
+      const orderData = {
+        pickupLocation,
+        destinationLocation,
+        truckType: selectedTruckId,
+        description: cargoDescription,
+        scheduledTime: scheduledTime === "now" ? new Date() : selectedDate,
+          price: estimatedPrice,
+      };
+      
+      await customerService.createOrder(orderData);
+      
+      // Update active orders count using AsyncStorage
+      await storage.incrementActiveOrdersCount();
       
       setShowSuccessModal(true);
-    }, 500);
+    } catch (error) {
+      console.error("Error creating order:", error);
+      Alert.alert(
+        "Error",
+        "Failed to create order. Please try again.",
+        [{ text: "OK" }]
+      );
+    }
   };
 
   const handleSuccessNavigation = () => {

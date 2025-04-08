@@ -5,8 +5,10 @@ import { Order } from '../entities/Order';
 import { User } from '../entities/User';
 import { Location } from '../entities/Location';
 import { TruckType } from '../entities/TruckType';
-import { Payment } from '../models/Payment';
+import { Payment } from '../entities/Payment';
 import { Bid } from '../entities/Bid';
+import { Job } from '../entities/Job';
+import { Driver } from '../entities/Driver';
 
 // Load environment variables
 dotenv.config();
@@ -35,7 +37,7 @@ if (dbType === 'postgres') {
     database: dbName,
     synchronize: true,
     logging: true,
-    entities: [Order, User, Location, TruckType, Payment, Bid],
+    entities: [Order, User, Location, TruckType, Payment, Bid, Job, Driver],
     migrations: ['src/migrations/*.ts'],
     connectTimeoutMS: 2000,
     extra: {
@@ -55,7 +57,7 @@ if (dbType === 'postgres') {
     database: dbPath,
     synchronize: true,
     logging: true,
-    entities: [Order, User, Location, TruckType, Payment, Bid],
+    entities: [Order, User, Location, TruckType, Payment, Bid, Job, Driver],
     migrations: ['src/migrations/*.ts']
   });
 }

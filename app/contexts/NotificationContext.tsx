@@ -3,6 +3,8 @@ import { Alert, Platform } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import { useAuth } from './AuthContext';
 import storage from '../utils/storage';
+import { getApiBaseUrl } from '../services/apiUtils';
+import axios from 'axios';
 
 interface Notification {
   id: string;
@@ -15,10 +17,9 @@ interface Notification {
 
 interface NotificationContextType {
   notifications: Notification[];
-  unreadCount: number;
   isLoading: boolean;
   error: string | null;
-  registerForPushNotifications: () => Promise<string | null>;
+  fetchNotifications: () => Promise<void>;
   sendLocalNotification: (title: string, body: string, data?: any) => Promise<void>;
   markAsRead: (notificationId: string) => Promise<void>;
   markAllAsRead: () => Promise<void>;
@@ -27,63 +28,56 @@ interface NotificationContextType {
 
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
 
+export const useNotifications = () => {
+  const context = useContext(NotificationContext);
+  if (!context) {
+    throw new Error('useNotifications must be used within a NotificationProvider');
+  }
+  return context;
+};
+
 export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
 
-  const unreadCount = notifications.filter(n => !n.read).length;
+  // Create API instance for notifications
+  const notificationApi = axios.create({
+    baseURL: getApiBaseUrl(),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  // Add request interceptor to add auth token
+  notificationApi.interceptors.request.use(async (config) => {
+    const token = await storage.getToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  });
 
   useEffect(() => {
     if (user) {
-      loadNotifications();
-      configureNotifications();
+      fetchNotifications();
     }
   }, [user]);
 
-  const configureNotifications = () => {
-    Notifications.setNotificationHandler({
-      handleNotification: async () => ({
-        shouldShowAlert: true,
-        shouldPlaySound: true,
-        shouldSetBadge: true,
-      }),
-    });
-  };
-
-  const loadNotifications = async () => {
+  const fetchNotifications = async (): Promise<void> => {
     try {
-      const storedNotifications = await storage.getNotifications();
-      setNotifications(storedNotifications);
+      setIsLoading(true);
+      setError(null);
+      
+      // Fetch notifications from the server
+      const response = await notificationApi.get('/notifications');
+      setNotifications(response.data.notifications || []);
     } catch (error) {
-      console.error('Error loading notifications:', error);
-      setError('Failed to load notifications');
+      console.error('Error fetching notifications:', error);
+      setError('Failed to fetch notifications');
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const registerForPushNotifications = async (): Promise<string | null> => {
-    try {
-      const { status: existingStatus } = await Notifications.getPermissionsAsync();
-      let finalStatus = existingStatus;
-
-      if (existingStatus !== 'granted') {
-        const { status } = await Notifications.requestPermissionsAsync();
-        finalStatus = status;
-      }
-
-      if (finalStatus !== 'granted') {
-        Alert.alert('Permission required', 'Push notifications are required for this app.');
-        return null;
-      }
-
-      const token = (await Notifications.getExpoPushTokenAsync()).data;
-      return token;
-    } catch (error) {
-      console.error('Error registering for push notifications:', error);
-      return null;
     }
   };
 
@@ -107,8 +101,11 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         read: false,
       };
 
+      // Update local state
       setNotifications(prev => [...prev, newNotification]);
-      await storage.setNotifications([...notifications, newNotification]);
+      
+      // Send to server
+      await notificationApi.post('/notifications', newNotification);
     } catch (error) {
       console.error('Error sending local notification:', error);
       throw error;
@@ -117,11 +114,14 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   const markAsRead = async (notificationId: string): Promise<void> => {
     try {
+      // Update local state
       const updatedNotifications = notifications.map(notification =>
         notification.id === notificationId ? { ...notification, read: true } : notification
       );
       setNotifications(updatedNotifications);
-      await storage.setNotifications(updatedNotifications);
+      
+      // Update on server
+      await notificationApi.patch(`/notifications/${notificationId}`, { read: true });
     } catch (error) {
       console.error('Error marking notification as read:', error);
       throw error;
@@ -130,12 +130,15 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   const markAllAsRead = async (): Promise<void> => {
     try {
+      // Update local state
       const updatedNotifications = notifications.map(notification => ({
         ...notification,
         read: true,
       }));
       setNotifications(updatedNotifications);
-      await storage.setNotifications(updatedNotifications);
+      
+      // Update on server
+      await notificationApi.patch('/notifications/mark-all-read');
     } catch (error) {
       console.error('Error marking all notifications as read:', error);
       throw error;
@@ -144,8 +147,11 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   const clearNotifications = async (): Promise<void> => {
     try {
+      // Update local state
       setNotifications([]);
-      await storage.setNotifications([]);
+      
+      // Update on server
+      await notificationApi.delete('/notifications');
     } catch (error) {
       console.error('Error clearing notifications:', error);
       throw error;
@@ -154,10 +160,9 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   const value = {
     notifications,
-    unreadCount,
     isLoading,
     error,
-    registerForPushNotifications,
+    fetchNotifications,
     sendLocalNotification,
     markAsRead,
     markAllAsRead,
@@ -165,12 +170,4 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   };
 
   return <NotificationContext.Provider value={value}>{children}</NotificationContext.Provider>;
-};
-
-export const useNotifications = () => {
-  const context = useContext(NotificationContext);
-  if (context === undefined) {
-    throw new Error('useNotifications must be used within a NotificationProvider');
-  }
-  return context;
 }; 

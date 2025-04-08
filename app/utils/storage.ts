@@ -3,9 +3,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const STORAGE_KEYS = {
   AUTH_TOKEN: '@auth_token',
   USER_DATA: '@user_data',
+  LANGUAGE_PREFERENCE: '@language_preference',
   ACTIVE_ORDERS: '@active_orders',
-  COMPLETED_ORDERS: '@completed_orders',
-  NOTIFICATIONS: '@notifications',
 } as const;
 
 class Storage {
@@ -37,10 +36,17 @@ class Storage {
     }
   }
 
-  // User data management
+  // User data management (only basic session info)
   async setUserData(userData: any): Promise<void> {
     try {
-      await AsyncStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(userData));
+      // Only store minimal user data needed for session management
+      const minimalUserData = {
+        id: userData.id,
+        name: userData.name,
+        email: userData.email,
+        role: userData.role,
+      };
+      await AsyncStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(minimalUserData));
     } catch (error) {
       console.error('Error saving user data:', error);
       throw error;
@@ -66,62 +72,54 @@ class Storage {
     }
   }
 
-  // Orders management
-  async setActiveOrders(orders: any[]): Promise<void> {
+  // Language preference
+  async setLanguagePreference(language: string): Promise<void> {
     try {
-      await AsyncStorage.setItem(STORAGE_KEYS.ACTIVE_ORDERS, JSON.stringify(orders));
+      await AsyncStorage.setItem(STORAGE_KEYS.LANGUAGE_PREFERENCE, language);
     } catch (error) {
-      console.error('Error saving active orders:', error);
+      console.error('Error saving language preference:', error);
       throw error;
     }
   }
 
-  async getActiveOrders(): Promise<any[]> {
+  async getLanguagePreference(): Promise<string | null> {
     try {
-      const data = await AsyncStorage.getItem(STORAGE_KEYS.ACTIVE_ORDERS);
-      return data ? JSON.parse(data) : [];
+      return await AsyncStorage.getItem(STORAGE_KEYS.LANGUAGE_PREFERENCE);
     } catch (error) {
-      console.error('Error getting active orders:', error);
-      return [];
+      console.error('Error getting language preference:', error);
+      return null;
     }
   }
 
-  async setCompletedOrders(orders: any[]): Promise<void> {
+  // Active orders management
+  async getActiveOrdersCount(): Promise<number> {
     try {
-      await AsyncStorage.setItem(STORAGE_KEYS.COMPLETED_ORDERS, JSON.stringify(orders));
+      const count = await AsyncStorage.getItem(STORAGE_KEYS.ACTIVE_ORDERS);
+      return count ? parseInt(count, 10) : 0;
     } catch (error) {
-      console.error('Error saving completed orders:', error);
+      console.error('Error getting active orders count:', error);
+      return 0;
+    }
+  }
+
+  async setActiveOrdersCount(count: number): Promise<void> {
+    try {
+      await AsyncStorage.setItem(STORAGE_KEYS.ACTIVE_ORDERS, count.toString());
+    } catch (error) {
+      console.error('Error saving active orders count:', error);
       throw error;
     }
   }
 
-  async getCompletedOrders(): Promise<any[]> {
+  async incrementActiveOrdersCount(): Promise<number> {
     try {
-      const data = await AsyncStorage.getItem(STORAGE_KEYS.COMPLETED_ORDERS);
-      return data ? JSON.parse(data) : [];
+      const currentCount = await this.getActiveOrdersCount();
+      const newCount = currentCount + 1;
+      await this.setActiveOrdersCount(newCount);
+      return newCount;
     } catch (error) {
-      console.error('Error getting completed orders:', error);
-      return [];
-    }
-  }
-
-  // Notifications management
-  async setNotifications(notifications: any[]): Promise<void> {
-    try {
-      await AsyncStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify(notifications));
-    } catch (error) {
-      console.error('Error saving notifications:', error);
+      console.error('Error incrementing active orders count:', error);
       throw error;
-    }
-  }
-
-  async getNotifications(): Promise<any[]> {
-    try {
-      const data = await AsyncStorage.getItem(STORAGE_KEYS.NOTIFICATIONS);
-      return data ? JSON.parse(data) : [];
-    } catch (error) {
-      console.error('Error getting notifications:', error);
-      return [];
     }
   }
 

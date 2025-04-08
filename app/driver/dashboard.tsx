@@ -212,13 +212,13 @@ export default function DriverDashboard() {
 
   return (
     <SafeAreaContainer
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }
-    >
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
       <View>
-        {/* Header */}
-        <View className="flex-row justify-between items-center mb-4">
+          {/* Header */}
+          <View className="flex-row justify-between items-center mb-4">
           <View>
             <Text className="text-2xl font-bold text-neutral-800 dark:text-white">
               Driver Dashboard
@@ -245,10 +245,10 @@ export default function DriverDashboard() {
               <Settings size={24} color={isDarkMode ? "#ffffff" : "#374151"} />
             </TouchableOpacity>
           </View>
-        </View>
+          </View>
 
         {/* Status Card */}
-        <View
+            <View
           className={`mb-6 p-4 rounded-lg ${
             isOnline
               ? "bg-green-50 dark:bg-green-900"
@@ -297,25 +297,25 @@ export default function DriverDashboard() {
               </Text>
             </TouchableOpacity>
           </View>
-        </View>
+          </View>
 
         {/* Job Requests */}
         {isOnline ? (
           <View className="mb-6">
             <Text className="text-xl font-semibold text-neutral-800 dark:text-white mb-4">
-              Job Requests
-            </Text>
-            <RequestsList
-              requests={jobRequests}
-              onAccept={handleAccept}
-              onDecline={handleDecline}
-              onBid={handleBid}
-              onAcceptBid={handleAcceptBid}
-              onDeclineBid={handleDeclineBid}
-              onCounterBid={handleCounterBid}
-              driverId="driver123"
-            />
-          </View>
+                Job Requests
+              </Text>
+              <RequestsList
+                requests={jobRequests}
+                onAccept={handleAccept}
+                onDecline={handleDecline}
+                onBid={handleBid}
+                onAcceptBid={handleAcceptBid}
+                onDeclineBid={handleDeclineBid}
+                onCounterBid={handleCounterBid}
+                driverId="driver123"
+              />
+            </View>
         ) : (
           <View className="mb-6">
             <Text className="text-xl font-semibold text-neutral-800 dark:text-white mb-4">
@@ -330,8 +330,8 @@ export default function DriverDashboard() {
                 Go online to view and accept job requests
               </Text>
             </View>
-          </View>
-        )}
+            </View>
+          )}
 
         {/* Active Jobs */}
         <View className="mb-6">
@@ -519,7 +519,7 @@ export default function DriverDashboard() {
               </TouchableOpacity>
             </View>
           </View>
-        </View>
+    </View>
       </Modal>
     </SafeAreaContainer>
   );

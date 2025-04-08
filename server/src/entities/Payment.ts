@@ -1,8 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToOne, JoinColumn } from 'typeorm';
 import { Job } from './Job';
-import { PaymentStatus } from '../types/enums';
 
-@Entity('payments')
+@Entity()
 export class Payment {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -10,22 +9,27 @@ export class Payment {
   @Column()
   jobId: string;
 
-  @Column({ type: 'float' })
-  amount: number;
-
-  @Column({
-    type: 'varchar',
-    length: 20,
-    default: PaymentStatus.PENDING
-  })
-  status: string;
-
   @OneToOne(() => Job, job => job.payment)
-  @JoinColumn({ name: 'jobId' })
+  @JoinColumn()
   job: Job;
 
-  @Column('simple-json', { nullable: true })
-  metadata: Record<string, any>;
+  @Column('decimal', { precision: 10, scale: 2 })
+  amount: number;
+
+  @Column({ nullable: true })
+  outTradeNo: string;
+
+  @Column({ nullable: true })
+  tradeNo: string;
+
+  @Column({ nullable: true })
+  paymentMethod: string;
+
+  @Column({ nullable: true })
+  transactionId: string;
+
+  @Column()
+  status: string;
 
   @CreateDateColumn()
   createdAt: Date;

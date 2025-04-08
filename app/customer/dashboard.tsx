@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { View, Text, TouchableOpacity, ScrollView, RefreshControl, Alert, StyleSheet } from "react-native";
-import { useRouter } from "expo-router";
+import { useRouter, useFocusEffect } from "expo-router";
 import { Bell, Settings, MapPin, Calendar, Package, Truck, Clock, DollarSign, AlertCircle, List } from "lucide-react-native";
 import { useTheme } from "../_layout";
 import { useAuth } from "../auth/authContext";
@@ -33,31 +33,21 @@ const CustomerDashboard = () => {
       setLoading(true);
       setError(null);
 
-      // Read active orders from localStorage
-      const storedActiveOrders = parseInt(localStorage.getItem('activeOrders') || '0', 10);
-      
-      // Create mock orders based on the count
-      const mockActiveOrders: Order[] = Array(storedActiveOrders).fill(null).map((_, index) => ({
-        id: `order-${index + 1}`,
-        status: 'pending',
-        pickupLocation: 'Sample Location',
-        destinationLocation: 'Sample Location',
-        price: 350,
-        date: new Date().toISOString(),
-        truckType: 'Small Truck'
-      }));
+      // Fetch customer stats from API
+      const customerStats = await customerService.getStats();
+      setStats(customerStats);
 
-      setActiveOrders(mockActiveOrders);
-      setPaymentPendingOrders([]); // No pending payments for now
-      setOrderHistory([]); // No history for now
+      // Fetch active orders from API
+      const activeOrdersData = await customerService.getActiveOrders();
+      setActiveOrders(activeOrdersData);
 
-      // Set mock stats
-      setStats({
-        activeOrders: storedActiveOrders,
-        totalOrders: storedActiveOrders,
-        completedOrders: 0,
-        totalSpent: 0
-      });
+      // Fetch order history from API
+      const orderHistoryData = await customerService.getOrderHistory();
+      setOrderHistory(orderHistoryData);
+
+      // Fetch pending payments from API
+      const pendingPayments = await customerService.getPendingPayments();
+      setPaymentPendingOrders(pendingPayments);
     } catch (err) {
       console.error("Error fetching dashboard data:", err);
       setError("Failed to load dashboard data");
@@ -70,6 +60,13 @@ const CustomerDashboard = () => {
   useEffect(() => {
     fetchDashboardData();
   }, []);
+
+  // Refresh data when screen comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      fetchDashboardData();
+    }, [])
+  );
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -86,7 +83,7 @@ const CustomerDashboard = () => {
       params: { orderId },
     });
   };
-  
+
   const handlePaymentSuccess = async () => {
     Alert.alert(
       "Payment Successful",
@@ -109,8 +106,8 @@ const CustomerDashboard = () => {
     return (
       <SafeAreaContainer scrollable={false}>
         <View className="flex-1 items-center justify-center">
-          <Text className="text-neutral-600 dark:text-neutral-400">Loading dashboard...</Text>
-        </View>
+        <Text className="text-neutral-600 dark:text-neutral-400">Loading dashboard...</Text>
+      </View>
       </SafeAreaContainer>
     );
   }
@@ -119,14 +116,14 @@ const CustomerDashboard = () => {
     return (
       <SafeAreaContainer scrollable={false}>
         <View className="flex-1 items-center justify-center p-4">
-          <Text className="text-red-500 text-center mb-4">{error}</Text>
-          <TouchableOpacity
-            className="bg-red-500 py-2 px-4 rounded-lg"
-            onPress={fetchDashboardData}
-          >
-            <Text className="text-white font-medium">Retry</Text>
-          </TouchableOpacity>
-        </View>
+        <Text className="text-red-500 text-center mb-4">{error}</Text>
+        <TouchableOpacity
+          className="bg-red-500 py-2 px-4 rounded-lg"
+          onPress={fetchDashboardData}
+        >
+          <Text className="text-white font-medium">Retry</Text>
+        </TouchableOpacity>
+      </View>
       </SafeAreaContainer>
     );
   }
@@ -204,7 +201,7 @@ const CustomerDashboard = () => {
           </View>
         </View>
       )}
-      
+
       {/* Booking Card */}
       <BookingCard onBookingInitiated={handleBookingPress} />
 

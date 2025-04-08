@@ -16,6 +16,7 @@ import { authMiddleware } from './middleware/auth';
 import { logger } from './utils/logger';
 import { WebSocketServer } from './websocket/server';
 import { createServer } from 'http';
+import { config } from './config/config';
 
 // Load environment variables
 dotenv.config();
@@ -24,7 +25,13 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: config.corsOrigin,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+  maxAge: 86400, // 24 hours
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

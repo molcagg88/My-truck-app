@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToOne, JoinColumn, OneToMany } from 'typeorm';
-import { Driver } from './Driver';
+import { User } from './User';
+import { Order } from './Order';
 import { Payment } from './Payment';
 import { JobStatus } from '../types/enums';
 import { Bid } from './Bid';
@@ -10,10 +11,18 @@ export class Job {
   id: string;
 
   @Column()
-  title: string;
+  orderId: string;
 
-  @Column('text')
-  description: string;
+  @ManyToOne(() => Order, order => order.jobs)
+  @JoinColumn()
+  order: Order;
+
+  @Column()
+  driverId: string;
+
+  @ManyToOne(() => User, user => user.jobs)
+  @JoinColumn()
+  driver: User;
 
   @Column({
     type: 'varchar',
@@ -29,21 +38,30 @@ export class Job {
   })
   statusTimestamps: Record<string, Date>;
 
-  @Column({ type: 'float' })
+  @Column('decimal', { precision: 10, scale: 2 })
   amount: number;
 
   @Column({ nullable: true })
-  driverId: string;
+  pickupLocation: string;
 
-  @Column()
-  customerId: string;
+  @Column({ nullable: true })
+  destinationLocation: string;
 
-  @ManyToOne(() => Driver, driver => driver.jobs, { nullable: true })
-  @JoinColumn({ name: 'driverId' })
-  driver: Driver | null;
+  @Column({ nullable: true })
+  currentLocation: string;
 
-  @OneToOne(() => Payment, payment => payment.job, { nullable: true })
-  payment: Payment | null;
+  @Column({ nullable: true })
+  estimatedArrivalTime: Date;
+
+  @Column({ nullable: true })
+  actualArrivalTime: Date;
+
+  @Column({ nullable: true })
+  completedAt: Date;
+
+  @OneToOne(() => Payment, payment => payment.job)
+  @JoinColumn()
+  payment: Payment;
 
   @OneToMany(() => Bid, bid => bid.job)
   bids: Bid[];

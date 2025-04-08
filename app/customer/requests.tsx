@@ -1,39 +1,30 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { View, Text, TouchableOpacity, ScrollView, RefreshControl, StyleSheet } from "react-native";
-import { useRouter } from "expo-router";
+import { useRouter, useFocusEffect } from "expo-router";
 import { ArrowLeft, Truck, Clock, MapPin } from "lucide-react-native";
 import { useTheme } from "../_layout";
 import OrderHistoryList from "../components/OrderHistoryList";
 import SafeAreaContainer from "../utils/SafeAreaContainer";
+import storage from "../utils/storage";
+import customerService, { Order } from "../services/customerService";
+import { handleApiError } from "../services/apiUtils";
 
 const RequestsScreen = () => {
   const router = useRouter();
   const { isDarkMode } = useTheme();
-  const [activeOrders, setActiveOrders] = useState<any[]>([]);
+  const [activeOrders, setActiveOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
   const fetchOrders = async () => {
     try {
       setLoading(true);
-      // Read active orders from localStorage
-      const storedActiveOrders = parseInt(localStorage.getItem('activeOrders') || '0', 10);
-      
-      // Create mock orders based on the count
-      const mockActiveOrders = Array(storedActiveOrders).fill(null).map((_, index) => ({
-        id: `order-${index + 1}`,
-        status: 'pending',
-        pickupLocation: 'Sample Location',
-        destinationLocation: 'Sample Location',
-        price: 350,
-        createdAt: new Date().toISOString(),
-        date: new Date().toISOString(),
-        truckType: 'Small Truck'
-      }));
-
-      setActiveOrders(mockActiveOrders);
+      // Fetch active orders from API
+      const orders = await customerService.getActiveOrders();
+      setActiveOrders(orders);
     } catch (error) {
       console.error('Error fetching orders:', error);
+      handleApiError(error);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -43,6 +34,13 @@ const RequestsScreen = () => {
   useEffect(() => {
     fetchOrders();
   }, []);
+
+  // Refresh data when screen comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      fetchOrders();
+    }, [])
+  );
 
   const onRefresh = () => {
     setRefreshing(true);

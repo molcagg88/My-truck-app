@@ -2,6 +2,8 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { I18nManager } from 'react-native';
 import * as Localization from 'expo-localization';
 import storage from '../utils/storage';
+import { getApiBaseUrl } from '../services/apiUtils';
+import axios from 'axios';
 
 interface Translations {
   [key: string]: {
@@ -9,7 +11,17 @@ interface Translations {
   };
 }
 
-const translations: Translations = {
+interface LanguageContextType {
+  language: string;
+  isRTL: boolean;
+  t: (key: string) => string;
+  changeLanguage: (lang: string) => Promise<void>;
+  isLoading: boolean;
+  error: string | null;
+}
+
+// Default translations as fallback
+const defaultTranslations: Translations = {
   en: {
     // Common
     'common.loading': 'Loading...',
@@ -111,21 +123,17 @@ const translations: Translations = {
   },
   am: {
     // Add Amharic translations here
-  },
+  }
 };
-
-interface LanguageContextType {
-  language: string;
-  isRTL: boolean;
-  t: (key: string) => string;
-  changeLanguage: (lang: string) => Promise<void>;
-}
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [language, setLanguage] = useState('en');
   const [isRTL, setIsRTL] = useState(false);
+  const [translations, setTranslations] = useState<Translations>(defaultTranslations);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     loadLanguagePreference();
@@ -133,28 +141,76 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const loadLanguagePreference = async () => {
     try {
+      setIsLoading(true);
+      setError(null);
+      
+      // Get language preference from local storage
       const storedLanguage = await storage.getLanguagePreference();
-      if (storedLanguage) {
-        setLanguage(storedLanguage);
-        setIsRTL(storedLanguage === 'am');
-      } else {
-        const systemLanguage = Localization.locale.split('-')[0];
-        setLanguage(systemLanguage);
-        setIsRTL(systemLanguage === 'am');
-      }
+      const selectedLanguage = storedLanguage || Localization.locale.split('-')[0];
+      
+      // Set language and RTL
+      setLanguage(selectedLanguage);
+      setIsRTL(selectedLanguage === 'am');
+      
+      // Fetch translations from server
+      await fetchTranslations(selectedLanguage);
     } catch (error) {
       console.error('Error loading language preference:', error);
+      setError('Failed to load language settings');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchTranslations = async (lang: string) => {
+    try {
+      // Create API instance for translations
+      const translationApi = axios.create({
+        baseURL: getApiBaseUrl(),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      // Fetch translations from server
+      const response = await translationApi.get(`/translations/${lang}`);
+      
+      if (response.data && response.data.translations) {
+        setTranslations(prev => ({
+          ...prev,
+          [lang]: response.data.translations
+        }));
+      }
+    } catch (error) {
+      console.error('Error fetching translations:', error);
+      // Continue with default translations if server fetch fails
     }
   };
 
   const changeLanguage = async (lang: string) => {
     try {
+      setIsLoading(true);
+      setError(null);
+      
+      // Set language and RTL
       setLanguage(lang);
       setIsRTL(lang === 'am');
+      
+      // Save to local storage
       await storage.setLanguagePreference(lang);
+      
+      // Update RTL setting
       I18nManager.forceRTL(lang === 'am');
+      
+      // Fetch translations if not already loaded
+      if (!translations[lang] || Object.keys(translations[lang]).length === 0) {
+        await fetchTranslations(lang);
+      }
     } catch (error) {
       console.error('Error changing language:', error);
+      setError('Failed to change language');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -167,6 +223,8 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     isRTL,
     t,
     changeLanguage,
+    isLoading,
+    error
   };
 
   return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;

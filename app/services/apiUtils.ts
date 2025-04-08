@@ -86,7 +86,7 @@ export const formatValidationErrors = (error: AxiosError<any>) => {
 // Get the base URL based on the environment
 export const getApiBaseUrl = (): string => {
   if (__DEV__) {
-    return 'http://localhost:3000/api';
+    return 'http://192.168.1.2:3000/api';
   }
   return 'https://api.your-production-domain.com/api';
 };

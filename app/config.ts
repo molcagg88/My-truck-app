@@ -1,5 +1,5 @@
 // API Configuration
-export const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000/api';
+export const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://192.168.1.2:3000/api';
 
 // Development mode flags
 export const IS_DEVELOPMENT = process.env.NODE_ENV === 'development';

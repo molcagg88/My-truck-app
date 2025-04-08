@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 import { User } from './User';
-import { Bid } from './Bid';
+import { Job } from './Job';
 
 export type OrderStatus = 'pending' | 'accepted' | 'in-progress' | 'completed' | 'cancelled' | 'payment_pending';
 
@@ -9,8 +9,12 @@ export class Order {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'uuid' })
+  @Column()
   customerId: string;
+
+  @ManyToOne(() => User, user => user.orders)
+  @JoinColumn()
+  customer: User;
 
   @Column({ type: 'uuid', nullable: true })
   driverId: string;
@@ -21,7 +25,7 @@ export class Order {
   @Column()
   destinationLocation: string;
 
-  @Column()
+  @Column({ nullable: true })
   truckType: string;
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
@@ -46,6 +50,15 @@ export class Order {
   @Column({ default: false })
   isPaid: boolean;
 
+  @Column({ nullable: true })
+  weight: number;
+
+  @Column({ nullable: true })
+  dimensions: string;
+
+  @OneToMany(() => Job, job => job.order)
+  jobs: Job[];
+
   @CreateDateColumn()
   createdAt: Date;
 
@@ -55,7 +68,4 @@ export class Order {
   @ManyToOne(() => User, { nullable: true })
   @JoinColumn({ name: 'driverId' })
   driver: User;
-
-  @OneToMany(() => Bid, bid => bid.order)
-  bids: Bid[];
 } 

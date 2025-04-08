@@ -15,6 +15,7 @@ export class CustomerController {
   private userRepository = AppDataSource.getRepository(User);
   private locationRepository = AppDataSource.getRepository(Location);
   private truckTypeRepository = AppDataSource.getRepository(TruckType);
+  private jobRepository = AppDataSource.getRepository(Job);
 
   // Get customer dashboard stats
   getStats = async (req: Request, res: Response) => {
@@ -272,51 +273,26 @@ export class CustomerController {
     }
   };
 
-  // Add getPendingPayments method
-  getPendingPayments = async (req: Request, res: Response, next: NextFunction) => {
+  // Get pending payments
+  getPendingPayments = async (req: Request, res: Response) => {
     try {
-      const userId = req.user?.id;
-      
-      if (!userId) {
-        throw new AppError('Unauthorized', 401);
+      const customerId = req.user?.id;
+      if (!customerId) {
+        return res.status(401).json({ message: 'Unauthorized' });
       }
-      
-      // Get all jobs with payment_pending status for this customer
-      const jobRepository = AppDataSource.getRepository(Job);
-      const pendingPaymentJobs = await jobRepository.find({
-        where: {
-          customerId: userId,
-          status: JobStatus.PAYMENT_PENDING
-        },
-        relations: ['driver', 'payment'],
-        order: {
-          createdAt: 'DESC'
-        }
-      });
-      
-      // Format the response to include only necessary information
-      const formattedJobs = pendingPaymentJobs.map(job => ({
-        id: job.id,
-        status: job.status,
-        amount: job.amount,
-        driverId: job.driverId,
-        driver: job.driver ? {
-          id: job.driver.id,
-          name: job.driver.name,
-          phone: job.driver.phone,
-          rating: job.driver.rating
-        } : null,
-        createdAt: job.createdAt,
-        updatedAt: job.updatedAt
-      }));
-      
-      return res.status(200).json({
-        status: 'success',
-        results: formattedJobs.length,
-        data: formattedJobs
-      });
+
+      // Get all completed orders for this customer that don't have a payment
+      const orders = await this.orderRepository
+        .createQueryBuilder('order')
+        .where('order.customerId = :customerId', { customerId })
+        .andWhere('order.status = :status', { status: 'completed' })
+        .andWhere('order.isPaid = :isPaid', { isPaid: false })
+        .getMany();
+
+      return res.json(orders);
     } catch (error) {
-      next(error);
+      console.error('Error getting pending payments:', error);
+      return res.status(500).json({ message: 'Internal server error' });
     }
-  };
+  }
 } 

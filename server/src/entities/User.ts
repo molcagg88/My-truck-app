@@ -2,6 +2,8 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateCol
 import bcrypt from 'bcryptjs';
 import { UserRoles } from '../types/enums';
 import { Bid } from './Bid';
+import { Order } from './Order';
+import { Job } from './Job';
 
 export type UserRole = 'customer' | 'driver' | 'admin';
 
@@ -49,6 +51,15 @@ export class User {
 
   @Column({ nullable: true })
   profileImage: string;
+
+  @Column({ nullable: true })
+  address: string;
+
+  @OneToMany(() => Order, order => order.customer)
+  orders: Order[];
+
+  @OneToMany(() => Job, job => job.driver)
+  jobs: Job[];
 
   @CreateDateColumn()
   createdAt: Date;

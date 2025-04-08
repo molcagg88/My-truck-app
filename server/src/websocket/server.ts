@@ -2,11 +2,20 @@ import { Server } from 'http';
 import WebSocket from 'ws';
 import jwt from 'jsonwebtoken';
 import { config } from '../config/config';
+import { IncomingMessage } from 'http';
 
+// Extend WebSocket interface to include our custom properties
 interface WebSocketClient extends WebSocket {
   userId?: string;
   userType?: string;
   isAlive?: boolean;
+  close(code?: number, data?: string | Buffer): void;
+  terminate(): void;
+  ping(data?: any, mask?: boolean, cb?: (err: Error) => void): void;
+  pong(data?: any, mask?: boolean, cb?: (err: Error) => void): void;
+  send(data: any, cb?: (err?: Error) => void): void;
+  on(event: string, listener: (...args: any[]) => void): this;
+  readyState: number;
 }
 
 interface Message {
@@ -35,7 +44,7 @@ export class WebSocketServer {
    * Initialize WebSocket server and setup connection handling
    */
   private setupWebSocketServer() {
-    this.wss.on('connection', (ws: WebSocketClient, req) => {
+    this.wss.on('connection', (ws: WebSocketClient, req: IncomingMessage) => {
       console.log('WebSocket client connected');
       
       // Parse token from URL
@@ -211,7 +220,7 @@ export class WebSocketServer {
   public broadcast(type: string, data: any) {
     const message = { type, ...data, timestamp: new Date().toISOString() };
     
-    this.wss.clients.forEach(client => {
+    this.wss.clients.forEach((client: WebSocketClient) => {
       if (client.readyState === WebSocket.OPEN) {
         client.send(JSON.stringify(message));
       }
