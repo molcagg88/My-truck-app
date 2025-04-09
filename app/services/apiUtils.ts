@@ -85,10 +85,15 @@ export const formatValidationErrors = (error: AxiosError<any>) => {
 
 // Get the base URL based on the environment
 export const getApiBaseUrl = (): string => {
+  // In development, try to use the local IP address
   if (__DEV__) {
-    return 'http://192.168.1.2:3000/api';
+    // For development, use the local network IP
+    // This works for both physical devices and emulators
+    return 'http://172.20.30.126:3000/api';
   }
-  return 'https://api.your-production-domain.com/api';
+  
+  // In production, use the production API URL
+  return process.env.EXPO_PUBLIC_API_URL || 'https://api.your-production-domain.com/api';
 };
 
 // Format currency

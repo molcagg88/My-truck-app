@@ -97,10 +97,28 @@ const geezSMSService = {
       };
     } catch (error: any) {
       console.error('Error sending OTP:', error);
-      return {
-        success: false,
-        error: error.response?.data?.message || "Failed to send OTP. Please try again.",
-      };
+      
+      // Provide more specific error messages based on the error type
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        return {
+          success: false,
+          error: error.response.data?.message || `Server error: ${error.response.status}`,
+        };
+      } else if (error.request) {
+        // The request was made but no response was received
+        return {
+          success: false,
+          error: "No response from server. Please check your internet connection.",
+        };
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        return {
+          success: false,
+          error: error.message || "Failed to send OTP. Please try again.",
+        };
+      }
     }
   },
 

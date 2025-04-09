@@ -375,25 +375,49 @@ export class AuthController {
       const normalizedPhone = this.normalizePhoneNumber(phone);
       console.log(`Sending OTP to normalized phone: ${normalizedPhone}`);
       
-      // In a real implementation, we would call a SMS gateway service
-      // For development, we just simulate OTP sending
-      console.log(`[DEV] Sending OTP to ${normalizedPhone}`);
+      // Check if we're in development mode
+      const isDevMode = process.env.NODE_ENV === 'development' || process.env.EXPO_PUBLIC_DEV_MODE === 'true';
       
-      // Return success with the normalized phone to ensure consistency in the client
-      res.json({
-        success: true,
-        message: 'OTP sent successfully',
-        data: {
-          otpId: 'otp-id',
-          expiresIn: 300, // 5 minutes
-          phone: normalizedPhone, // Return the normalized phone
+      if (isDevMode) {
+        // In development mode, simulate OTP sending
+        console.log(`[DEV] Sending OTP to ${normalizedPhone}`);
+        
+        // Return success with the normalized phone to ensure consistency in the client
+        return res.json({
+          success: true,
+          message: 'OTP sent successfully (Development Mode)',
+          data: {
+            otpId: 'dev-otp-id',
+            expiresIn: 300, // 5 minutes
+            phone: normalizedPhone,
+            // In dev mode, include the test OTP code
+            testOtp: '123456'
+          }
+        });
+      } else {
+        // In production mode, validate GeezSMS API key
+        const geezSmsApiKey = process.env.GEEZSMS_API_KEY;
+        if (!geezSmsApiKey || geezSmsApiKey === 'your_api_key_here') {
+          console.error('GeezSMS API key not configured');
+          return res.status(500).json({
+            success: false,
+            message: 'SMS service not configured properly'
+          });
         }
-      });
+        
+        // TODO: Implement actual GeezSMS API call here
+        // For now, return an error
+        return res.status(500).json({
+          success: false,
+          message: 'SMS service not implemented yet'
+        });
+      }
     } catch (error) {
       console.error('Error sending OTP:', error);
       res.status(500).json({ 
         success: false, 
-        message: 'Failed to send OTP' 
+        message: 'Failed to send OTP',
+        error: error instanceof Error ? error.message : 'Unknown error'
       });
     }
   };

@@ -31,5 +31,5 @@ export const config: Config = {
     database: process.env.DB_NAME || 'truck_app',
   },
   wsPort: parseInt(process.env.WS_PORT || '3001', 10),
-  corsOrigin: (process.env.CORS_ORIGIN || 'http://localhost:3000,http://192.168.1.2:3000,exp://192.168.1.2:19000').split(','),
+  corsOrigin: (process.env.CORS_ORIGIN || 'http://localhost:3000,http://172.20.30.126:3000,exp://172.20.30.126:19000').split(','),
 }; 

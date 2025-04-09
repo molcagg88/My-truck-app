@@ -1677,3 +1677,80 @@
 {"level":"info","message":"POST /api/auth/check-phone","timestamp":"2025-04-08T14:50:22.282Z"}
 {"level":"info","message":"POST /api/auth/send-otp","timestamp":"2025-04-08T14:50:22.317Z"}
 {"level":"info","message":"POST /api/auth/verify-otp","timestamp":"2025-04-08T14:50:26.679Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-08T14:57:39.774Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-08T14:57:39.792Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-08T14:57:39.795Z"}
+{"level":"info","message":"🔌 WebSocket server initialized","timestamp":"2025-04-08T14:57:39.798Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-08T14:58:42.726Z"}
+{"level":"info","message":"POST /api/auth/check-phone","timestamp":"2025-04-08T14:58:49.273Z"}
+{"level":"info","message":"POST /api/auth/send-otp","timestamp":"2025-04-08T14:58:49.312Z"}
+{"level":"info","message":"POST /api/auth/verify-otp","timestamp":"2025-04-08T14:58:52.731Z"}
+{"level":"info","message":"GET /api/customer/stats","timestamp":"2025-04-08T14:58:53.180Z"}
+{"level":"info","message":"GET /api/customer/stats","timestamp":"2025-04-08T14:58:53.201Z"}
+{"level":"info","message":"GET /api/customer/orders/active","timestamp":"2025-04-08T14:58:53.590Z"}
+{"level":"info","message":"GET /api/customer/orders/history?page=1&limit=10","timestamp":"2025-04-08T14:58:53.710Z"}
+{"level":"info","message":"GET /api/customer/orders/active","timestamp":"2025-04-08T14:58:53.729Z"}
+{"level":"info","message":"GET /api/customer/orders/history?page=1&limit=10","timestamp":"2025-04-08T14:58:53.882Z"}
+{"level":"info","message":"GET /api/customer/payments/pending","timestamp":"2025-04-08T14:58:53.914Z"}
+{"level":"info","message":"GET /api/customer/payments/pending","timestamp":"2025-04-08T14:58:54.246Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-09T04:28:17.800Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-09T04:28:17.809Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-09T04:28:17.810Z"}
+{"level":"info","message":"🔌 WebSocket server initialized","timestamp":"2025-04-09T04:28:17.811Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-09T04:44:42.221Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-09T04:44:42.235Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-09T04:44:42.237Z"}
+{"level":"info","message":"🔌 WebSocket server initialized","timestamp":"2025-04-09T04:44:42.240Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-09T04:45:17.641Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-09T04:45:17.648Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-09T04:45:17.649Z"}
+{"level":"info","message":"🔌 WebSocket server initialized","timestamp":"2025-04-09T04:45:17.651Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-09T07:29:01.654Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-09T07:29:01.664Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-09T07:29:01.665Z"}
+{"level":"info","message":"API also available at http://192.168.1.2:3000/api","timestamp":"2025-04-09T07:29:01.666Z"}
+{"level":"info","message":"🔌 WebSocket server initialized","timestamp":"2025-04-09T07:29:01.669Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-09T07:33:51.353Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-09T07:33:51.368Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-09T07:33:51.370Z"}
+{"level":"info","message":"API also available at http://192.168.1.2:3000/api","timestamp":"2025-04-09T07:33:51.372Z"}
+{"level":"info","message":"🔌 WebSocket server initialized","timestamp":"2025-04-09T07:33:51.374Z"}
+{"level":"info","message":"GET /api/health","timestamp":"2025-04-09T07:34:11.888Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-09T07:35:10.856Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-09T07:35:10.864Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-09T07:35:10.865Z"}
+{"level":"info","message":"API also available at http://192.168.1.2:3000/api","timestamp":"2025-04-09T07:35:10.867Z"}
+{"level":"info","message":"🔌 WebSocket server initialized","timestamp":"2025-04-09T07:35:10.871Z"}
+{"level":"info","message":"GET /api/health","timestamp":"2025-04-09T07:35:26.236Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-09T07:36:21.633Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-09T07:36:21.643Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-09T07:36:21.644Z"}
+{"level":"info","message":"API also available at http://172.20.30.126:3000/api","timestamp":"2025-04-09T07:36:21.646Z"}
+{"level":"info","message":"🔌 WebSocket server initialized","timestamp":"2025-04-09T07:36:21.647Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-09T07:37:29.490Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-09T07:37:29.505Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-09T07:37:29.507Z"}
+{"level":"info","message":"API also available at http://172.20.30.126:3000/api","timestamp":"2025-04-09T07:37:29.514Z"}
+{"level":"info","message":"🔌 WebSocket server initialized","timestamp":"2025-04-09T07:37:29.520Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-09T07:37:34.086Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-09T07:37:34.105Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-09T07:37:34.120Z"}
+{"level":"info","message":"API also available at http://172.20.30.126:3000/api","timestamp":"2025-04-09T07:37:34.122Z"}
+{"level":"info","message":"🔌 WebSocket server initialized","timestamp":"2025-04-09T07:37:34.125Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-09T07:39:00.585Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-09T07:39:00.601Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-09T07:39:00.603Z"}
+{"level":"info","message":"API also available at http://172.20.30.126:3000/api","timestamp":"2025-04-09T07:39:00.605Z"}
+{"level":"info","message":"🔌 WebSocket server initialized","timestamp":"2025-04-09T07:39:00.607Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-09T07:41:17.340Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-09T07:41:17.358Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-09T07:41:17.360Z"}
+{"level":"info","message":"API also available at http://172.20.30.126:3000/api","timestamp":"2025-04-09T07:41:17.361Z"}
+{"level":"info","message":"🔌 WebSocket server initialized","timestamp":"2025-04-09T07:41:17.364Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-09T07:41:23.734Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-09T07:41:32.316Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-09T07:41:40.684Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-09T07:43:39.850Z"}
+{"level":"info","message":"POST /api/auth/check-phone","timestamp":"2025-04-09T07:43:50.856Z"}
+{"level":"info","message":"POST /api/auth/send-otp","timestamp":"2025-04-09T07:43:50.903Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-09T07:44:59.879Z"}

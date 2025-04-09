@@ -26,9 +26,11 @@ const port = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors({
-  origin: config.corsOrigin,
+  origin: process.env.NODE_ENV === 'development' 
+    ? true  // Allow all origins in development
+    : config.corsOrigin,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
   credentials: true,
   maxAge: 86400, // 24 hours
 }));
@@ -106,6 +108,7 @@ AppDataSource.initialize()
     server.listen(port, () => {
       logger.info(`Server is running on port ${port}`);
       logger.info(`API available at http://localhost:${port}/api`);
+      logger.info(`API also available at http://172.20.30.126:${port}/api`);
       
       // Initialize WebSocket server after HTTP server is running
       wss = new WebSocketServer(server);
