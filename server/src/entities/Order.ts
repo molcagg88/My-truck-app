@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 import { User } from './User';
 import { Job } from './Job';
+import { Bid } from './Bid';
 
 export type OrderStatus = 'pending' | 'accepted' | 'in-progress' | 'completed' | 'cancelled' | 'payment_pending';
 
@@ -58,6 +59,9 @@ export class Order {
 
   @OneToMany(() => Job, job => job.order)
   jobs: Job[];
+
+  @OneToMany(() => Bid, bid => bid.order)
+  bids: Bid[];
 
   @CreateDateColumn()
   createdAt: Date;

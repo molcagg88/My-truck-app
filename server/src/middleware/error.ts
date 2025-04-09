@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { EntityNotFoundError, QueryFailedError } from 'typeorm';
 import { logger } from '../utils/logger';
+import sentry from '../config/sentry';
 
 export class AppError extends Error {
   statusCode: number;
@@ -56,6 +57,16 @@ export const errorHandler = (
   res: Response,
   next: NextFunction
 ) => {
+  // Log the error to Sentry
+  sentry.captureException(err, {
+    url: req.url,
+    method: req.method,
+    body: req.body,
+    params: req.params,
+    query: req.query,
+    headers: req.headers,
+  });
+
   if (err instanceof AppError) {
     return res.status(err.statusCode).json({
       status: err.status,

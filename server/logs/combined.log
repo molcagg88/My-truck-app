@@ -1754,3 +1754,56 @@
 {"level":"info","message":"POST /api/auth/check-phone","timestamp":"2025-04-09T07:43:50.856Z"}
 {"level":"info","message":"POST /api/auth/send-otp","timestamp":"2025-04-09T07:43:50.903Z"}
 {"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-09T07:44:59.879Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-09T07:45:08.352Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-09T07:45:08.363Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-09T07:45:08.364Z"}
+{"level":"info","message":"API also available at http://172.20.30.126:3000/api","timestamp":"2025-04-09T07:45:08.366Z"}
+{"level":"info","message":"🔌 WebSocket server initialized","timestamp":"2025-04-09T07:45:08.369Z"}
+{"level":"info","message":"POST /api/auth/check-phone","timestamp":"2025-04-09T07:45:51.273Z"}
+{"level":"info","message":"POST /api/auth/send-otp","timestamp":"2025-04-09T07:45:51.473Z"}
+{"level":"info","message":"POST /api/auth/verify-otp","timestamp":"2025-04-09T07:45:54.580Z"}
+{"level":"info","message":"GET /api/customer/stats","timestamp":"2025-04-09T07:45:55.141Z"}
+{"level":"info","message":"GET /api/customer/stats","timestamp":"2025-04-09T07:45:55.473Z"}
+{"level":"info","message":"GET /api/customer/orders/active","timestamp":"2025-04-09T07:45:55.507Z"}
+{"level":"info","message":"GET /api/customer/orders/history?page=1&limit=10","timestamp":"2025-04-09T07:45:55.600Z"}
+{"level":"info","message":"GET /api/customer/payments/pending","timestamp":"2025-04-09T07:45:55.691Z"}
+{"level":"info","message":"GET /api/customer/orders/active","timestamp":"2025-04-09T07:45:55.713Z"}
+{"level":"info","message":"GET /api/customer/orders/history?page=1&limit=10","timestamp":"2025-04-09T07:45:55.912Z"}
+{"level":"info","message":"GET /api/customer/payments/pending","timestamp":"2025-04-09T07:45:56.035Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-04-09T08:19:42.777Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-04-09T08:19:42.792Z"}
+{"level":"info","message":"API available at http://localhost:3000/api","timestamp":"2025-04-09T08:19:42.795Z"}
+{"level":"info","message":"API also available at http://172.20.30.126:3000/api","timestamp":"2025-04-09T08:19:42.796Z"}
+{"level":"info","message":"🔌 WebSocket server initialized","timestamp":"2025-04-09T08:19:42.798Z"}
+{"level":"info","message":"GET /api/auth/me","timestamp":"2025-04-09T08:22:35.515Z"}
+{"level":"info","message":"POST /api/auth/check-phone","timestamp":"2025-04-09T08:22:44.347Z"}
+{"level":"info","message":"POST /api/auth/send-otp","timestamp":"2025-04-09T08:22:44.445Z"}
+{"level":"info","message":"POST /api/auth/verify-otp","timestamp":"2025-04-09T08:22:47.889Z"}
+{"level":"info","message":"GET /api/customer/stats","timestamp":"2025-04-09T08:22:48.409Z"}
+{"level":"info","message":"GET /api/customer/stats","timestamp":"2025-04-09T08:22:48.724Z"}
+{"level":"info","message":"GET /api/customer/orders/active","timestamp":"2025-04-09T08:22:48.775Z"}
+{"level":"info","message":"GET /api/customer/orders/history?page=1&limit=10","timestamp":"2025-04-09T08:22:48.924Z"}
+{"level":"info","message":"GET /api/customer/payments/pending","timestamp":"2025-04-09T08:22:49.035Z"}
+{"level":"info","message":"GET /api/customer/orders/active","timestamp":"2025-04-09T08:22:49.093Z"}
+{"level":"info","message":"GET /api/customer/orders/history?page=1&limit=10","timestamp":"2025-04-09T08:22:49.251Z"}
+{"level":"info","message":"GET /api/customer/payments/pending","timestamp":"2025-04-09T08:22:49.345Z"}
+{"level":"info","message":"POST /api/auth/check-phone","timestamp":"2025-04-09T08:51:04.551Z"}
+{"level":"info","message":"POST /api/auth/send-otp","timestamp":"2025-04-09T08:51:04.770Z"}
+{"level":"info","message":"POST /api/auth/check-phone","timestamp":"2025-04-09T08:58:40.857Z"}
+{"level":"info","message":"POST /api/auth/send-otp","timestamp":"2025-04-09T08:58:41.048Z"}
+{"level":"info","message":"POST /api/auth/verify-otp","timestamp":"2025-04-09T08:58:49.623Z"}
+{"level":"info","message":"GET /api/customer/stats","timestamp":"2025-04-09T08:58:50.102Z"}
+{"level":"info","message":"GET /api/customer/stats","timestamp":"2025-04-09T08:58:50.364Z"}
+{"level":"info","message":"GET /api/customer/orders/active","timestamp":"2025-04-09T08:58:50.380Z"}
+{"level":"info","message":"GET /api/customer/orders/history?page=1&limit=10","timestamp":"2025-04-09T08:58:50.479Z"}
+{"level":"info","message":"GET /api/customer/payments/pending","timestamp":"2025-04-09T08:58:50.562Z"}
+{"level":"info","message":"GET /api/customer/orders/active","timestamp":"2025-04-09T08:58:50.731Z"}
+{"level":"info","message":"GET /api/customer/orders/history?page=1&limit=10","timestamp":"2025-04-09T08:58:50.820Z"}
+{"level":"info","message":"GET /api/customer/payments/pending","timestamp":"2025-04-09T08:58:50.907Z"}
+{"level":"info","message":"GET /api/customer/orders/active","timestamp":"2025-04-09T08:58:56.399Z"}
+{"level":"info","message":"GET /api/customer/orders/active","timestamp":"2025-04-09T08:58:56.530Z"}
+{"level":"info","message":"GET /api/customer/stats","timestamp":"2025-04-09T08:59:00.081Z"}
+{"level":"info","message":"GET /api/customer/orders/active","timestamp":"2025-04-09T08:59:00.280Z"}
+{"level":"info","message":"GET /api/customer/orders/history?page=1&limit=10","timestamp":"2025-04-09T08:59:00.362Z"}
+{"level":"info","message":"GET /api/customer/payments/pending","timestamp":"2025-04-09T08:59:00.443Z"}
+{"level":"info","message":"POST /api/orders","timestamp":"2025-04-09T08:59:11.976Z"}

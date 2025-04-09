@@ -6,6 +6,7 @@ import { AppDataSource } from '../config/database';
 import { User } from '../entities/User';
 import bcrypt from 'bcryptjs';
 import { config } from '../config/config';
+import sentry from '../config/sentry';
 
 declare global {
   namespace Express {
@@ -109,6 +110,10 @@ export const authMiddleware = async (
       
       console.log('User found:', user.id);
       req.user = user;
+      
+      // Set user context in Sentry
+      sentry.setUserContext(user.id, user.email, user.name);
+      
       next();
     } catch (error: any) {
       console.error('JWT verification error:', error.message);

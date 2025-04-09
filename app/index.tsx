@@ -5,6 +5,7 @@ import { useTheme } from "./_layout";
 import { ArrowRight } from "lucide-react-native";
 import SafeAreaContainer from "./utils/SafeAreaContainer";
 import { Ionicons } from "@expo/vector-icons";
+import * as Sentry from '@sentry/react-native';
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -15,7 +16,16 @@ export default function HomeScreen() {
   
   // Determine if we should use the native driver (not supported on web)
   const useNative = Platform.OS !== 'web';
+// Initialize Sentry
+  Sentry.init({
+    dsn: 'https://your-dsn-key@sentry.io/project-id',
+    enableNative: true,
+    debug: true, // optional: shows logs in dev
+    enableInExpoDevelopment: true,
+  });
 
+  // Send test error on startup
+  Sentry.captureException(new Error('Test error from index.tsx'));
   useEffect(() => {
     Animated.parallel([
       Animated.timing(fadeAnim, {

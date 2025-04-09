@@ -11,12 +11,16 @@ import paymentRoutes from './routes/paymentRoutes';
 import locationRoutes from './routes/locationRoutes';
 import jobRoutes from './routes/job';
 import biddingRoutes from './routes/bidding';
+import orderRoutes from './routes/order';
 import { errorHandler } from './middleware/error';
 import { authMiddleware } from './middleware/auth';
 import { logger } from './utils/logger';
 import { WebSocketServer } from './websocket/server';
 import { createServer } from 'http';
 import { config } from './config/config';
+import sentry from './config/sentry';
+import helmet from 'helmet';
+import morgan from 'morgan';
 
 // Load environment variables
 dotenv.config();
@@ -24,7 +28,11 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 3000;
 
+// Initialize Sentry
+sentry.init();
+
 // Middleware
+app.use(helmet()); // Security headers
 app.use(cors({
   origin: process.env.NODE_ENV === 'development' 
     ? true  // Allow all origins in development
@@ -36,6 +44,12 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(morgan('dev')); // Request logging
+
+// Add Sentry request handler only if Sentry is enabled
+if (sentry.requestHandler) {
+  app.use(sentry.requestHandler());
+}
 
 // Simple logger for requests
 app.use((req, res, next) => {
@@ -53,6 +67,7 @@ app.use('/api/customer', authMiddleware, customerRoutes);
 app.use('/api/driver', authMiddleware, driverRoutes);
 app.use('/api/jobs', authMiddleware, jobRoutes);
 app.use('/api/bidding', biddingRoutes);
+app.use('/api/orders', authMiddleware, orderRoutes); // Add order routes
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -76,6 +91,7 @@ app.get('/api', (req, res) => {
       '/api/customer',
       '/api/driver',
       '/api/payments',
+      '/api/orders',
     ]
   });
 });
@@ -83,7 +99,12 @@ app.get('/api', (req, res) => {
 // Register routes
 app.use('/api/location', locationRoutes);
 
-// Error handling middleware
+// Add Sentry error handler only if Sentry is enabled
+if (sentry.errorHandler) {
+  app.use(sentry.errorHandler());
+}
+
+// Global error handler
 app.use(errorHandler);
 
 // Handle 404 routes

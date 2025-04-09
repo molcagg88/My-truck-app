@@ -13,6 +13,15 @@ import "../global.css";
 import { Platform, useColorScheme } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AuthProvider } from "./auth/authContext";
+import { initSentry } from './services/sentry';
+import * as Sentry from '@sentry/react-native';
+
+Sentry.init({
+  dsn: 'https://9bfcd75eddfb9d73f4c8d811215f229d@o4509122361556992.ingest.de.sentry.io/4509122363392080',
+
+  // uncomment the line below to enable Spotlight (https://spotlightjs.com)
+  // spotlight: __DEV__,
+});
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -31,7 +40,7 @@ const ThemeContext = createContext<ThemeContextType>({
 // Custom hook to use theme
 export const useTheme = () => useContext(ThemeContext);
 
-export default function RootLayout() {
+export default Sentry.wrap(function RootLayout() {
   // Get device color scheme
   const colorScheme = useColorScheme();
   const [isDarkMode, setIsDarkMode] = useState(colorScheme === 'dark');
@@ -91,6 +100,11 @@ export default function RootLayout() {
       SplashScreen.hideAsync();
     }
   }, [loaded]);
+
+  // Initialize Sentry
+  useEffect(() => {
+    initSentry();
+  }, []);
 
   if (!loaded) {
     return null;
@@ -227,4 +241,4 @@ export default function RootLayout() {
       </ThemeContext.Provider>
     </AuthProvider>
   );
-}
+});
