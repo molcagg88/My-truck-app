@@ -11,7 +11,7 @@ export const initSentry = () => {
   }
 
   Sentry.init({
-    dsn: Constants.expoConfig?.extra?.sentryDsn || 'YOUR_SENTRY_DSN',
+    dsn: process.env.EXPO_PUBLIC_SENTRY_DSN || 'https://9bfcd75eddfb9d73f4c8d811215f229d@o4509122361556992.ingest.de.sentry.io/4509122363392080',
     // Enable performance monitoring
     enableAutoSessionTracking: true,
     // Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
@@ -27,10 +27,8 @@ export const initSentry = () => {
     // Enable native symbol upload
     enableNativeCrashHandling: true,
     // Set release and distribution
-    release: Constants.expoConfig?.version || '1.0.0',
-    dist: Constants.expoConfig?.runtimeVersion || '1',
-    // Set platform
-    platform: Platform.OS,
+    release: String(Constants.expoConfig?.version || '1.0.0'),
+    dist: String(Constants.expoConfig?.runtimeVersion || '1'),
   });
 
   // Set user context when available

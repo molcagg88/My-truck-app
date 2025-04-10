@@ -85,15 +85,19 @@ export const formatValidationErrors = (error: AxiosError<any>) => {
 
 // Get the base URL based on the environment
 export const getApiBaseUrl = (): string => {
-  // In development, try to use the local IP address
+  // First check for environment variable
+  if (process.env.EXPO_PUBLIC_API_URL) {
+    return process.env.EXPO_PUBLIC_API_URL;
+  }
+
+  // In development, try to use localhost first
   if (__DEV__) {
-    // For development, use the local network IP
-    // This works for both physical devices and emulators
-    return 'http://172.20.30.126:3000/api';
+    // Try localhost first
+    return 'http://localhost:3000/api';
   }
   
-  // In production, use the production API URL
-  return process.env.EXPO_PUBLIC_API_URL || 'https://api.your-production-domain.com/api';
+  // Fallback to production URL
+  return 'https://api.my-truck-app.com/api';
 };
 
 // Format currency

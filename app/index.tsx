@@ -6,6 +6,7 @@ import { ArrowRight } from "lucide-react-native";
 import SafeAreaContainer from "./utils/SafeAreaContainer";
 import { Ionicons } from "@expo/vector-icons";
 import * as Sentry from '@sentry/react-native';
+import Constants from 'expo-constants';
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -16,12 +17,13 @@ export default function HomeScreen() {
   
   // Determine if we should use the native driver (not supported on web)
   const useNative = Platform.OS !== 'web';
-// Initialize Sentry
+  
+  // Initialize Sentry
   Sentry.init({
-    dsn: 'https://your-dsn-key@sentry.io/project-id',
+    dsn: process.env.EXPO_PUBLIC_SENTRY_DSN || 'https://9bfcd75eddfb9d73f4c8d811215f229d@o4509122361556992.ingest.de.sentry.io/4509122363392080',
     enableNative: true,
     debug: true, // optional: shows logs in dev
-    enableInExpoDevelopment: true,
+    //enableInExpoDevelopment: false,
   });
 
   // Send test error on startup

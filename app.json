@@ -32,22 +32,12 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
-      ],
-      [
-        "@sentry/react-native/expo",
-        {
-          "url": "https://sentry.io/",
-          "project": "react-native",
-          "organization": "kabaa"
-        }
       ]
     ],
     "experiments": {
       "typedRoutes": true
     },
     "extra": {
-      "apiUrl": "https://api.my-truck-app.com/api",
-      "devApiUrl": "http://172.20.30.126:3000/api",
       "eas": {
         "projectId": "your-eas-project-id"
       }

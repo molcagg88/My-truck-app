@@ -16,9 +16,9 @@ import { AuthProvider } from "./auth/authContext";
 import { initSentry } from './services/sentry';
 import * as Sentry from '@sentry/react-native';
 
+// Initialize Sentry
 Sentry.init({
-  dsn: 'https://9bfcd75eddfb9d73f4c8d811215f229d@o4509122361556992.ingest.de.sentry.io/4509122363392080',
-
+  dsn: process.env.EXPO_PUBLIC_SENTRY_DSN || 'https://9bfcd75eddfb9d73f4c8d811215f229d@o4509122361556992.ingest.de.sentry.io/4509122363392080',
   // uncomment the line below to enable Spotlight (https://spotlightjs.com)
   // spotlight: __DEV__,
 });
